@@ -66,4 +66,5 @@ urlpatterns = [
 path("bus-owner-requests/", views.admin_bus_owner_requests, name="admin_bus_owner_requests"),
 path("approved-bus-owners/", views.admin_approved_bus_owners, name="admin_approved_bus_owners"),
 path("approve-owner/<int:owner_id>/", views.approve_bus_owner, name="approve_bus_owner"),
+path('complaint/<int:complaint_id>/', views.admin_complaint_detail, name='admin_complaint_detail'),
 ]

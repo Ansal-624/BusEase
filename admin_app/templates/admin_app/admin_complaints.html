@@ -29,7 +29,7 @@
   }
 
   .gov-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
   }
@@ -316,21 +316,64 @@
 
   /* Subject Cell */
   .gov-subject {
-    max-width: 300px;
+    max-width: 250px;
   }
 
   .gov-subject-text {
-    font-weight: 500;
-    color: #333;
+    font-weight: 600;
+    color: var(--gov-primary);
     margin-bottom: 5px;
   }
 
   .gov-subject-preview {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #666;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .gov-subject-preview i {
+    color: var(--gov-secondary);
+  }
+
+  /* Description Preview */
+  .gov-description-preview {
+    max-width: 200px;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.4;
+    margin-top: 5px;
+    padding: 5px 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 2px solid var(--gov-secondary);
+  }
+
+  /* Attachment Link */
+  .gov-attachment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #f0f4ff;
+    color: var(--gov-primary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid var(--gov-primary);
+    margin-top: 5px;
+  }
+
+  .gov-attachment-link:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+  }
+
+  .gov-attachment-link i {
+    font-size: 0.8rem;
   }
 
   /* Date Cell */
@@ -375,34 +418,43 @@
     border-color: #17a2b8;
   }
 
-  .gov-status-resolved {
+  .gov-status-action {
     background: rgba(40, 167, 69, 0.15);
     color: #28a745;
     border-color: #28a745;
   }
 
-  .gov-status-rejected {
+  .gov-status-invalid {
     background: rgba(220, 53, 69, 0.15);
     color: #dc3545;
     border-color: #dc3545;
   }
 
-  /* Action Button */
+  /* Action Buttons Group */
+  .gov-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 100px;
+  }
+
   .gov-action-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     background: var(--gov-primary);
     color: var(--gov-secondary);
     border: 2px solid var(--gov-secondary);
     border-radius: 8px;
-    padding: 8px 16px;
+    padding: 8px 12px;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
     text-decoration: none;
+    width: 100%;
   }
 
   .gov-action-btn:hover {
@@ -414,6 +466,16 @@
 
   .gov-action-btn i {
     font-size: 0.9rem;
+  }
+
+  .gov-view-btn {
+    background: var(--gov-info);
+    border-color: var(--gov-info);
+    color: white;
+  }
+
+  .gov-view-btn:hover {
+    background: #138496;
   }
 
   /* Empty State */
@@ -455,6 +517,12 @@
   }
 
   /* Responsive */
+  @media (max-width: 1200px) {
+    .gov-table td {
+      min-width: 150px;
+    }
+  }
+
   @media (max-width: 992px) {
     .gov-stats-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -471,8 +539,13 @@
       grid-template-columns: 1fr;
     }
 
-    .gov-table td {
-      min-width: 150px;
+    .gov-action-group {
+      flex-direction: row;
+      min-width: auto;
+    }
+
+    .gov-action-btn {
+      width: auto;
     }
   }
 
@@ -530,7 +603,6 @@
 
     <!-- Stats Cards -->
     <div class="gov-stats-grid">
-
       <!-- Pending Complaints -->
       <a href="{% url 'complaints_by_status' 'Pending' %}" class="gov-stat-card">
         <div class="gov-stat-icon">
@@ -538,7 +610,7 @@
         </div>
         <div class="gov-stat-content">
           <div class="gov-stat-label">Pending Complaints</div>
-          <div class="gov-stat-number">{{ pending_complaints|default:"0" }}</div>
+          <div class="gov-stat-number">{{ pending_count|default:"0" }}</div>
         </div>
       </a>
 
@@ -549,21 +621,20 @@
         </div>
         <div class="gov-stat-content">
           <div class="gov-stat-label">Checking Complaints</div>
-          <div class="gov-stat-number">{{ checking_complaints|default:"0" }}</div>
+          <div class="gov-stat-number">{{ checking_count|default:"0" }}</div>
         </div>
       </a>
 
-      <!-- Resolved Complaints -->
-      <a href="{% url 'complaints_by_status' 'Resolved' %}" class="gov-stat-card">
+      <!-- Action/Resolved Complaints -->
+      <a href="{% url 'complaints_by_status' 'Action' %}" class="gov-stat-card">
         <div class="gov-stat-icon">
           <i class="bi bi-check-circle"></i>
         </div>
         <div class="gov-stat-content">
-          <div class="gov-stat-label">Resolved Complaints</div>
-          <div class="gov-stat-number">{{ resolved_complaints|default:"0" }}</div>
+          <div class="gov-stat-label">Action/Resolved</div>
+          <div class="gov-stat-number">{{ action_count|default:"0" }}</div>
         </div>
       </a>
-
     </div>
 
     <!-- Complaints Table Card -->
@@ -586,6 +657,8 @@
                 <th>#</th>
                 <th>Traveller</th>
                 <th>Subject</th>
+                <th>Description</th>
+                <th>Attachment</th>
                 <th>Date Filed</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -607,12 +680,26 @@
                 </td>
                 <td>
                   <div class="gov-subject">
-                    <div class="gov-subject-text">{{ c.subject|truncatechars:50 }}</div>
+                    <div class="gov-subject-text">{{ c.subject|truncatechars:30 }}</div>
                     <div class="gov-subject-preview">
-                      <i class="bi bi-clock" style="color: var(--gov-secondary); font-size: 0.7rem;"></i>
+                      <i class="bi bi-clock"></i>
                       {{ c.created_at|timesince }} ago
                     </div>
                   </div>
+                </td>
+                <td>
+                  <div class="gov-description-preview">
+                    {{ c.description|truncatechars:50 }}
+                  </div>
+                </td>
+                <td>
+                  {% if c.attachment %}
+                    <a href="{{ c.attachment.url }}" target="_blank" class="gov-attachment-link">
+                      <i class="bi bi-paperclip"></i> View
+                    </a>
+                  {% else %}
+                    <span style="color: #999; font-size: 0.8rem;">No file</span>
+                  {% endif %}
                 </td>
                 <td>
                   <div class="gov-date">
@@ -629,13 +716,13 @@
                     <span class="gov-status-badge gov-status-checking">
                       <i class="bi bi-search"></i> Checking
                     </span>
-                  {% elif c.status == "Resolved" %}
-                    <span class="gov-status-badge gov-status-resolved">
-                      <i class="bi bi-check-circle"></i> Resolved
+                  {% elif c.status == "Action" %}
+                    <span class="gov-status-badge gov-status-action">
+                      <i class="bi bi-check-circle"></i> Action
                     </span>
-                  {% elif c.status == "Rejected" %}
-                    <span class="gov-status-badge gov-status-rejected">
-                      <i class="bi bi-x-circle"></i> Rejected
+                  {% elif c.status == "Invalid" %}
+                    <span class="gov-status-badge gov-status-invalid">
+                      <i class="bi bi-x-circle"></i> Invalid
                     </span>
                   {% else %}
                     <span class="gov-status-badge gov-status-pending">
@@ -644,9 +731,14 @@
                   {% endif %}
                 </td>
                 <td>
-                  <a href="{% url 'update_complaint_status' c.id %}" class="gov-action-btn">
-                    <i class="bi bi-pencil-square"></i> Update
-                  </a>
+                  <div class="gov-action-group">
+                    <a href="{% url 'update_complaint_status' c.id %}" class="gov-action-btn">
+                      <i class="bi bi-pencil-square"></i> Update
+                    </a>
+                    <a href="{% url 'admin_complaint_detail' c.id %}" class="gov-action-btn gov-view-btn">
+                      <i class="bi bi-eye"></i> View
+                    </a>
+                  </div>
                 </td>
               </tr>
               {% endfor %}

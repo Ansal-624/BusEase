@@ -335,3 +335,8 @@ def complaints_by_status(request, status):
         "complaints": complaints,
         "status": status
     })
+
+@staff_member_required
+def admin_complaint_detail(request, complaint_id):
+    complaint = get_object_or_404(Complaint, id=complaint_id)
+    return render(request, 'admin_app/admin_complaint_detail.html', {'complaint': complaint})
