@@ -1,0 +1,733 @@
+{% extends 'base.html' %}
+{% block title %}Add Schedule - Government Transport Portal{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-add-schedule-page {
+    padding: 20px 0 40px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+  }
+
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .gov-hero-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .gov-hero-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .gov-bus-badge {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid var(--gov-secondary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+  }
+
+  .gov-bus-badge i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-hero-decor {
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+    font-size: 6rem;
+    color: var(--gov-secondary);
+    opacity: 0.15;
+    transform: rotate(5deg);
+  }
+
+  /* Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,51,102,0.1);
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 18px 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+  }
+
+  .gov-card-header h5 {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-card-header h5 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-card-body {
+    padding: 25px;
+  }
+
+  /* Form Elements */
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .gov-form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+  }
+
+  .gov-input:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 3px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+
+  /* Map Container */
+  .gov-map-container {
+    border: 2px solid var(--gov-primary);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+
+  #map {
+    height: 400px;
+    width: 100%;
+  }
+
+  .gov-map-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .gov-map-btn {
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .gov-map-btn-warning {
+    background: var(--gov-warning);
+    color: var(--gov-primary);
+    border-color: var(--gov-primary);
+  }
+
+  .gov-map-btn-warning:hover {
+    background: #e0a800;
+    transform: translateY(-2px);
+  }
+
+  .gov-map-btn-danger {
+    background: var(--gov-danger);
+    color: white;
+    border-color: var(--gov-danger);
+  }
+
+  .gov-map-btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+  }
+
+  /* Stops Table */
+  .gov-table-container {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .gov-stops-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .gov-stops-table th {
+    background: #f0f4ff;
+    color: var(--gov-primary);
+    padding: 12px 15px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-stops-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: middle;
+  }
+
+  .gov-stops-table tr:hover {
+    background: #f8f9fa;
+  }
+
+  .gov-stop-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .gov-stop-input:focus {
+    border-color: var(--gov-primary);
+    outline: none;
+  }
+
+  .gov-order-badge {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  /* Submit Buttons */
+  .gov-form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+
+  .gov-submit-btn {
+    background: var(--gov-gradient);
+    color: white;
+    border: 2px solid var(--gov-secondary);
+    border-radius: 12px;
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .gov-submit-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+  }
+
+  .gov-cancel-btn {
+    background: white;
+    color: var(--gov-primary);
+    border: 2px solid var(--gov-primary);
+    border-radius: 12px;
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .gov-cancel-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateY(-2px);
+  }
+
+  /* Info Note */
+  .gov-info-note {
+    background: #f0f4ff;
+    border-left: 4px solid var(--gov-secondary);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gov-primary);
+    font-size: 0.9rem;
+  }
+
+  .gov-info-note i {
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+  }
+
+  /* Loading State */
+  .gov-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    color: transparent;
+    position: relative;
+  }
+
+  .gov-submit-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .gov-form-actions {
+      flex-direction: column;
+    }
+
+    .gov-submit-btn, .gov-cancel-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="gov-add-schedule-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <h1 class="gov-hero-title">
+          <i class="bi bi-calendar-plus"></i> Add New Schedule
+        </h1>
+        <div class="gov-hero-subtitle">
+          <span class="gov-bus-badge">
+            <i class="bi bi-bus-front"></i> {{ bus.bus_number }} - {{ bus.bus_name }}
+          </span>
+        </div>
+      </div>
+      <i class="bi bi-clock-history gov-hero-decor"></i>
+    </div>
+
+    <!-- Info Note -->
+    <div class="gov-info-note">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>Click on the map to add stops along the route. You can name each stop and set arrival times.</span>
+    </div>
+
+    <form method="post" id="scheduleForm">
+      {% csrf_token %}
+
+      <!-- Route Details Card -->
+      <div class="gov-form-card">
+        <div class="gov-card-header">
+          <h5>
+            <i class="bi bi-signpost-2"></i>
+            Route Details
+          </h5>
+        </div>
+        <div class="gov-card-body">
+          <div class="gov-form-row">
+            <div class="gov-form-group">
+              <label class="gov-label">
+                <i class="bi bi-geo-alt"></i>
+                Start Location Name
+              </label>
+              <input type="text" name="start_location" class="gov-input" placeholder="e.g., Kaloor Bus Stand" required>
+            </div>
+
+            <div class="gov-form-group">
+              <label class="gov-label">
+                <i class="bi bi-flag"></i>
+                End Location Name
+              </label>
+              <input type="text" name="end_location" class="gov-input" placeholder="e.g., Aluva Bus Stand" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Card -->
+      <div class="gov-form-card">
+        <div class="gov-card-header">
+          <h5>
+            <i class="bi bi-map"></i>
+            Select Stops on Map
+          </h5>
+        </div>
+        <div class="gov-card-body">
+          <div class="gov-map-container">
+            <div id="map"></div>
+          </div>
+
+          <div class="gov-map-actions">
+            <button type="button" class="gov-map-btn gov-map-btn-warning" onclick="removeLastStop()">
+              <i class="bi bi-arrow-return-left"></i> Remove Last Stop
+            </button>
+            <button type="button" class="gov-map-btn gov-map-btn-danger" onclick="clearStops()">
+              <i class="bi bi-trash"></i> Clear All Stops
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stops Table Card -->
+      <div class="gov-form-card">
+        <div class="gov-card-header">
+          <h5>
+            <i class="bi bi-list-check"></i>
+            Stops Details
+          </h5>
+        </div>
+        <div class="gov-card-body">
+          <div class="gov-table-container">
+            <table class="gov-stops-table" id="stopsTable">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Stop Name</th>
+                  <th>Arrival Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dynamically populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden field to store route JSON -->
+      <input type="hidden" name="route_data" id="route_data">
+
+      <!-- Schedule Details Card -->
+      <div class="gov-form-card">
+        <div class="gov-card-header">
+          <h5>
+            <i class="bi bi-calendar-week"></i>
+            Schedule Details
+          </h5>
+        </div>
+        <div class="gov-card-body">
+          <div class="gov-form-row">
+            <div class="gov-form-group">
+              <label class="gov-label">
+                <i class="bi bi-calendar"></i>
+                Journey Date
+              </label>
+              <input type="date" name="journey_date" class="gov-input" required>
+            </div>
+
+            <div class="gov-form-group">
+              <label class="gov-label">
+                <i class="bi bi-currency-rupee"></i>
+                Fare per KM (₹)
+              </label>
+              <input type="number" step="0.01" name="fare" class="gov-input" placeholder="e.g., 2.50" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="gov-form-actions">
+        <button type="submit" class="gov-submit-btn" id="submitBtn">
+          <i class="bi bi-check-circle"></i>
+          Add Schedule
+        </button>
+        <a href="{% url 'view_buses' %}" class="gov-cancel-btn">
+          <i class="bi bi-x-circle"></i>
+          Cancel
+        </a>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+// Initialize map
+var map = L.map('map').setView([10.8505, 76.2711], 7);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+let markers = [];
+let routeCoords = [];
+let polyline;
+
+// Add Stop on Map Click
+map.on('click', function(e) {
+    let lat = e.latlng.lat;
+    let lng = e.latlng.lng;
+
+    routeCoords.push({lat: lat, lng: lng});
+    let marker = L.marker([lat, lng]).addTo(map);
+    markers.push(marker);
+
+    updateRoute();
+    updateTable();
+});
+
+// Draw Polyline
+function updateRoute() {
+    if (polyline) {
+        map.removeLayer(polyline);
+    }
+
+    let latlngs = routeCoords.map(p => [p.lat, p.lng]);
+    polyline = L.polyline(latlngs, {color: '#003366', weight: 4}).addTo(map);
+
+    document.getElementById("route_data").value = JSON.stringify(routeCoords);
+}
+
+// Update Stops Table
+function updateTable() {
+    let tbody = document.querySelector("#stopsTable tbody");
+    tbody.innerHTML = "";
+
+    routeCoords.forEach((point, index) => {
+        let row = document.createElement("tr");
+        
+        // Order cell
+        let orderCell = document.createElement("td");
+        let orderBadge = document.createElement("div");
+        orderBadge.className = "gov-order-badge";
+        orderBadge.textContent = index + 1;
+        orderCell.appendChild(orderBadge);
+        
+        // Stop name cell
+        let nameCell = document.createElement("td");
+        let nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.name = `stop_name_${index}`;
+        nameInput.className = "gov-stop-input stop-name";
+        nameInput.dataset.index = index;
+        nameInput.value = `Stop ${index + 1}`;
+        nameInput.required = true;
+        nameCell.appendChild(nameInput);
+        
+        // Time cell
+        let timeCell = document.createElement("td");
+        let timeInput = document.createElement("input");
+        timeInput.type = "time";
+        timeInput.name = `stop_time_${index}`;
+        timeInput.className = "gov-stop-input stop-time";
+        timeInput.dataset.index = index;
+        timeInput.required = true;
+        timeCell.appendChild(timeInput);
+        
+        row.appendChild(orderCell);
+        row.appendChild(nameCell);
+        row.appendChild(timeCell);
+        
+        tbody.appendChild(row);
+    });
+}
+
+// Remove Last Stop
+function removeLastStop() {
+    if(routeCoords.length === 0) return;
+
+    routeCoords.pop();
+    map.removeLayer(markers.pop());
+
+    updateRoute();
+    updateTable();
+}
+
+// Clear All Stops
+function clearStops() {
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+    routeCoords = [];
+
+    if(polyline){
+        map.removeLayer(polyline);
+    }
+
+    updateTable();
+    document.getElementById("route_data").value = "";
+}
+
+// Before Submit - Attach stop names + times to JSON
+document.querySelector("form").addEventListener("submit", function(e) {
+    let stopNames = document.querySelectorAll(".stop-name");
+    let stopTimes = document.querySelectorAll(".stop-time");
+
+    if (routeCoords.length === 0) {
+        e.preventDefault();
+        alert("Please add at least one stop on the map");
+        return;
+    }
+
+    if (stopNames.length === 0 || stopTimes.length === 0) {
+        e.preventDefault();
+        alert("Please fill in stop details");
+        return;
+    }
+
+    let fullData = routeCoords.map((point, index) => {
+        return {
+            lat: point.lat,
+            lng: point.lng,
+            stop_name: stopNames[index]?.value || `Stop ${index + 1}`,
+            arrival_time: stopTimes[index]?.value || "00:00"
+        };
+    });
+
+    document.getElementById("route_data").value = JSON.stringify(fullData);
+    
+    // Add loading state to submit button
+    document.getElementById('submitBtn').classList.add('loading');
+});
+</script>
+
+{% endblock %}

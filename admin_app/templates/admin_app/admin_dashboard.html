@@ -1,0 +1,571 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - Government Transport Portal{% endblock %}
+{% block content %}
+
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-admin-dashboard {
+    padding: 20px 0 40px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 20px;
+    padding: 25px 35px;
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--gov-secondary);
+    box-shadow: 0 10px 25px rgba(0, 51, 102, 0.15);
+  }
+
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 215, 0, 0.08);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .gov-hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-hero-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .gov-hero-subtitle i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-hero-badge {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--gov-secondary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+  }
+
+  /* Dashboard Layout */
+  .gov-dashboard-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 25px;
+  }
+
+  /* Sidebar */
+  .gov-sidebar {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 51, 102, 0.08);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    position: sticky;
+    top: 90px;
+    height: fit-content;
+  }
+
+  .gov-sidebar-header {
+    background: var(--gov-gradient);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid var(--gov-secondary);
+  }
+
+  .gov-sidebar-header i {
+    font-size: 2.5rem;
+    color: var(--gov-secondary);
+    margin-bottom: 8px;
+  }
+
+  .gov-sidebar-header h5 {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .gov-sidebar-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    margin: 3px 0 0;
+  }
+
+  .gov-sidebar-nav {
+    padding: 12px;
+  }
+
+  .gov-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .gov-nav-item:hover {
+    background: #f0f4ff;
+    color: var(--gov-primary);
+  }
+
+  .gov-nav-item.active {
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.08), rgba(255, 215, 0, 0.08));
+    color: var(--gov-primary);
+    font-weight: 500;
+  }
+
+  .gov-nav-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--gov-primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gov-secondary);
+    font-size: 1.1rem;
+  }
+
+  .gov-nav-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+  }
+
+  .gov-nav-badge {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    padding: 2px 8px;
+    border-radius: 16px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1px solid var(--gov-secondary);
+  }
+
+  /* Main Content Area */
+  .gov-main-content {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 51, 102, 0.08);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+
+  .gov-content-header {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    padding: 20px 25px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-content-header h3 {
+    color: var(--gov-primary);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-content-header h3 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-content-body {
+    padding: 25px;
+  }
+
+  /* Stats Cards Grid */
+  .gov-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .gov-stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 3px 12px rgba(0, 51, 102, 0.04);
+    border: 1px solid #eaeef2;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .gov-stat-card:hover {
+    border-color: var(--gov-primary);
+    box-shadow: 0 8px 18px rgba(0, 51, 102, 0.08);
+  }
+
+  .gov-stat-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    background: var(--gov-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gov-secondary);
+  }
+
+  .gov-stat-icon-wrapper i {
+    font-size: 1.6rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-stat-content {
+    flex: 1;
+  }
+
+  .gov-stat-label {
+    color: #6b7280;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+
+  .gov-stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    line-height: 1.1;
+  }
+
+  /* Quick Actions */
+  .gov-quick-actions {
+    background: linear-gradient(135deg, #f9fafc, #ffffff);
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid #eaeef2;
+  }
+
+  .gov-quick-actions h5 {
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-quick-actions h5 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-action-chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .gov-action-chip {
+    background: white;
+    border: 1px solid #d0d9e2;
+    color: #2c3e50;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-action-chip:hover {
+    background: var(--gov-primary);
+    color: white;
+    border-color: var(--gov-primary);
+  }
+
+  .gov-action-chip i {
+    font-size: 0.9rem;
+  }
+
+  .gov-action-chip:hover i {
+    color: var(--gov-secondary);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .gov-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .gov-dashboard-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .gov-sidebar {
+      position: static;
+      margin-bottom: 20px;
+    }
+
+    .gov-hero-title {
+      font-size: 1.5rem;
+    }
+
+    .gov-content-header h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .gov-stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="gov-admin-dashboard">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <h1 class="gov-hero-title">
+          <i class="bi bi-shield-lock me-2"></i>RTO Admin Dashboard
+        </h1>
+        <div class="gov-hero-subtitle">
+          <i class="bi bi-calendar-check"></i>
+          <span>{{ "now"|date:"l, F d, Y" }}</span>
+          <span class="gov-hero-badge">
+            <i class="bi bi-person-badge"></i> Administrator
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Layout with Sidebar -->
+    <div class="gov-dashboard-layout">
+
+      <!-- Sidebar Navigation -->
+      <div class="gov-sidebar">
+        <div class="gov-sidebar-header">
+          <i class="bi bi-person-badge-fill"></i>
+          <h5>{{ user.username }}</h5>
+          <p>RTO Admin</p>
+        </div>
+
+        <div class="gov-sidebar-nav">
+          <a href="{% url 'admin_bus_owner_requests' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-person-lines-fill"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>Owner Requests</span>
+              <span class="gov-nav-badge">{{ pending_bus_owners|default:"0" }}</span>
+            </div>
+          </a>
+          <a href="{% url 'admin_approved_bus_owners' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-person-check"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>Approved Owners</span>
+              <span class="gov-nav-badge">{{ approved_bus_owners|default:"0" }}</span>
+            </div>
+          </a>
+          <a href="{% url 'admin_bus_approvals' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-truck"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>Bus Approvals</span>
+              <span class="gov-nav-badge">{{ pending_buses_count|default:"0" }}</span>
+            </div>
+          </a>
+          <a href="{% url 'admin_approved_buses' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>Approved Buses</span>
+              <span class="gov-nav-badge">{{ approved_buses_count|default:"0" }}</span>
+            </div>
+          </a>
+          <a href="{% url 'admin_concessions' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-bookmark-check"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>Concession Apps</span>
+              <span class="gov-nav-badge">{{ pending_concessions_count|default:"0" }}</span>
+            </div>
+          </a>
+          <a href="{% url 'admin_approved_concessions' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-award"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>Approved Concessions</span>
+              <span class="gov-nav-badge">{{ approved_concessions_count|default:"0" }}</span>
+            </div>
+          </a>
+          <a href="{% url 'admin_complaints' %}" class="gov-nav-item">
+            <div class="gov-nav-icon">
+              <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="gov-nav-info">
+              <span>User Complaints</span>
+              <span class="gov-nav-badge">{{ complaints_count|default:"0" }}</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="gov-main-content">
+        <div class="gov-content-header">
+          <h3>
+            <i class="bi bi-speedometer2"></i>
+            Overview
+          </h3>
+        </div>
+
+        <div class="gov-content-body">
+          <!-- Statistics Cards -->
+          <div class="gov-stats-grid">
+            <div class="gov-stat-card">
+              <div class="gov-stat-icon-wrapper">
+                <i class="bi bi-truck"></i>
+              </div>
+              <div class="gov-stat-content">
+                <div class="gov-stat-label">Pending Buses</div>
+                <div class="gov-stat-number">{{ pending_buses_count|default:"0" }}</div>
+              </div>
+            </div>
+            <div class="gov-stat-card">
+              <div class="gov-stat-icon-wrapper">
+                <i class="bi bi-check-circle"></i>
+              </div>
+              <div class="gov-stat-content">
+                <div class="gov-stat-label">Approved Buses</div>
+                <div class="gov-stat-number">{{ approved_buses_count|default:"0" }}</div>
+              </div>
+            </div>
+            <div class="gov-stat-card">
+              <div class="gov-stat-icon-wrapper">
+                <i class="bi bi-bookmark-check"></i>
+              </div>
+              <div class="gov-stat-content">
+                <div class="gov-stat-label">Pending Concessions</div>
+                <div class="gov-stat-number">{{ pending_concessions_count|default:"0" }}</div>
+              </div>
+            </div>
+            <div class="gov-stat-card">
+              <div class="gov-stat-icon-wrapper">
+                <i class="bi bi-award"></i>
+              </div>
+              <div class="gov-stat-content">
+                <div class="gov-stat-label">Approved Concessions</div>
+                <div class="gov-stat-number">{{ approved_concessions_count|default:"0" }}</div>
+              </div>
+            </div>
+            <div class="gov-stat-card">
+              <div class="gov-stat-icon-wrapper">
+                <i class="bi bi-exclamation-triangle"></i>
+              </div>
+              <div class="gov-stat-content">
+                <div class="gov-stat-label">Open Complaints</div>
+                <div class="gov-stat-number">{{ complaints_count|default:"0" }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="gov-quick-actions">
+            <h5>
+              <i class="bi bi-lightning-charge"></i>
+              Quick Actions
+            </h5>
+            <div class="gov-action-chips">
+              <a href="{% url 'admin_bus_approvals' %}" class="gov-action-chip">
+                <i class="bi bi-truck"></i> Review Buses
+              </a>
+              <a href="{% url 'admin_concessions' %}" class="gov-action-chip">
+                <i class="bi bi-bookmark-check"></i> Process Concessions
+              </a>
+              <a href="{% url 'admin_complaints' %}" class="gov-action-chip">
+                <i class="bi bi-exclamation-triangle"></i> Handle Complaints
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.gov-nav-item').forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+{% endblock %}

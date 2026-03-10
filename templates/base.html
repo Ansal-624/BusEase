@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BusEase - Government Transport Portal{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <!-- Government Style Custom Styles -->
+    <style>
+        :root {
+            --gov-primary: #003366;
+            --gov-secondary: #FFD700;
+            --gov-accent: #002244;
+            --gov-light: #f0f4f8;
+            --gov-dark: #1a1d20;
+            --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+            --transport-blue: #0047ab;
+            --transport-gold: #ffb700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 80px;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+
+        /* Government Official Navbar with Transport Theme */
+        .gov-navbar {
+            background: var(--gov-gradient) !important;
+            box-shadow: 0 4px 15px rgba(0,51,102,0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            border-bottom: 3px solid var(--gov-secondary);
+            padding: 8px 0;
+        }
+
+        .gov-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(45deg, var(--gov-secondary), var(--gov-secondary) 10px, transparent 10px, transparent 20px);
+        }
+
+        /* Transport Logo Styling */
+        .gov-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .transport-logo {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--gov-secondary), #ffd700);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transport-logo::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), transparent);
+        }
+
+        .transport-logo i {
+            font-size: 32px;
+            color: var(--gov-primary);
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+            z-index: 2;
+        }
+
+        .transport-logo .bus-icon {
+            transform: rotate(0deg);
+            animation: subtleMove 3s infinite ease-in-out;
+        }
+
+        @keyframes subtleMove {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(3px); }
+        }
+
+        /* Road line decoration under logo */
+        .transport-logo::after {
+            content: '';
+            position: absolute;
+            bottom: 12px;
+            left: 10px;
+            right: 10px;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--gov-primary), var(--gov-primary) 5px, transparent 5px, transparent 10px);
+            opacity: 0.3;
+        }
+
+        .gov-brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gov-brand-main {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gov-brand-main i {
+            color: var(--gov-secondary);
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+
+        .gov-brand-sub {
+            font-size: 0.7rem;
+            color: var(--gov-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gov-brand-sub i {
+            font-size: 0.6rem;
+        }
+
+        .navbar-brand {
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            opacity: 0.9;
+        }
+
+        .navbar-brand:hover .transport-logo {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+        /* Navbar Links - Government Style */
+        .gov-nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 600;
+            padding: 8px 16px !important;
+            margin: 0 4px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        .gov-nav-link i {
+            margin-right: 8px;
+            color: var(--gov-secondary);
+        }
+
+        .gov-nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gov-secondary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .gov-nav-link:hover {
+            color: white !important;
+            background: rgba(255,215,0,0.15);
+        }
+
+        .gov-nav-link:hover::after {
+            width: 80%;
+        }
+
+        .gov-nav-link.active {
+            background: var(--gov-secondary);
+            color: var(--gov-primary) !important;
+        }
+
+        .gov-nav-link.active i {
+            color: var(--gov-primary);
+        }
+
+        /* Government Notification Icon */
+        .gov-notification-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .gov-notification-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            border: 1px solid rgba(255,215,0,0.3);
+            position: relative;
+        }
+
+        .gov-notification-icon:hover {
+            background: var(--gov-secondary);
+            color: var(--gov-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,51,102,0.3);
+        }
+
+        .gov-notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 22px;
+            text-align: center;
+            border: 2px solid var(--gov-secondary);
+            box-shadow: 0 2px 8px rgba(220,53,69,0.5);
+        }
+
+        /* Government Notification Dropdown */
+        .gov-notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: -20px;
+            width: 380px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+            display: none;
+            z-index: 1000;
+            border: 2px solid var(--gov-primary);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .gov-notification-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 25px;
+            width: 15px;
+            height: 15px;
+            background: white;
+            transform: rotate(45deg);
+            border-top: 2px solid var(--gov-primary);
+            border-left: 2px solid var(--gov-primary);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gov-notification-dropdown.show {
+            display: block;
+        }
+
+        .gov-notification-header {
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--gov-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .gov-notification-header h6 {
+            margin: 0;
+            font-weight: 700;
+            color: var(--gov-primary);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .gov-mark-read-btn {
+            background: none;
+            border: 1px solid var(--gov-primary);
+            color: var(--gov-primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 4px 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .gov-mark-read-btn:hover {
+            background: var(--gov-primary);
+            color: var(--gov-secondary);
+        }
+
+        .gov-notification-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .gov-notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .gov-notification-item:hover {
+            background: #f0f4ff;
+        }
+
+        .gov-notification-item.unread {
+            background: #e6f0ff;
+            border-left: 4px solid var(--gov-primary);
+        }
+
+        .gov-notification-content {
+            display: flex;
+            gap: 12px;
+        }
+
+        .gov-notification-icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .gov-notification-icon-circle.info {
+            background: rgba(0,51,102,0.1);
+            color: var(--gov-primary);
+        }
+
+        .gov-notification-icon-circle.success {
+            background: rgba(40,167,69,0.1);
+            color: #28a745;
+        }
+
+        .gov-notification-icon-circle.warning {
+            background: rgba(255,193,7,0.1);
+            color: #ffc107;
+        }
+
+        .gov-notification-text p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .gov-notification-time {
+            font-size: 0.7rem;
+            color: var(--gov-primary);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .gov-notification-footer {
+            padding: 12px 20px;
+            text-align: center;
+            border-top: 2px solid var(--gov-primary);
+            background: #f8f9fa;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .gov-notification-footer a {
+            color: var(--gov-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .gov-notification-footer a:hover {
+            color: var(--gov-secondary);
+        }
+
+        .gov-no-notifications {
+            padding: 40px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .gov-no-notifications i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: var(--gov-primary);
+            opacity: 0.3;
+        }
+
+        /* Content Container - Government Style */
+        .gov-content-wrapper {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,51,102,0.1);
+            margin-top: 20px;
+            margin-bottom: 30px;
+            min-height: 400px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .gov-content-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary), var(--gov-primary));
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* Government Alert Messages */
+        .gov-alert {
+            border: none;
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0,51,102,0.1);
+            animation: slideInDown 0.5s ease-out;
+            border-left: 4px solid;
+            margin-bottom: 20px;
+        }
+
+        .gov-alert-success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .gov-alert-danger {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .gov-alert-warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .gov-alert-info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        /* Government Footer with Transport Theme */
+        .gov-footer {
+            margin-top: auto;
+            background: var(--gov-gradient);
+            color: rgba(255,255,255,0.9);
+            padding: 50px 0 20px;
+            position: relative;
+            border-top: 4px solid var(--gov-secondary);
+        }
+
+        .gov-footer::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(45deg, var(--gov-secondary), var(--gov-secondary) 10px, transparent 10px, transparent 20px);
+        }
+
+        .gov-footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .gov-footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .gov-footer-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--gov-secondary), #ffd700);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .gov-footer-logo i {
+            font-size: 40px;
+            color: var(--gov-primary);
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.2));
+        }
+
+        .gov-footer-text h4 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gov-footer-text p {
+            color: var(--gov-secondary);
+            font-size: 0.8rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .gov-footer-links {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .gov-footer-column h5 {
+            color: var(--gov-secondary);
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,215,0,0.3);
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gov-footer-column h5 i {
+            font-size: 0.9rem;
+        }
+
+        .gov-footer-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .gov-footer-column ul li {
+            margin-bottom: 8px;
+        }
+
+        .gov-footer-column ul li a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gov-footer-column ul li a i {
+            color: var(--gov-secondary);
+            font-size: 0.7rem;
+        }
+
+        .gov-footer-column ul li a:hover {
+            color: var(--gov-secondary);
+            padding-left: 5px;
+        }
+
+        .gov-footer-contact p {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gov-footer-contact i {
+            color: var(--gov-secondary);
+            width: 20px;
+            font-size: 1rem;
+        }
+
+        .gov-social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .gov-social-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .gov-social-icon:hover {
+            background: var(--gov-secondary);
+            color: var(--gov-primary);
+            transform: translateY(-3px);
+        }
+
+        .gov-footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+        }
+
+        .gov-footer-bottom i {
+            color: var(--gov-secondary);
+        }
+
+        .gov-footer-bottom a {
+            color: var(--gov-secondary);
+            text-decoration: none;
+        }
+
+        .gov-footer-bottom a:hover {
+            text-decoration: underline;
+        }
+
+        /* Transport-themed decorative elements */
+        .gov-seal-decoration {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        .gov-seal-decoration i {
+            font-size: 100px;
+            color: var(--gov-primary);
+        }
+
+        /* Bus route line animation */
+        .route-line {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--gov-secondary), var(--gov-secondary) 10px, transparent 10px, transparent 20px);
+            opacity: 0.1;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 991px) {
+            .gov-navbar .navbar-collapse {
+                background: var(--gov-primary);
+                padding: 20px;
+                border-radius: 12px;
+                margin-top: 15px;
+                border: 2px solid var(--gov-secondary);
+            }
+
+            .gov-notification-dropdown {
+                position: fixed;
+                top: 70px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 40px);
+                max-width: 380px;
+                right: auto;
+            }
+
+            .gov-notification-dropdown::before {
+                right: 50%;
+                transform: translateX(50%) rotate(45deg);
+            }
+
+            .gov-footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .gov-footer-brand {
+                justify-content: center;
+            }
+
+            .gov-footer-links {
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .gov-social-links {
+                justify-content: center;
+            }
+
+            .gov-footer-column {
+                text-align: center;
+            }
+
+            .gov-footer-column ul li a {
+                justify-content: center;
+            }
+
+            .gov-footer-contact p {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+
+            .gov-content-wrapper {
+                padding: 20px;
+            }
+
+            .gov-brand-main {
+                font-size: 1.2rem;
+            }
+
+            .gov-brand-sub {
+                font-size: 0.6rem;
+            }
+
+            .transport-logo {
+                width: 45px;
+                height: 45px;
+            }
+
+            .transport-logo i {
+                font-size: 26px;
+            }
+
+            .gov-footer-logo {
+                width: 60px;
+                height: 60px;
+            }
+
+            .gov-footer-logo i {
+                font-size: 34px;
+            }
+        }
+
+        /* Animation */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Page Transition */
+        .gov-page-transition {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Government Navbar with Transport Logo -->
+<nav class="navbar navbar-expand-lg navbar-dark gov-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <div class="gov-brand">
+                <div class="transport-logo">
+                    <i class="bi bi-bus-front-fill bus-icon"></i>
+                </div>
+                <div class="gov-brand-text">
+                    <span class="gov-brand-main">
+                        <i class="bi bi-bus-front"></i>BusEase
+                    </span>
+                    <span class="gov-brand-sub">
+                        <i class="bi bi-signpost-2"></i> Government Transport Portal
+                    </span>
+                </div>
+            </div>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <!-- Role-based Dashboard Links -->
+                    {% if user.is_superuser or user.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link gov-nav-link" href="{% url 'admin_dashboard' %}">
+                                <i class="bi bi-shield-lock"></i> Admin Dashboard
+                            </a>
+                        </li>
+                    {% elif user.role == 'owner' %}
+                        <li class="nav-item">
+                            <a class="nav-link gov-nav-link" href="{% url 'owner_dashboard' %}">
+                                <i class="bi bi-building"></i> Owner Dashboard
+                            </a>
+                        </li>
+                    {% elif user.role == 'traveller' %}
+                        <li class="nav-item">
+                            <a class="nav-link gov-nav-link" href="{% url 'traveller_dashboard' %}">
+                                <i class="bi bi-person-badge"></i> My Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    
+
+                    <li class="nav-item">
+                        <a class="nav-link gov-nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link gov-nav-link" href="{% url 'home' %}">
+                            <i class="bi bi-house"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link gov-nav-link" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link gov-nav-link" href="{% url 'register' %}">
+                            <i class="bi bi-person-plus"></i> Register
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Content Container -->
+<div class="container gov-page-transition">
+
+    <!-- Display Django messages -->
+    {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+                <div class="gov-alert gov-alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong>
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check-circle-fill me-2"></i>Success:
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Alert:
+                        {% elif message.tags == 'warning' %}
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>Warning:
+                        {% else %}
+                            <i class="bi bi-info-circle-fill me-2"></i>Information:
+                        {% endif %}
+                    </strong>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content Block -->
+    <div class="gov-content-wrapper">
+        {% block content %}{% endblock %}
+        <!-- Bus Route Decoration -->
+        <div class="route-line"></div>
+    </div>
+</div>
+
+<!-- Government Footer with Transport Logo -->
+<footer class="gov-footer">
+    <div class="container">
+        <div class="gov-footer-content">
+            <div class="gov-footer-brand">
+                <div class="gov-footer-logo">
+                    <i class="bi bi-bus-front-fill"></i>
+                </div>
+                <div class="gov-footer-text">
+                    <h4><i class="bi bi-bus-front"></i> BusEase</h4>
+                    <p>Government Transport Portal</p>
+                </div>
+            </div>
+
+            <div class="gov-footer-links">
+                <div class="gov-footer-column">
+                    <h5><i class="bi bi-link"></i> Quick Links</h5>
+                    <ul>
+                        <li><a href="{% url 'home' %}"><i class="bi bi-chevron-right"></i>Home</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>About Us</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>Services</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="gov-footer-column">
+                    <h5><i class="bi bi-file-text"></i> Legal</h5>
+                    <ul>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>Privacy Policy</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>Terms of Use</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>RTI Act</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i>Disclaimer</a></li>
+                    </ul>
+                </div>
+
+                <div class="gov-footer-column">
+                    <h5><i class="bi bi-telephone"></i> Contact</h5>
+                    <div class="gov-footer-contact">
+                        <p><i class="bi bi-telephone"></i> Toll Free: 1800-XXX-XXXX</p>
+                        <p><i class="bi bi-envelope"></i> support@govtransport.in</p>
+                        <p><i class="bi bi-geo-alt"></i> Ministry of Transport, New Delhi</p>
+                    </div>
+                    <div class="gov-social-links">
+                        <a href="#" class="gov-social-icon" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="gov-social-icon" title="Twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="gov-social-icon" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="gov-social-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gov-footer-bottom">
+            <p class="mb-0">
+                © {{ now|default:2025 }} BusEase - Government Transport Portal. All Rights Reserved. 
+                <br class="d-block d-md-none">
+                <i class="bi bi-bus-front"></i> This portal is designed, developed and maintained by Ministry of Road Transport & Highways, Government of India.
+                <br>
+                <i class="bi bi-heart-fill text-danger"></i> Best viewed in Chrome, Firefox, Edge and Safari browsers.
+                <br>
+                <a href="#">Sitemap</a> | <a href="#">Accessibility Statement</a> | <a href="#">Help</a>
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom Scripts -->
+<script>
+    // Add scrolled class to navbar on scroll
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.gov-navbar');
+        if (window.scrollY > 50) {
+            navbar.style.boxShadow = '0 4px 20px rgba(0,51,102,0.3)';
+        } else {
+            navbar.style.boxShadow = '0 4px 15px rgba(0,51,102,0.2)';
+        }
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.gov-alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.gov-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+            if (navbarCollapse.classList.contains('show')) {
+                bootstrap.Collapse.getInstance(navbarCollapse).hide();
+            }
+        });
+    });
+
+    // Notification dropdown toggle
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    
+    if (notificationBtn && notificationDropdown) {
+        notificationBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            notificationDropdown.classList.toggle('show');
+        });
+
+        // Close notification dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.classList.remove('show');
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside it
+        notificationDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    // Mark all notifications as read
+    function markAllRead() {
+        const unreadItems = document.querySelectorAll('.gov-notification-item.unread');
+        unreadItems.forEach(item => {
+            item.classList.remove('unread');
+        });
+        
+        const notificationCount = document.getElementById('notificationCount');
+        if (notificationCount) {
+            notificationCount.style.display = 'none';
+        }
+        
+        // Show confirmation message (optional)
+        const header = document.querySelector('.gov-notification-header h6');
+        if (header) {
+            const originalText = header.innerHTML;
+            header.innerHTML = '<i class="bi bi-check-all me-2"></i>All marked read';
+            setTimeout(() => {
+                header.innerHTML = '<i class="bi bi-bell-fill me-2"></i>Notifications';
+            }, 2000);
+        }
+    }
+
+    // Mark individual notification as read when clicked
+    document.querySelectorAll('.gov-notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+            this.classList.remove('unread');
+            updateNotificationCount();
+        });
+    });
+
+    // Update notification count
+    function updateNotificationCount() {
+        const unreadCount = document.querySelectorAll('.gov-notification-item.unread').length;
+        const notificationCount = document.getElementById('notificationCount');
+        
+        if (notificationCount) {
+            if (unreadCount > 0) {
+                notificationCount.textContent = unreadCount;
+                notificationCount.style.display = 'block';
+            } else {
+                notificationCount.style.display = 'none';
+            }
+        }
+    }
+
+    // Add active class to current nav link
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.gov-nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Keyboard shortcut for notifications (Ctrl+N)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'n') {
+            e.preventDefault();
+            if (notificationDropdown) {
+                notificationDropdown.classList.toggle('show');
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

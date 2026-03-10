@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h4>Reply to Admin — Original: {{ n.subject }}</h4>
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-2"><textarea name="body" rows="4" class="form-control" placeholder="Reply..."></textarea></div>
+    <button class="btn btn-primary">Send Reply</button>
+  </form>
+</div>
+{% endblock %}

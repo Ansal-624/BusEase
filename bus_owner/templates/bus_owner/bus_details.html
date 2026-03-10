@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Bus Details{% endblock %}
+{% block content %}
+
+<h2 class="mb-3">{{ bus.bus_name }} ({{ bus.bus_number }})</h2>
+
+<div class="card shadow p-3">
+    <h4 class="text-primary">Basic Information</h4>
+    <p><strong>Owner Contact:</strong> {{ bus.owner_contact_number }}</p>
+    <p><strong>Driver Name:</strong> {{ bus.driver_name }}</p>
+    <p><strong>Driver Contact:</strong> {{ bus.driver_contact_number }}</p>
+    <p><strong>Total Seats:</strong> {{ bus.total_seats }}</p>
+
+    <hr>
+
+    <h4 class="text-primary">Documents</h4>
+    <p><strong>Driver License:</strong> <a href="{{ bus.driver_license.url }}" target="_blank">View</a></p>
+    <p><strong>Registration Document:</strong> <a href="{{ bus.registration_document.url }}" target="_blank">View</a></p>
+    <p><strong>Pollution Certificate:</strong> <a href="{{ bus.pollution_test_certificate.url }}" target="_blank">View</a></p>
+    <p><strong>Insurance Document:</strong> <a href="{{ bus.insurance_document.url }}" target="_blank">View</a></p>
+
+    <hr>
+
+    <h4 class="text-primary">Photos</h4>
+    {% if photos %}
+        <div class="row">
+        {% for img in photos %}
+            <div class="col-md-3 mb-3">
+                <img src="{{ img.image.url }}" class="img-fluid rounded shadow">
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No photos available.</p>
+    {% endif %}
+</div>
+
+<a href="{% url 'view_buses' %}" class="btn btn-secondary mt-3">
+    <i class="bi bi-arrow-left"></i> Back
+</a>
+
+{% endblock %}

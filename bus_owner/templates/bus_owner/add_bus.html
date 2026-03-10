@@ -1,0 +1,761 @@
+{% extends 'base.html' %}
+{% block title %}Register New Bus - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-register-page {
+    padding: 30px 0 50px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Header Section */
+  .gov-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .gov-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .gov-title-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gov-gradient);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--gov-secondary);
+  }
+
+  .gov-title-icon i {
+    font-size: 2rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-title-text h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gov-primary);
+    margin: 0 0 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-title-text p {
+    color: #666;
+    font-size: 0.95rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-title-text p i {
+    color: var(--gov-secondary);
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  /* Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0,51,102,0.2);
+    border: 2px solid var(--gov-primary);
+    position: relative;
+    overflow: hidden;
+    animation: govSlideUp 0.6s ease-out;
+  }
+
+  @keyframes govSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .gov-form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary), var(--gov-primary));
+  }
+
+  .gov-form-card::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    pointer-events: none;
+  }
+
+  /* Form Sections */
+  .gov-form-section {
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .gov-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .gov-section-title i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    padding: 8px;
+    border-radius: 10px;
+  }
+
+  .gov-section-title h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Form Grid */
+  .gov-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .gov-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Form Groups */
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-form-group.full-width {
+    grid-column: span 2;
+  }
+
+  @media (max-width: 768px) {
+    .gov-form-group.full-width {
+      grid-column: span 1;
+    }
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+    font-size: 1rem;
+  }
+
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
+  }
+
+  .gov-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 14px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+  }
+
+  .gov-input:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+
+  .gov-input::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  /* File Upload */
+  .gov-file-upload {
+    border: 2px dashed var(--gov-primary);
+    border-radius: 14px;
+    padding: 25px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .gov-file-upload:hover {
+    background: #e9ecef;
+    border-color: var(--gov-secondary);
+  }
+
+  .gov-file-upload i {
+    font-size: 2.5rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+  }
+
+  .gov-file-upload p {
+    color: var(--gov-primary);
+    font-weight: 600;
+    margin: 0 0 5px;
+  }
+
+  .gov-file-upload small {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* File Preview */
+  .gov-file-preview {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f0f4ff;
+    border-radius: 10px;
+    border-left: 4px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-file-preview i {
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+  }
+
+  .gov-file-preview span {
+    color: var(--gov-primary);
+    font-weight: 600;
+  }
+
+  /* Photos Grid */
+  .gov-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .gov-photo-preview {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--gov-primary);
+  }
+
+  .gov-photo-preview img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  .gov-photo-remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--gov-danger);
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 2px solid white;
+  }
+
+  /* Submit Button */
+  .gov-submit-btn {
+    background: var(--gov-gradient);
+    color: white;
+    border: 3px solid var(--gov-secondary);
+    border-radius: 50px;
+    padding: 18px 30px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .gov-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .gov-submit-btn:hover {
+    background: linear-gradient(135deg, #002244, #001122);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,51,102,0.4);
+  }
+
+  .gov-submit-btn:hover::before {
+    left: 100%;
+  }
+
+  .gov-submit-btn i {
+    color: var(--gov-secondary);
+    font-size: 1.5rem;
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #856404;
+  }
+
+  .gov-alert i {
+    font-size: 1.2rem;
+  }
+
+  /* Loading State */
+  .gov-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    color: transparent;
+    position: relative;
+  }
+
+  .gov-submit-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 50%;
+    left: 50%;
+    margin-left: -12.5px;
+    margin-top: -12.5px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
+    border-radius: 50%;
+    animation: govSpin 0.8s linear infinite;
+  }
+
+  @keyframes govSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .gov-form-card {
+      padding: 30px 25px;
+    }
+
+    .gov-header-section {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .gov-title-text h1 {
+      font-size: 1.5rem;
+    }
+
+    .gov-photos-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 576px) {
+    .gov-photos-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="gov-register-page">
+  <div class="gov-container">
+
+    <!-- Header Section with Back Button -->
+    <div class="gov-header-section">
+      <div class="gov-title-wrapper">
+        <div class="gov-title-icon">
+          <i class="bi bi-bus-front"></i>
+        </div>
+        <div class="gov-title-text">
+          <h1>Register New Bus</h1>
+          <p>
+            <i class="bi bi-shield-check"></i>
+            Submit for government transport department approval
+          </p>
+        </div>
+      </div>
+      <a href="javascript:history.back()" class="gov-back-btn">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+    </div>
+
+    <!-- Display Django messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="gov-alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="gov-form-card">
+      <form method="POST" enctype="multipart/form-data" id="busRegistrationForm">
+        {% csrf_token %}
+
+        <!-- Basic Information Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-info-circle"></i>
+            <h3>Basic Information</h3>
+          </div>
+
+          <div class="gov-form-grid">
+            <!-- Bus Name -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="bus_name">
+                <i class="bi bi-bus-front"></i> Bus Name <span class="gov-required">*</span>
+              </label>
+              <input type="text" name="bus_name" id="bus_name" class="gov-input" 
+                     placeholder="e.g., Green Line Travels" required>
+            </div>
+
+            <!-- Bus Number -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="bus_number">
+                <i class="bi bi-hash"></i> Bus Number <span class="gov-required">*</span>
+              </label>
+              <input type="text" name="bus_number" id="bus_number" class="gov-input" 
+                     placeholder="e.g., KL-01-AB-1234" required>
+            </div>
+
+            <!-- Total Seats -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="total_seats">
+                <i class="bi bi-people"></i> Total Seats <span class="gov-required">*</span>
+              </label>
+              <input type="number" name="total_seats" id="total_seats" class="gov-input" 
+                     placeholder="e.g., 40" min="10" max="60" required>
+            </div>
+
+            <!-- Owner Contact Number -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="owner_contact_number">
+                <i class="bi bi-telephone"></i> Owner Contact <span class="gov-required">*</span>
+              </label>
+              <input type="tel" name="owner_contact_number" id="owner_contact_number" class="gov-input" 
+                     placeholder="e.g., 9876543210" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver Information Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-person-badge"></i>
+            <h3>Driver Information</h3>
+          </div>
+
+          <div class="gov-form-grid">
+            <!-- Driver Name -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="driver_name">
+                <i class="bi bi-person"></i> Driver's Name <span class="gov-required">*</span>
+              </label>
+              <input type="text" name="driver_name" id="driver_name" class="gov-input" 
+                     placeholder="Full name of driver" required>
+            </div>
+
+            <!-- Driver Contact Number -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="driver_contact_number">
+                <i class="bi bi-telephone"></i> Driver's Contact <span class="gov-required">*</span>
+              </label>
+              <input type="tel" name="driver_contact_number" id="driver_contact_number" class="gov-input" 
+                     placeholder="e.g., 9876543210" required>
+            </div>
+
+            <!-- Driver License Upload -->
+            <div class="gov-form-group full-width">
+              <label class="gov-label" for="driver_license">
+                <i class="bi bi-file-earmark-text"></i> Driver's License
+              </label>
+              <div class="gov-file-upload">
+                <i class="bi bi-cloud-upload"></i>
+                <p>Click to upload driver's license</p>
+                <small>Supported: PDF, JPG, PNG (Max 5MB)</small>
+                <input type="file" name="driver_license" id="driver_license" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+              <div id="driverLicensePreview" class="gov-file-preview" style="display: none;">
+                <i class="bi bi-file-earmark-check"></i>
+                <span id="driverLicenseName"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-folder"></i>
+            <h3>Vehicle Documents</h3>
+          </div>
+
+          <div class="gov-form-grid">
+            <!-- Registration Document -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="registration_document">
+                <i class="bi bi-file-earmark-text"></i> Registration Document
+              </label>
+              <div class="gov-file-upload">
+                <i class="bi bi-cloud-upload"></i>
+                <p>Upload RC</p>
+                <input type="file" name="registration_document" id="registration_document" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+
+            <!-- Pollution Test Certificate -->
+            <div class="gov-form-group">
+              <label class="gov-label" for="pollution_test_certificate">
+                <i class="bi bi-file-earmark-text"></i> Pollution Certificate
+              </label>
+              <div class="gov-file-upload">
+                <i class="bi bi-cloud-upload"></i>
+                <p>Upload PUC</p>
+                <input type="file" name="pollution_test_certificate" id="pollution_test_certificate" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+
+            <!-- Insurance Document -->
+            <div class="gov-form-group full-width">
+              <label class="gov-label" for="insurance_document">
+                <i class="bi bi-file-earmark-text"></i> Insurance Document
+              </label>
+              <div class="gov-file-upload">
+                <i class="bi bi-cloud-upload"></i>
+                <p>Upload Insurance Certificate</p>
+                <input type="file" name="insurance_document" id="insurance_document" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bus Photos Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-images"></i>
+            <h3>Bus Photos</h3>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label" for="bus_photos">
+              <i class="bi bi-camera"></i> Upload Bus Photos
+            </label>
+            <div class="gov-file-upload">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Click to select multiple photos</p>
+              <small>Supported: JPG, PNG (Max 5MB each)</small>
+              <input type="file" name="bus_photos" id="bus_photos" class="gov-file-input" accept="image/*" multiple>
+            </div>
+            <div id="photosPreview" class="gov-photos-grid"></div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="gov-submit-btn" id="submitBtn">
+          <i class="bi bi-check-circle"></i>
+          Submit for Government Approval
+          <i class="bi bi-shield-check"></i>
+        </button>
+
+        <!-- Note -->
+        <p style="text-align: center; margin-top: 15px; font-size: 0.85rem; color: #666;">
+          <i class="bi bi-info-circle" style="color: var(--gov-secondary);"></i>
+          All documents will be verified by the transport department. Approval may take 2-3 business days.
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // File preview functionality
+  document.getElementById('driver_license').addEventListener('change', function(e) {
+    const preview = document.getElementById('driverLicensePreview');
+    const fileName = document.getElementById('driverLicenseName');
+    
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+
+  // Multiple photos preview
+  document.getElementById('bus_photos').addEventListener('change', function(e) {
+    const preview = document.getElementById('photosPreview');
+    preview.innerHTML = '';
+    
+    for (let i = 0; i < this.files.length; i++) {
+      const file = this.files[i];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const col = document.createElement('div');
+        col.className = 'gov-photo-preview';
+        col.innerHTML = `
+          <img src="${e.target.result}" alt="Bus photo">
+          <div class="gov-photo-remove" onclick="this.parentElement.remove()">
+            <i class="bi bi-x"></i>
+          </div>
+        `;
+        preview.appendChild(col);
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Form submission with loading state
+  document.getElementById('busRegistrationForm').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.classList.add('loading');
+  });
+
+  // Auto-hide alerts after 5 seconds
+  setTimeout(function() {
+    document.querySelectorAll('.gov-alert').forEach(alert => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => alert.style.display = 'none', 500);
+    });
+  }, 5000);
+</script>
+
+{% endblock %}

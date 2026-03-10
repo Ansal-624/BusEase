@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h3 class="mb-4">🚌 Available Buses for Tracking</h3>
+
+    <div class="card shadow">
+        <div class="card-body">
+
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Bus Name</th>
+                        <th>Bus Number</th>
+                        <th>Route</th>
+                        <th>Owner</th>
+                        <th>Track</th>
+                    </tr>
+                </thead>
+               <tbody>
+    {% for item in bus_data %}
+    <tr>
+        <td>{{ item.bus.bus_name }}</td>
+        <td>{{ item.bus.bus_number }}</td>
+
+        <td>
+            {% if item.schedule %}
+                {{ item.schedule.route.start_location }}
+                →
+                {{ item.schedule.route.end_location }}
+            {% else %}
+                <span class="text-danger">No Active Schedule</span>
+            {% endif %}
+        </td>
+
+        <td>{{ item.bus.owner.user.username }}</td>
+
+        <td>
+            {% if item.schedule %}
+                <a href="{% url 'track_bus' item.bus.id %}" 
+                   class="btn btn-primary btn-sm">
+                    Track Bus
+                </a>
+            {% else %}
+                <button class="btn btn-secondary btn-sm" disabled>
+                    Not Available
+                </button>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5" class="text-center">
+            No approved buses available.
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

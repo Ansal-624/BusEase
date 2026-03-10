@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Approve Concession for {{ concession.traveller.username }}</h3>
+<form method="post">{% csrf_token %}
+  <label>Enter Validity (days):</label>
+  <input type="number" name="expiry_days" value="180" class="form-control mb-3" required>
+  <button type="submit" class="btn btn-success">Approve</button>
+  <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

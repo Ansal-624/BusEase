@@ -1,0 +1,605 @@
+{% extends 'base.html' %}
+{% block title %}File Complaint - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-complaint-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fa;
+    padding: 40px 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  /* Government Background Watermark */
+  .gov-complaint-page::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    width: 800px;
+    height: 800px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    pointer-events: none;
+  }
+
+  .gov-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 20px;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .gov-hero-content h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-hero-content p {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .gov-hero-content p i {
+    color: var(--gov-secondary);
+  }
+
+  /* Main Card */
+  .gov-complaint-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    overflow: hidden;
+    border: 2px solid var(--gov-primary);
+    animation: govSlideUp 0.5s ease-out;
+  }
+
+  @keyframes govSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 18px 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .gov-card-header i {
+    font-size: 2rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-card-header h3 {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-card-body {
+    padding: 30px;
+  }
+
+  /* Form Groups */
+  .gov-form-group {
+    margin-bottom: 25px;
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+    font-size: 1rem;
+  }
+
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
+    font-size: 0.8rem;
+  }
+
+  /* Form Inputs */
+  .gov-input,
+  .gov-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    font-family: inherit;
+  }
+
+  .gov-input:focus,
+  .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+
+  .gov-input::placeholder,
+  .gov-textarea::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  .gov-textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  /* File Upload */
+  .gov-file-upload {
+    border: 2px dashed var(--gov-primary);
+    border-radius: 14px;
+    padding: 25px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .gov-file-upload:hover {
+    background: #e9ecef;
+    border-color: var(--gov-secondary);
+  }
+
+  .gov-file-upload i {
+    font-size: 2.5rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+  }
+
+  .gov-file-upload p {
+    color: var(--gov-primary);
+    font-weight: 600;
+    margin: 0 0 5px;
+  }
+
+  .gov-file-upload small {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* File Preview */
+  .gov-file-preview {
+    margin-top: 15px;
+    padding: 12px 15px;
+    background: #f0f4ff;
+    border-radius: 10px;
+    border-left: 4px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--gov-primary);
+  }
+
+  .gov-file-preview i {
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+  }
+
+  .gov-file-preview .gov-remove-file {
+    margin-left: auto;
+    color: var(--gov-danger);
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+
+  .gov-file-preview .gov-remove-file:hover {
+    transform: scale(1.1);
+  }
+
+  /* Submit Button */
+  .gov-submit-btn {
+    background: var(--gov-gradient);
+    color: white;
+    border: 2px solid var(--gov-secondary);
+    border-radius: 12px;
+    padding: 16px 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gov-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .gov-submit-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+  }
+
+  .gov-submit-btn:hover::before {
+    left: 100%;
+  }
+
+  .gov-submit-btn i {
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+  }
+
+  .gov-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  /* Loading State */
+  .gov-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    color: transparent;
+    position: relative;
+  }
+
+  .gov-submit-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    background: #f8d7da;
+    border-left: 4px solid #dc3545;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #721c24;
+  }
+
+  .gov-alert i {
+    font-size: 1.2rem;
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    border-left-color: #28a745;
+    color: #155724;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-card-body {
+      padding: 20px;
+    }
+
+    .gov-hero-content h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="gov-complaint-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <h1>
+          <i class="bi bi-exclamation-triangle"></i> File a Complaint
+        </h1>
+        <p>
+          <i class="bi bi-shield-check"></i>
+          Your feedback helps us improve government transport services
+        </p>
+      </div>
+    </div>
+
+    <!-- Display Django messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="gov-alert {% if message.tags == 'success' %}gov-alert-success{% endif %}">
+          <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Complaint Form Card -->
+    <div class="gov-complaint-card">
+      <div class="gov-card-header">
+        <i class="bi bi-chat-quote"></i>
+        <h3>Complaint Details</h3>
+      </div>
+
+      <div class="gov-card-body">
+        <form method="POST" enctype="multipart/form-data" id="complaintForm">
+          {% csrf_token %}
+
+          <!-- Subject Field -->
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-tag"></i>
+              Subject <span class="gov-required">*</span>
+            </label>
+            <input type="text" 
+                   name="subject" 
+                   class="gov-input" 
+                   placeholder="Brief summary of your complaint"
+                   value="{{ form.subject.value|default:'' }}"
+                   required>
+          </div>
+
+          <!-- Description Field -->
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-chat-left-text"></i>
+              Description <span class="gov-required">*</span>
+            </label>
+            <textarea name="description" 
+                      class="gov-textarea" 
+                      placeholder="Please provide detailed information about your complaint..."
+                      required>{{ form.description.value|default:'' }}</textarea>
+          </div>
+
+          <!-- Attachment Field -->
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-paperclip"></i>
+              Attachment (Optional)
+            </label>
+            <div class="gov-file-upload" id="fileUploadArea">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Click to upload photo or video</p>
+              <small>Supported: JPG, PNG, MP4 (Max 10MB)</small>
+              <input type="file" 
+                     name="attachment" 
+                     id="attachmentInput" 
+                     class="gov-file-input" 
+                     accept="image/*,video/*">
+            </div>
+            <div id="filePreview" class="gov-file-preview" style="display: none;">
+              <i class="bi bi-file-earmark-check"></i>
+              <span id="fileName"></span>
+              <span class="gov-remove-file" onclick="removeFile()">
+                <i class="bi bi-x-circle"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="gov-submit-btn" id="submitBtn">
+            <i class="bi bi-send"></i>
+            Submit Complaint
+          </button>
+        </form>
+
+        <!-- Back Button -->
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="javascript:history.back()" class="gov-back-btn">
+            <i class="bi bi-arrow-left"></i> Cancel and Go Back
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Note -->
+    <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #999;">
+      <i class="bi bi-shield-check" style="color: var(--gov-secondary);"></i>
+      All complaints are reviewed by the transport department. You will receive updates via email.
+    </p>
+
+  </div>
+</div>
+
+<script>
+  // File upload preview
+  const attachmentInput = document.getElementById('attachmentInput');
+  const filePreview = document.getElementById('filePreview');
+  const fileName = document.getElementById('fileName');
+  const fileUploadArea = document.getElementById('fileUploadArea');
+
+  attachmentInput.addEventListener('change', function(e) {
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      filePreview.style.display = 'flex';
+      fileUploadArea.style.borderColor = 'var(--gov-success)';
+    } else {
+      removeFile();
+    }
+  });
+
+  function removeFile() {
+    attachmentInput.value = '';
+    filePreview.style.display = 'none';
+    fileUploadArea.style.borderColor = 'var(--gov-primary)';
+  }
+
+  // Form submission with loading state
+  document.getElementById('complaintForm').addEventListener('submit', function(e) {
+    const subject = document.querySelector('input[name="subject"]').value.trim();
+    const description = document.querySelector('textarea[name="description"]').value.trim();
+    
+    if (!subject || !description) {
+      e.preventDefault();
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    document.getElementById('submitBtn').classList.add('loading');
+  });
+
+  // Auto-hide alerts after 5 seconds
+  setTimeout(function() {
+    document.querySelectorAll('.gov-alert').forEach(alert => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => alert.style.display = 'none', 500);
+    });
+  }, 5000);
+</script>
+
+{% endblock %}

@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+{% block title %}Write Bus Review - Government Transport Portal{% endblock %}
+{% block content %}
+
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-review-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fa;
+    padding: 40px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .gov-review-container {
+    max-width: 650px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  /* Review Card */
+  .gov-review-card {
+    background: white;
+    border-radius: 24px;
+    padding: 45px;
+    box-shadow: 0 20px 50px rgba(0,51,102,0.15);
+    border: 1px solid #e0e0e0;
+    position: relative;
+    overflow: hidden;
+    animation: govSlideUp 0.6s ease-out;
+  }
+
+  @keyframes govSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .gov-review-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary), var(--gov-primary));
+  }
+
+  .gov-review-card::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 120px;
+    height: 120px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    pointer-events: none;
+  }
+
+  /* Header */
+  .gov-review-header {
+    text-align: center;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+    position: relative;
+  }
+
+  .gov-bus-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.2);
+  }
+
+  .gov-bus-icon i {
+    font-size: 2.5rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-review-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Times New Roman', serif;
+  }
+
+  .gov-bus-name-badge {
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    padding: 10px 25px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,51,102,0.1);
+  }
+
+  .gov-bus-name-badge i {
+    color: var(--gov-secondary);
+  }
+
+  /* Form */
+  .gov-form {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Rating Stars */
+  .gov-rating-container {
+    margin-bottom: 30px;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .gov-rating-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gov-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gov-rating-label i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-direction: row-reverse;
+  }
+
+  .gov-star-input {
+    display: none;
+  }
+
+  .gov-star-label {
+    font-size: 2.8rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .gov-star-label:hover,
+  .gov-star-label:hover ~ .gov-star-label,
+  .gov-star-input:checked ~ .gov-star-label {
+    color: var(--gov-secondary);
+    transform: scale(1.1);
+    text-shadow: 0 0 15px rgba(255,215,0,0.5);
+  }
+
+  .gov-star-input:checked + .gov-star-label {
+    color: var(--gov-secondary);
+  }
+
+  .gov-rating-hint {
+    margin-top: 15px;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .gov-rating-hint i {
+    color: var(--gov-secondary);
+  }
+
+  /* Comment Section */
+  .gov-form-group {
+    margin-bottom: 30px;
+  }
+
+  .gov-form-label {
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 12px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-form-label i {
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+    background: var(--gov-primary);
+    padding: 6px;
+    border-radius: 50%;
+  }
+
+  .gov-textarea {
+    width: 100%;
+    padding: 18px;
+    border: 2px solid #dee2e6;
+    border-radius: 16px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    resize: vertical;
+    min-height: 150px;
+    font-family: inherit;
+  }
+
+  .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+
+  .gov-textarea::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  /* Submit Button */
+  .gov-btn-submit {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    border: 2px solid var(--gov-secondary);
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    width: 100%;
+    margin: 10px 0 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .gov-btn-submit:hover {
+    background: var(--gov-accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,51,102,0.4);
+  }
+
+  .gov-btn-submit:active {
+    transform: translateY(0);
+  }
+
+  .gov-btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .gov-btn-submit:hover::before {
+    left: 100%;
+  }
+
+  /* Back Link */
+  .gov-back-link {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px dashed var(--gov-primary);
+  }
+
+  .gov-back-link a {
+    color: var(--gov-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-back-link a:hover {
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  .gov-back-link i {
+    font-size: 1.1rem;
+  }
+
+  /* Loading State */
+  .gov-btn-submit.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    color: transparent;
+    position: relative;
+  }
+
+  .gov-btn-submit.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
+    border-radius: 50%;
+    animation: govSpin 0.8s linear infinite;
+  }
+
+  @keyframes govSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Success Animation */
+  .gov-success-check {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .gov-success-check i {
+    font-size: 4rem;
+    color: var(--gov-success);
+    animation: govScale 0.5s ease;
+  }
+
+  @keyframes govScale {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-review-card {
+      padding: 30px 25px;
+    }
+
+    .gov-review-title {
+      font-size: 1.6rem;
+    }
+
+    .gov-bus-icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    .gov-bus-icon i {
+      font-size: 2rem;
+    }
+
+    .gov-star-label {
+      font-size: 2.2rem;
+    }
+
+    .gov-bus-name-badge {
+      font-size: 0.95rem;
+      padding: 8px 15px;
+    }
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 6px solid;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,51,102,0.1);
+  }
+
+  .gov-alert-success {
+    border-left-color: var(--gov-success);
+  }
+
+  .gov-alert-success i {
+    color: var(--gov-success);
+  }
+
+  .gov-alert-error {
+    border-left-color: var(--gov-danger);
+  }
+
+  .gov-alert-error i {
+    color: var(--gov-danger);
+  }
+
+  .gov-alert-content {
+    flex: 1;
+  }
+
+  .gov-alert-title {
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin-bottom: 3px;
+  }
+
+  .gov-alert-text {
+    color: #666;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="gov-review-page">
+  <div class="gov-review-container">
+    <div class="gov-review-card">
+      
+      <!-- Header -->
+      <div class="gov-review-header">
+        <div class="gov-bus-icon">
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <h2 class="gov-review-title">Share Your Experience</h2>
+        <div class="gov-bus-name-badge">
+          <i class="bi bi-bus-front"></i>
+          {{ bus.bus_name }} ({{ bus.bus_number }})
+        </div>
+      </div>
+
+      <!-- Alert Messages (if any) -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="gov-alert {% if message.tags == 'success' %}gov-alert-success{% else %}gov-alert-error{% endif %}">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+            <div class="gov-alert-content">
+              <div class="gov-alert-title">
+                {% if message.tags == 'success' %}Success{% else %}Error{% endif %}
+              </div>
+              <p class="gov-alert-text">{{ message }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Review Form -->
+      <form method="post" class="gov-form" id="reviewForm">
+        {% csrf_token %}
+
+        <!-- Rating Stars -->
+        <div class="gov-rating-container">
+          <div class="gov-rating-label">
+            <i class="bi bi-star-fill"></i>
+            Rate Your Journey
+          </div>
+          
+          <div class="gov-star-rating">
+            <input type="radio" name="rating" value="5" id="star5" class="gov-star-input" required>
+            <label for="star5" class="gov-star-label" title="5 stars - Excellent">★</label>
+            
+            <input type="radio" name="rating" value="4" id="star4" class="gov-star-input">
+            <label for="star4" class="gov-star-label" title="4 stars - Very Good">★</label>
+            
+            <input type="radio" name="rating" value="3" id="star3" class="gov-star-input">
+            <label for="star3" class="gov-star-label" title="3 stars - Average">★</label>
+            
+            <input type="radio" name="rating" value="2" id="star2" class="gov-star-input">
+            <label for="star2" class="gov-star-label" title="2 stars - Poor">★</label>
+            
+            <input type="radio" name="rating" value="1" id="star1" class="gov-star-input">
+            <label for="star1" class="gov-star-label" title="1 star - Terrible">★</label>
+          </div>
+          
+          <div class="gov-rating-hint">
+            <i class="bi bi-info-circle"></i>
+            <span>Tap on the stars to rate your experience</span>
+          </div>
+        </div>
+
+        <!-- Comment Section -->
+        <div class="gov-form-group">
+          <label class="gov-form-label">
+            <i class="bi bi-chat-quote"></i>
+            Your Review
+          </label>
+          <textarea
+            name="comment"
+            class="gov-textarea"
+            placeholder="Tell us about your journey... Share details about your experience with the bus, driver, punctuality, comfort, etc."
+            required></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="gov-btn-submit" id="submitBtn">
+          <i class="bi bi-check-circle"></i>
+          Submit Review
+        </button>
+      </form>
+
+      <!-- Back Link -->
+      <div class="gov-back-link">
+        <a href="{% url 'view_schedules' bus.id %}">
+          <i class="bi bi-arrow-left"></i>
+          Back to Bus Schedules
+        </a>
+      </div>
+
+      <!-- Decorative Elements -->
+      <div style="position: absolute; bottom: 10px; left: 10px; opacity: 0.05; font-size: 3rem;">
+        <i class="bi bi-shield-shaded"></i>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reviewForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const stars = document.querySelectorAll('.gov-star-input');
+    const labels = document.querySelectorAll('.gov-star-label');
+
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+      // Check if rating is selected
+      let ratingSelected = false;
+      stars.forEach(star => {
+        if (star.checked) ratingSelected = true;
+      });
+
+      if (!ratingSelected) {
+        e.preventDefault();
+        showNotification('Please select a rating', 'error');
+        return;
+      }
+
+      // Add loading state
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+      document.querySelectorAll('.gov-alert').forEach(alert => {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.style.display = 'none', 500);
+      });
+    }, 5000);
+
+    // Star hover effect text
+    const starMessages = {
+      1: 'Terrible - Very dissatisfied',
+      2: 'Poor - Dissatisfied',
+      3: 'Average - Okay',
+      4: 'Very Good - Satisfied',
+      5: 'Excellent - Very satisfied'
+    };
+
+    labels.forEach(label => {
+      label.addEventListener('mouseenter', function() {
+        const value = this.getAttribute('for').replace('star', '');
+        document.querySelector('.gov-rating-hint span').textContent = starMessages[value];
+      });
+
+      label.addEventListener('mouseleave', function() {
+        document.querySelector('.gov-rating-hint span').textContent = 'Tap on the stars to rate your experience';
+      });
+    });
+
+    stars.forEach(star => {
+      star.addEventListener('change', function() {
+        const value = this.value;
+        document.querySelector('.gov-rating-hint span').textContent = starMessages[value];
+      });
+    });
+
+    // Notification function
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `gov-alert gov-alert-${type}`;
+      notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        animation: slideInRight 0.3s ease;
+      `;
+      
+      notification.innerHTML = `
+        <i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'}"></i>
+        <div class="gov-alert-content">
+          <div class="gov-alert-title">${type === 'error' ? 'Error' : 'Success'}</div>
+          <p class="gov-alert-text">${message}</p>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+      }, 3000);
+    }
+
+    // Add animation style
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
+
+{% endblock %}

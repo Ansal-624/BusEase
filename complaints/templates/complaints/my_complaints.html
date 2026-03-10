@@ -1,0 +1,638 @@
+{% extends "base.html" %}
+{% block title %}My Complaints - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-complaints-page {
+    padding: 20px 0 40px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+  }
+
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .gov-hero-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .gov-hero-subtitle {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-hero-subtitle i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-stats-badge {
+    background: var(--gov-secondary);
+    color: var(--gov-primary);
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-hero-decor {
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+    font-size: 8rem;
+    color: var(--gov-secondary);
+    opacity: 0.15;
+    transform: rotate(5deg);
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  /* Stats Cards */
+  .gov-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .gov-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,51,102,0.05);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .gov-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .gov-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,51,102,0.15);
+    border-color: var(--gov-primary);
+  }
+
+  .gov-stat-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .gov-stat-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--gov-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-stat-icon i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-stat-content {
+    flex: 1;
+  }
+
+  .gov-stat-label {
+    color: #666;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+
+  .gov-stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--gov-primary);
+    line-height: 1;
+    font-family: 'Times New Roman', serif;
+  }
+
+  /* Main Card */
+  .gov-main-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,51,102,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 30px;
+  }
+
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 20px 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .gov-card-title {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-card-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-card-subtitle {
+    color: var(--gov-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Complaint Card */
+  .gov-complaint-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gov-complaint-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(135deg, var(--gov-primary), var(--gov-secondary));
+  }
+
+  .gov-complaint-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.15);
+    border-color: var(--gov-primary);
+  }
+
+  .gov-complaint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .gov-complaint-subject {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-complaint-subject i {
+    color: var(--gov-secondary);
+    font-size: 1.3rem;
+  }
+
+  /* Status Badges */
+  .gov-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 2px solid transparent;
+  }
+
+  .gov-status-pending {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+
+  .gov-status-checking {
+    background: rgba(23, 162, 184, 0.15);
+    color: #17a2b8;
+    border-color: #17a2b8;
+  }
+
+  .gov-status-action {
+    background: rgba(40, 167, 69, 0.15);
+    color: #28a745;
+    border-color: #28a745;
+  }
+
+  .gov-status-invalid {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  .gov-status-resolved {
+    background: rgba(40, 167, 69, 0.15);
+    color: #28a745;
+    border-color: #28a745;
+  }
+
+  .gov-status-rejected {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  /* Complaint Description */
+  .gov-complaint-description {
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 3px solid var(--gov-secondary);
+  }
+
+  /* Attachment Link */
+  .gov-attachment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f4ff;
+    color: var(--gov-primary);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid var(--gov-primary);
+    margin-bottom: 15px;
+  }
+
+  .gov-attachment-link:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateY(-2px);
+  }
+
+  .gov-attachment-link i {
+    font-size: 1rem;
+  }
+
+  /* Complaint Footer */
+  .gov-complaint-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px dashed #e0e0e0;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .gov-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  .gov-date i {
+    color: var(--gov-secondary);
+  }
+
+  /* Empty State */
+  .gov-empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 20px;
+    border: 2px dashed var(--gov-primary);
+    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+  }
+
+  .gov-empty-icon {
+    font-size: 5rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 4px solid var(--gov-secondary);
+  }
+
+  .gov-empty-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .gov-empty-text {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 25px;
+  }
+
+  .gov-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gov-gradient);
+    color: white;
+    border: 2px solid var(--gov-secondary);
+    border-radius: 12px;
+    padding: 12px 30px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-btn-primary:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .gov-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gov-hero-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .gov-complaint-header {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .gov-stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .gov-hero-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="gov-complaints-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <div>
+          <h1 class="gov-hero-title">
+            <i class="bi bi-chat-quote"></i> My Complaints
+          </h1>
+          <p class="gov-hero-subtitle">
+            <i class="bi bi-shield-check"></i> Track your submitted complaints
+          </p>
+        </div>
+        <span class="gov-stats-badge">
+          <i class="bi bi-exclamation-triangle"></i> {{ complaints|length }} Total
+        </span>
+      </div>
+      <i class="bi bi-chat-dots gov-hero-decor"></i>
+    </div>
+
+    <!-- Back Button -->
+    <a href="{% url 'traveller_dashboard' %}" class="gov-back-btn">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <!-- Stats Cards (if you want to add status counts) -->
+    
+    <!-- Complaints List -->
+    {% if complaints %}
+      {% for c in complaints %}
+        <div class="gov-complaint-card">
+          <div class="gov-complaint-header">
+            <h3 class="gov-complaint-subject">
+              <i class="bi bi-tag"></i>
+              {{ c.subject }}
+            </h3>
+            <span class="gov-status-badge 
+              {% if c.status == 'Pending' %}gov-status-pending
+              {% elif c.status == 'Checking' %}gov-status-checking
+              {% elif c.status == 'Action' %}gov-status-action
+              {% elif c.status == 'Invalid' %}gov-status-invalid
+              {% elif c.status == 'Resolved' %}gov-status-resolved
+              {% elif c.status == 'Rejected' %}gov-status-rejected
+              {% endif %}">
+              <i class="bi 
+                {% if c.status == 'Pending' %}bi-clock
+                {% elif c.status == 'Checking' %}bi-search
+                {% elif c.status == 'Action' %}bi-check-circle
+                {% elif c.status == 'Invalid' %}bi-x-circle
+                {% elif c.status == 'Resolved' %}bi-check-circle-fill
+                {% elif c.status == 'Rejected' %}bi-x-circle-fill
+                {% endif %}"></i>
+              {{ c.status }}
+            </span>
+          </div>
+
+          <div class="gov-complaint-description">
+            {{ c.description|linebreaks }}
+          </div>
+
+          {% if c.attachment %}
+            <a href="{{ c.attachment.url }}" target="_blank" class="gov-attachment-link">
+              <i class="bi bi-paperclip"></i>
+              View Attachment
+              <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+          {% endif %}
+
+          <div class="gov-complaint-footer">
+            <div class="gov-date">
+              <i class="bi bi-calendar-check"></i>
+              Submitted on {{ c.created_at|date:"d M Y, h:i A" }}
+            </div>
+            <div class="gov-date">
+              <i class="bi bi-clock-history"></i>
+              Last updated {{ c.updated_at|timesince }} ago
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <!-- Empty State -->
+      <div class="gov-empty-state">
+        <div class="gov-empty-icon">
+          <i class="bi bi-chat-square-text"></i>
+        </div>
+        <h3 class="gov-empty-title">No Complaints Yet</h3>
+        <p class="gov-empty-text">
+          You haven't submitted any complaints. If you have an issue, let us know.
+        </p>
+        <a href="{% url 'add_complaint' %}" class="gov-btn-primary">
+          <i class="bi bi-plus-circle"></i> File a Complaint
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  // Auto-hide any alerts
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.querySelectorAll('.gov-alert').forEach(alert => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.style.display = 'none', 500);
+      });
+    }, 5000);
+  });
+</script>
+
+{% endblock %}

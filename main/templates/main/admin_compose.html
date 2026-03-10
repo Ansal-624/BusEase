@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Compose Message{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h4>Admin Compose</h4>
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-2"><input class="form-control" name="to_username" placeholder="Recipient username"></div>
+    <div class="mb-2"><input class="form-control" name="subject" placeholder="Subject"></div>
+    <div class="mb-2"><textarea class="form-control" name="body" rows="5" placeholder="Message"></textarea></div>
+    <button class="btn btn-primary">Send</button>
+  </form>
+</div>
+{% endblock %}

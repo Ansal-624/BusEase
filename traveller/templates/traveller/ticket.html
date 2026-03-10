@@ -1,0 +1,645 @@
+{% extends "base.html" %}
+{% block title %}Government Bus Ticket - Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-ticket-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fa;
+    padding: 30px 0;
+  }
+
+  .gov-ticket-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  /* Ticket Card */
+  .gov-ticket-card {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0,51,102,0.2);
+    border: 2px solid var(--gov-primary);
+    position: relative;
+    overflow: hidden;
+    animation: govSlideUp 0.6s ease-out;
+  }
+
+  @keyframes govSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .gov-ticket-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary), var(--gov-primary));
+  }
+
+  .gov-ticket-card::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    pointer-events: none;
+  }
+
+  /* Ticket Header */
+  .gov-ticket-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 2px dashed var(--gov-primary);
+    position: relative;
+  }
+
+  .gov-ticket-header::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    border: 2px solid var(--gov-primary);
+  }
+
+  .gov-emblem {
+    width: 70px;
+    height: 70px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.2);
+  }
+
+  .gov-emblem i {
+    font-size: 2.2rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-ticket-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--gov-primary);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Times New Roman', serif;
+  }
+
+  .gov-ticket-subtitle {
+    color: #666;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gov-ticket-subtitle i {
+    color: var(--gov-secondary);
+  }
+
+  /* Info Grid */
+  .gov-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .gov-info-item {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+  }
+
+  .gov-info-item:hover {
+    border-color: var(--gov-primary);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.1);
+  }
+
+  .gov-info-label {
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .gov-info-label i {
+    color: var(--gov-secondary);
+    font-size: 0.9rem;
+  }
+
+  .gov-info-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+  }
+
+  .gov-info-value-large {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--gov-primary);
+  }
+
+  /* Status Badge */
+  .gov-status-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid transparent;
+  }
+
+  .gov-status-confirmed {
+    background: rgba(40, 167, 69, 0.15);
+    color: #28a745;
+    border-color: #28a745;
+  }
+
+  .gov-status-pending {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+
+  .gov-status-cancelled {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  /* Route Display */
+  .gov-route-card {
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border: 2px solid var(--gov-primary);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .gov-route-point {
+    text-align: center;
+    flex: 1;
+  }
+
+  .gov-point-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-point-icon i {
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+  }
+
+  .gov-point-label {
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+
+  .gov-point-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+  }
+
+  .gov-route-arrow {
+    color: var(--gov-secondary);
+    font-size: 2rem;
+    margin: 0 10px;
+  }
+
+  /* Fare Section */
+  .gov-fare-section {
+    background: var(--gov-gradient);
+    border-radius: 16px;
+    padding: 20px 25px;
+    margin: 25px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-fare-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+
+  .gov-fare-label i {
+    color: var(--gov-secondary);
+    font-size: 1.3rem;
+  }
+
+  .gov-fare-amount {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--gov-secondary);
+    font-family: 'Times New Roman', serif;
+  }
+
+  /* Download Button */
+  .gov-download-section {
+    text-align: center;
+    margin: 30px 0 20px;
+  }
+
+  .gov-download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 16px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gov-download-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .gov-download-btn:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(40, 167, 69, 0.5);
+    border-color: white;
+  }
+
+  .gov-download-btn:hover::before {
+    left: 100%;
+  }
+
+  .gov-download-btn i {
+    color: var(--gov-secondary);
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+  }
+
+  .gov-download-btn:hover i {
+    transform: scale(1.2) rotate(360deg);
+  }
+
+  /* Footer */
+  .gov-ticket-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed var(--gov-primary);
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  .gov-footer-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0;
+  }
+
+  .gov-footer-note i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-footer-note span {
+    color: var(--gov-primary);
+    font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-ticket-card {
+      padding: 25px;
+    }
+
+    .gov-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .gov-route-card {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .gov-route-arrow {
+      transform: rotate(90deg);
+    }
+
+    .gov-fare-section {
+      flex-direction: column;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .gov-download-btn {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1rem;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    .gov-back-btn {
+      display: none;
+    }
+    
+    .gov-download-section {
+      display: none;
+    }
+    
+    .gov-ticket-card {
+      box-shadow: none;
+      border: 2px solid #000;
+    }
+  }
+</style>
+
+<div class="gov-ticket-page">
+  <div class="gov-ticket-container">
+
+    <!-- Back Button -->
+    <a href="{% url 'traveller_bookings_page' %}" class="gov-back-btn">
+      <i class="bi bi-arrow-left"></i> Back to My Bookings
+    </a>
+
+    <!-- Ticket Card -->
+    <div class="gov-ticket-card">
+
+      <!-- Header -->
+      <div class="gov-ticket-header">
+        <div class="gov-emblem">
+          <i class="bi bi-bus-front-fill"></i>
+        </div>
+        <h2 class="gov-ticket-title">Government Bus Ticket</h2>
+        <p class="gov-ticket-subtitle">
+          <i class="bi bi-shield-check"></i>
+          Ministry of Road Transport & Highways
+          <i class="bi bi-shield-check"></i>
+        </p>
+      </div>
+
+      <!-- Ticket Content -->
+      <div class="gov-ticket-content">
+
+        <!-- Booking ID and Status -->
+        <div class="gov-info-grid">
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-hash"></i> Booking ID
+            </div>
+            <div class="gov-info-value-large">#{{ booking.id }}</div>
+          </div>
+
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-tag"></i> Status
+            </div>
+            <div class="gov-info-value">
+              <span class="gov-status-badge 
+                {% if booking.status == 'Confirmed' %}gov-status-confirmed
+                {% elif booking.status == 'Pending' %}gov-status-pending
+                {% else %}gov-status-cancelled{% endif %}">
+                {{ booking.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passenger and Bus -->
+        <div class="gov-info-grid">
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-person-badge"></i> Passenger
+            </div>
+            <div class="gov-info-value">{{ booking.traveller.username }}</div>
+          </div>
+
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-bus-front"></i> Bus
+            </div>
+            <div class="gov-info-value">
+              {{ booking.bus.bus_name }}
+              <small style="color: #666;">({{ booking.bus.bus_number }})</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seat and Date -->
+        <div class="gov-info-grid">
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-person"></i> Seat Number
+            </div>
+            <div class="gov-info-value-large">{{ booking.seat_number }}</div>
+          </div>
+
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-calendar-check"></i> Booking Date
+            </div>
+            <div class="gov-info-value">{{ booking.booking_date|date:"d M Y, h:i A" }}</div>
+          </div>
+        </div>
+
+        <!-- Route -->
+        <div class="gov-route-card">
+          <div class="gov-route-point">
+            <div class="gov-point-icon">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="gov-point-label">From</div>
+            <div class="gov-point-name">{{ booking.from_stop.stop_name }}</div>
+          </div>
+
+          <i class="bi bi-arrow-right-circle-fill gov-route-arrow"></i>
+
+          <div class="gov-route-point">
+            <div class="gov-point-icon">
+              <i class="bi bi-flag"></i>
+            </div>
+            <div class="gov-point-label">To</div>
+            <div class="gov-point-name">{{ booking.to_stop.stop_name }}</div>
+          </div>
+        </div>
+
+        <!-- Departure Time -->
+        <div class="gov-info-grid">
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-clock"></i> Departure
+            </div>
+            <div class="gov-info-value">{{ booking.schedule.departure_time|date:"d M Y, h:i A" }}</div>
+          </div>
+
+          <div class="gov-info-item">
+            <div class="gov-info-label">
+              <i class="bi bi-clock-history"></i> Journey Duration
+            </div>
+            <div class="gov-info-value">2h 30m</div>
+          </div>
+        </div>
+
+        <!-- Fare -->
+        <div class="gov-fare-section">
+          <div class="gov-fare-label">
+            <i class="bi bi-currency-rupee"></i>
+            <span>Total Fare Paid</span>
+          </div>
+          <div class="gov-fare-amount">₹{{ booking.total_fare }}</div>
+        </div>
+
+        <!-- Download Button -->
+        <div class="gov-download-section">
+          <a href="{% url 'download_ticket' booking.id %}" class="gov-download-btn">
+            <i class="bi bi-file-pdf-fill"></i>
+            Download Ticket PDF
+            <i class="bi bi-download"></i>
+          </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="gov-ticket-footer">
+          <div class="gov-footer-note">
+            <i class="bi bi-shield-check"></i>
+            <span>✓</span> Government Authorized Ticket
+            <span>✓</span>
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <p>Valid with government ID proof • Computer generated ticket</p>
+          <p style="color: #003366; font-weight: 600;">Thank you for choosing Government Transport Services</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-hide any alerts
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.querySelectorAll('.gov-alert').forEach(alert => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.style.display = 'none', 500);
+      });
+    }, 5000);
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Apply for Concession{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Apply for Concession</h2>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label for="college_name" class="form-label">College Name</label>
+    <input type="text" name="college_name" id="college_name" class="form-control" placeholder="Enter your college name" required>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="starting_location" class="form-label">Starting Location</label>
+      <input type="text" name="starting_location" id="starting_location" class="form-control" placeholder="Enter starting point" required>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="ending_location" class="form-label">Ending Location</label>
+      <input type="text" name="ending_location" id="ending_location" class="form-control" placeholder="Enter destination" required>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="document" class="form-label">Upload ID Proof</label>
+    <input type="file" name="document" id="document" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+    <small class="text-muted">Accepted formats: JPG, PNG, or PDF.</small>
+  </div>
+
+  <div class="mb-3">
+    <label for="photo" class="form-label">Upload Passport Size Photo</label>
+    <input type="file" name="photo" id="photo" class="form-control" accept=".jpg,.jpeg,.png" required>
+    <small class="text-muted">Accepted formats: JPG or PNG only.</small>
+  </div>
+
+  <div class="d-flex justify-content-between">
+    <a href="{% url 'traveller_dashboard' %}" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Submit Application</button>
+  </div>
+</form>
+{% endblock %}

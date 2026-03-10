@@ -1,0 +1,704 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard - Government Transport Portal{% endblock %}
+{% block content %}
+
+<style>
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .gov-owner-dashboard {
+    padding: 20px 0 40px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  /* ── Hero ── */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+  }
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 400px; height: 400px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%; left: -5%;
+    width: 300px; height: 300px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+  .gov-hero-content { position: relative; z-index: 2; }
+  .gov-hero-title {
+    font-size: 2.2rem; font-weight: 800; color: white;
+    margin-bottom: 15px; text-transform: uppercase;
+    letter-spacing: 1px; line-height: 1.3;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+  .gov-hero-subtitle {
+    font-size: 1.1rem; color: rgba(255,255,255,0.95);
+    margin-bottom: 0; line-height: 1.6;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .gov-hero-subtitle i { color: var(--gov-secondary); }
+  .gov-hero-actions {
+    display: flex; gap: 15px;
+    justify-content: flex-end; flex-wrap: wrap;
+  }
+  .gov-hero-btn {
+    background: white; color: var(--gov-primary);
+    border: 2px solid var(--gov-secondary);
+    padding: 12px 25px; border-radius: 12px;
+    font-weight: 700; transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 10px; white-space: nowrap; min-width: 180px;
+    text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.95rem;
+  }
+  .gov-hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.3);
+    color: var(--gov-primary);
+  }
+  .gov-hero-btn-outline {
+    background: rgba(255,255,255,0.1);
+    color: white; border: 2px solid var(--gov-secondary);
+    backdrop-filter: blur(10px);
+  }
+  .gov-hero-btn-outline:hover { background: white; color: var(--gov-primary); }
+  .gov-hero-decor {
+    position: absolute; right: 30px; bottom: 20px;
+    font-size: 8rem; color: var(--gov-secondary);
+    opacity: 0.15; transform: rotate(5deg);
+  }
+
+  /* ── Alert ── */
+  .gov-alert {
+    border-radius: 12px; padding: 20px 25px; margin-bottom: 30px;
+    display: flex; align-items: center; gap: 15px;
+    border-left: 6px solid; background: white;
+    box-shadow: 0 5px 15px rgba(0,51,102,0.1);
+  }
+  .gov-alert-warning { border-left-color: var(--gov-warning); }
+  .gov-alert i { font-size: 1.8rem; color: var(--gov-warning); }
+  .gov-alert-content { flex: 1; }
+  .gov-alert-title {
+    font-weight: 700; color: var(--gov-primary);
+    margin-bottom: 5px; font-size: 1.1rem;
+  }
+  .gov-alert-text { color: #666; margin: 0; }
+
+  /* ── Stats Grid ── */
+  .gov-stats-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 25px; margin-bottom: 40px;
+  }
+  .gov-stat-card {
+    background: white; border-radius: 20px; padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+    transition: all 0.3s ease; border: 2px solid #e0e0e0;
+    position: relative; overflow: hidden;
+    text-decoration: none; display: block;
+  }
+  .gov-stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 100%; height: 6px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary));
+    transform: scaleX(0); transition: transform 0.3s ease;
+  }
+  .gov-stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    border-color: var(--gov-primary);
+  }
+  .gov-stat-card:hover::before { transform: scaleX(1); }
+  .gov-stat-icon {
+    position: absolute; right: 20px; top: 20px;
+    font-size: 4rem; color: var(--gov-secondary); opacity: 0.2;
+  }
+  .gov-stat-content { position: relative; z-index: 1; }
+  .gov-stat-label {
+    color: #666; font-size: 0.9rem;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .gov-stat-number {
+    font-size: 3.5rem; font-weight: 800; color: var(--gov-primary);
+    line-height: 1; margin-bottom: 5px; font-family: 'Times New Roman', serif;
+  }
+  .gov-stat-desc { color: #999; font-size: 0.85rem; margin: 0; }
+
+  /* ── Main Card ── */
+  .gov-main-card {
+    background: white; border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,51,102,0.12);
+    overflow: hidden; border: 1px solid #e0e0e0; margin-bottom: 30px;
+  }
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 20px 30px; border-bottom: 3px solid var(--gov-secondary);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .gov-card-title {
+    color: white; font-size: 1.6rem; font-weight: 700; margin: 0;
+    display: flex; align-items: center; gap: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .gov-card-title i { color: var(--gov-secondary); }
+  
+  /* New Register Button in Header */
+  .gov-header-register-btn {
+    background: var(--gov-secondary);
+    color: var(--gov-primary);
+    border: 2px solid white;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+  .gov-header-register-btn:hover {
+    background: white;
+    color: var(--gov-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  /* ── Table ── */
+  .gov-table-container { overflow-x: auto; max-height: 600px; overflow-y: auto; }
+  .gov-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .gov-table thead { position: sticky; top: 0; z-index: 10; }
+  .gov-table thead th {
+    background: #f0f4ff; color: var(--gov-primary);
+    padding: 18px 20px; font-weight: 700; font-size: 0.9rem;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 3px solid var(--gov-primary); white-space: nowrap;
+  }
+  .gov-table tbody tr { transition: all 0.3s ease; border-bottom: 1px solid #e9ecef; }
+  .gov-table tbody tr:hover { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
+  .gov-table td { padding: 20px; vertical-align: top; border-bottom: 1px solid #e9ecef; }
+
+  /* ── Bus Info ── */
+  .gov-bus-info { display: flex; align-items: center; gap: 15px; }
+  .gov-bus-avatar {
+    width: 60px; height: 60px;
+    background: var(--gov-gradient); border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; color: var(--gov-secondary);
+    border: 2px solid var(--gov-secondary); flex-shrink: 0;
+  }
+  .gov-bus-details { flex: 1; }
+  .gov-bus-name {
+    font-size: 1.2rem; font-weight: 700;
+    color: var(--gov-primary); margin-bottom: 5px; text-transform: uppercase;
+  }
+  .gov-bus-number {
+    color: #666; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .gov-bus-number i { color: var(--gov-secondary); }
+
+  /* ── Driver ── */
+  .gov-driver-info { display: flex; align-items: center; gap: 10px; }
+  .gov-driver-avatar {
+    width: 40px; height: 40px; background: var(--gov-primary);
+    border-radius: 10px; display: flex; align-items: center;
+    justify-content: center; color: var(--gov-secondary); font-size: 1.2rem;
+  }
+  .gov-driver-name { font-weight: 600; color: var(--gov-primary); }
+  .gov-driver-empty {
+    color: #999; font-style: italic;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  /* ── Status Badges ── */
+  .gov-status-badge {
+    padding: 8px 16px; border-radius: 30px; font-weight: 700;
+    font-size: 0.85rem; display: inline-flex; align-items: center;
+    gap: 8px; white-space: nowrap; border: 2px solid transparent;
+  }
+  .gov-status-active {
+    background: rgba(40,167,69,0.15); color: #28a745; border-color: #28a745;
+  }
+  .gov-status-pending {
+    background: rgba(255,193,7,0.15); color: #ffc107; border-color: #ffc107;
+  }
+
+  /* ── Schedule Cards ── */
+  .gov-schedule-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 16px; padding: 18px; margin-bottom: 15px;
+    border-left: 6px solid var(--gov-primary);
+    transition: all 0.3s ease; position: relative;
+  }
+  .gov-schedule-card:last-child { margin-bottom: 0; }
+  .gov-schedule-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.15);
+  }
+  .gov-route {
+    display: flex; align-items: center; gap: 15px;
+    margin-bottom: 15px; flex-wrap: wrap;
+  }
+  .gov-route-point {
+    background: var(--gov-primary); color: var(--gov-secondary);
+    padding: 6px 15px; border-radius: 30px; font-weight: 600;
+    font-size: 0.9rem; display: flex; align-items: center; gap: 5px;
+  }
+  .gov-route-arrow { color: var(--gov-primary); font-size: 1.2rem; }
+  .gov-schedule-meta {
+    display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;
+  }
+  .gov-meta-chip {
+    background: white; padding: 6px 12px; border-radius: 8px;
+    font-size: 0.85rem; display: flex; align-items: center; gap: 5px;
+    color: var(--gov-primary); font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .gov-meta-chip i { color: var(--gov-secondary); }
+  .gov-fare-chip { background: var(--gov-primary); color: var(--gov-secondary); font-weight: 700; }
+  .gov-stops-btn {
+    background: transparent; border: 2px solid var(--gov-primary);
+    color: var(--gov-primary); padding: 8px 16px; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer; width: 100%; justify-content: center;
+  }
+  .gov-stops-btn:hover { background: var(--gov-primary); color: var(--gov-secondary); }
+  .gov-stops-section {
+    background: white; border-radius: 12px; padding: 15px;
+    margin-top: 15px; border: 1px solid #e0e0e0;
+  }
+  .gov-stop-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px; border-bottom: 1px solid #e0e0e0;
+  }
+  .gov-stop-item:last-child { border-bottom: none; }
+  .gov-stop-name {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 600; color: var(--gov-primary);
+  }
+  .gov-stop-time {
+    background: var(--gov-primary); color: var(--gov-secondary);
+    padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+  }
+  .gov-delete-schedule {
+    position: absolute; top: 15px; right: 15px;
+    background: transparent; border: 2px solid var(--gov-danger);
+    color: var(--gov-danger); width: 36px; height: 36px;
+    border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; transition: all 0.3s ease; cursor: pointer;
+  }
+  .gov-delete-schedule:hover { background: var(--gov-danger); color: white; }
+
+  /* ── Action Buttons ── */
+  .gov-action-group { display: flex; flex-direction: column; gap: 10px; min-width: 160px; }
+  .gov-action-group form { width: 100%; }
+  .gov-action-btn {
+    padding: 12px 15px; border-radius: 10px; font-weight: 700;
+    transition: all 0.3s ease; text-decoration: none;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; font-size: 0.9rem; text-transform: uppercase;
+    letter-spacing: 0.5px; border: 2px solid transparent;
+    cursor: pointer; width: 100%;
+  }
+  .gov-action-primary {
+    background: var(--gov-primary); color: var(--gov-secondary); border-color: var(--gov-secondary);
+  }
+  .gov-action-primary:hover {
+    background: var(--gov-accent); transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.3); color: var(--gov-secondary);
+  }
+  .gov-action-success {
+    background: #28a745; color: white; border-color: #28a745;
+  }
+  .gov-action-success:hover {
+    background: #218838; transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(40,167,69,0.3); color: white;
+  }
+  .gov-action-danger {
+    background: var(--gov-danger); color: white; border-color: var(--gov-danger);
+  }
+  .gov-action-danger:hover {
+    background: #c82333; transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220,53,69,0.3);
+  }
+  .gov-action-disabled {
+    background: #e9ecef; color: #999; border-color: #dee2e6; cursor: not-allowed;
+  }
+
+  /* ── Empty State ── */
+  .gov-empty-state {
+    padding: 80px 20px; text-align: center;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  }
+  .gov-empty-icon {
+    font-size: 6rem; color: var(--gov-secondary);
+    background: var(--gov-primary); width: 150px; height: 150px;
+    border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; margin: 0 auto 25px;
+    border: 4px solid var(--gov-secondary);
+  }
+  .gov-empty-title {
+    font-size: 2rem; font-weight: 700; color: var(--gov-primary);
+    margin-bottom: 15px; text-transform: uppercase;
+  }
+  .gov-empty-text {
+    color: #666; font-size: 1.1rem; margin-bottom: 30px;
+    max-width: 500px; margin-left: auto; margin-right: auto;
+  }
+
+  /* ── Loading ── */
+  .gov-loading {
+    display: inline-block; width: 20px; height: 20px;
+    border: 3px solid rgba(255,215,0,0.3); border-radius: 50%;
+    border-top-color: var(--gov-secondary); animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Responsive ── */
+  @media (max-width: 992px) {
+    .gov-hero-section { padding: 30px; }
+    .gov-hero-title { font-size: 1.8rem; }
+    .gov-hero-actions { margin-top: 20px; justify-content: flex-start; }
+    .gov-hero-decor { font-size: 6rem; }
+    .gov-table td { min-width: 250px; }
+    .gov-schedule-card { min-width: 400px; }
+  }
+  @media (max-width: 768px) {
+    .gov-stats-grid { grid-template-columns: 1fr; }
+    .gov-hero-title { font-size: 1.5rem; }
+    .gov-hero-subtitle { font-size: 1rem; flex-direction: column; align-items: flex-start; }
+    .gov-hero-btn { width: 100%; min-width: 100%; }
+    .gov-card-title { font-size: 1.3rem; }
+    .gov-bus-info { flex-direction: column; align-items: flex-start; }
+    .gov-action-group { min-width: 140px; }
+    .gov-card-header { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 576px) {
+    .gov-hero-section { padding: 20px; }
+    .gov-stat-card { padding: 20px; }
+    .gov-stat-number { font-size: 2.5rem; }
+    .gov-route { flex-direction: column; align-items: flex-start; }
+    .gov-route-arrow { transform: rotate(90deg); }
+    .gov-schedule-meta { flex-direction: column; }
+    .gov-meta-chip { width: 100%; }
+  }
+</style>
+
+<div class="gov-owner-dashboard">
+
+  <!-- Hero Section (Simplified - removed Register Bus from here) -->
+  <div class="gov-hero-section">
+    <div class="row align-items-center">
+      <div class="col-lg-7 gov-hero-content">
+        <h1 class="gov-hero-title">
+          <i class="bi bi-shield-check me-2"></i>Welcome, {{ user.username }}
+        </h1>
+        <p class="gov-hero-subtitle">
+          <i class="bi bi-calendar-check"></i>
+          <span>{{ "now"|date:"l, F d, Y" }}</span>
+          <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+            <i class="bi bi-bus-front me-1"></i>Fleet Operator
+          </span>
+        </p>
+      </div>
+      <div class="col-lg-5">
+        <div class="gov-hero-actions">
+          <a href="{% url 'bus_status' %}" class="gov-hero-btn gov-hero-btn-outline">
+            <i class="bi bi-clipboard-check"></i>
+            <span>Application Status</span>
+          </a>
+          <a href="{% url 'add_app_review' %}" class="gov-hero-btn gov-hero-btn-outline">
+            <i class="bi bi-chat-square-heart"></i>
+            <span>Give App Review</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <i class="bi bi-bus-front-fill gov-hero-decor"></i>
+  </div>
+
+  <!-- Approval Alert -->
+  {% if not approved %}
+  <div class="gov-alert gov-alert-warning">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <div class="gov-alert-content">
+      <div class="gov-alert-title">Account Pending Verification</div>
+      <p class="gov-alert-text">
+        Your owner account is under review by the transport department.
+        You cannot register buses until your account is approved.
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Stats Grid -->
+  <div class="gov-stats-grid">
+    <a href="{% url 'view_buses' %}" class="gov-stat-card">
+      <div class="gov-stat-content">
+        <div class="gov-stat-label">Total Fleet</div>
+        <div class="gov-stat-number">{{ bus_count|default:"0" }}</div>
+        <div class="gov-stat-desc">Registered Buses</div>
+      </div>
+      <i class="bi bi-bus-front-fill gov-stat-icon"></i>
+    </a>
+    <a href="{% url 'bus_schedules' %}" class="gov-stat-card">
+      <div class="gov-stat-content">
+        <div class="gov-stat-label">Active Routes</div>
+        <div class="gov-stat-number">{{ total_schedules|default:"0" }}</div>
+        <div class="gov-stat-desc">Daily Schedules</div>
+      </div>
+      <i class="bi bi-calendar-event gov-stat-icon"></i>
+    </a>
+  </div>
+
+  <!-- Fleet Management Table -->
+  <div class="gov-main-card">
+    <div class="gov-card-header">
+      <h5 class="gov-card-title">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        Fleet Management Dashboard
+      </h5>
+      <!-- Register Bus Button moved here - prominent position -->
+      <a href="{% url 'add_bus' %}" class="gov-header-register-btn">
+        <i class="bi bi-plus-circle-fill"></i>
+        Register New Bus
+      </a>
+    </div>
+
+    {% if buses %}
+      <div class="gov-table-container">
+        <table class="gov-table">
+          <thead>
+            <tr>
+              <th>Bus Information</th>
+              <th>Driver Details</th>
+              <th>Status</th>
+              <th>Schedules &amp; Routes</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bus in buses %}
+            <tr>
+
+              <!-- Bus Info -->
+              <td>
+                <div class="gov-bus-info">
+                  <div class="gov-bus-avatar">
+                    <i class="bi bi-bus-front"></i>
+                  </div>
+                  <div class="gov-bus-details">
+                    <div class="gov-bus-name">{{ bus.bus_name }}</div>
+                    <div class="gov-bus-number">
+                      <i class="bi bi-hash"></i>
+                      {{ bus.bus_number }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Driver -->
+              <td>
+                {% if bus.driver_name %}
+                  <div class="gov-driver-info">
+                    <div class="gov-driver-avatar">
+                      <i class="bi bi-person-badge"></i>
+                    </div>
+                    <span class="gov-driver-name">{{ bus.driver_name }}</span>
+                  </div>
+                {% else %}
+                  <div class="gov-driver-empty">
+                    <i class="bi bi-dash-circle"></i>
+                    Not assigned
+                  </div>
+                {% endif %}
+              </td>
+
+              <!-- Status -->
+              <td>
+                {% if bus.approved %}
+                  <span class="gov-status-badge gov-status-active">
+                    <i class="bi bi-check-circle-fill"></i> Active
+                  </span>
+                {% else %}
+                  <span class="gov-status-badge gov-status-pending">
+                    <i class="bi bi-clock-fill"></i> Pending
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Schedules -->
+              <td>
+                {% if bus.schedules.count %}
+                  {% for schedule in bus.schedules.all %}
+                    <div class="gov-schedule-card">
+
+                      <div class="gov-route">
+                        <span class="gov-route-point">
+                          <i class="bi bi-geo-alt"></i>
+                          {{ schedule.route.start_location }}
+                        </span>
+                        <i class="bi bi-arrow-right-circle gov-route-arrow"></i>
+                        <span class="gov-route-point">
+                          <i class="bi bi-flag"></i>
+                          {{ schedule.route.end_location }}
+                        </span>
+                      </div>
+
+                      <div class="gov-schedule-meta">
+                        <span class="gov-meta-chip">
+                          <i class="bi bi-clock"></i>
+                          Depart: {{ schedule.departure_time|date:"M d, H:i" }}
+                        </span>
+                        <span class="gov-meta-chip">
+                          <i class="bi bi-clock-history"></i>
+                          Arrive: {{ schedule.arrival_time|date:"M d, H:i" }}
+                        </span>
+                        <span class="gov-meta-chip gov-fare-chip">
+                          <i class="bi bi-currency-rupee"></i>
+                          {{ schedule.fare }}
+                        </span>
+                      </div>
+
+                      {% if schedule.route.stops.count %}
+                        <button class="gov-stops-btn" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#stops{{ schedule.id }}">
+                          <i class="bi bi-pin-map"></i>
+                          View {{ schedule.route.stops.count }} Stops
+                        </button>
+                        <div class="collapse" id="stops{{ schedule.id }}">
+                          <div class="gov-stops-section">
+                            {% for stop in schedule.route.stops.all %}
+                              <div class="gov-stop-item">
+                                <span class="gov-stop-name">
+                                  <i class="bi bi-geo-alt"></i>
+                                  {{ stop.stop_name }}
+                                </span>
+                                <span class="gov-stop-time">{{ stop.arrival_time|time:"H:i" }}</span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      <form method="POST" action="{% url 'delete_schedule' schedule.id %}"
+                            onsubmit="return confirm('⚠️ Delete this schedule permanently?');">
+                        {% csrf_token %}
+                        <button type="submit" class="gov-delete-schedule" title="Delete Schedule">
+                          <i class="bi bi-trash-fill"></i>
+                        </button>
+                      </form>
+
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-muted fst-italic">
+                    <i class="bi bi-calendar-x me-1"></i>No schedules configured
+                  </div>
+                {% endif %}
+              </td>
+
+              <!-- Actions -->
+              <td>
+                <div class="gov-action-group">
+                  {% if bus.approved %}
+                    <a href="{% url 'add_schedule' bus.id %}" class="gov-action-btn gov-action-primary">
+                      <i class="bi bi-plus-circle"></i> Add Schedule
+                    </a>
+                    <a href="{% url 'view_bookings' bus.id %}" class="gov-action-btn gov-action-success">
+                      <i class="bi bi-people"></i> View Bookings
+                    </a>
+                  {% else %}
+                    <button class="gov-action-btn gov-action-disabled" disabled>
+                      <i class="bi bi-lock"></i> Awaiting Approval
+                    </button>
+                  {% endif %}
+
+                  <form method="POST" action="{% url 'delete_bus' bus.id %}"
+                        onsubmit="return confirm('⚠️ This will delete the bus and ALL its schedules. Continue?');">
+                    {% csrf_token %}
+                    <button type="submit" class="gov-action-btn gov-action-danger">
+                      <i class="bi bi-trash"></i> Delete Bus
+                    </button>
+                  </form>
+                </div>
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="gov-empty-state">
+        <div class="gov-empty-icon">
+          <i class="bi bi-bus-front"></i>
+        </div>
+        <h4 class="gov-empty-title">No Buses in Fleet</h4>
+        <p class="gov-empty-text">
+          Start building your transport business by registering your first vehicle with the transport department.
+        </p>
+        <a href="{% url 'add_bus' %}" class="gov-action-btn gov-action-primary px-5 py-3"
+           style="display: inline-flex; width: auto;">
+          <i class="bi bi-plus-circle"></i> Register Your First Bus
+        </a>
+      </div>
+    {% endif %}
+
+  </div><!-- /.gov-main-card -->
+
+</div><!-- /.gov-owner-dashboard -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Bootstrap tooltips
+    [].slice.call(document.querySelectorAll('[title]')).forEach(function (el) {
+      new bootstrap.Tooltip(el);
+    });
+
+    // Auto-hide alerts after 5 s
+    setTimeout(function () {
+      document.querySelectorAll('.gov-alert').forEach(function (alert) {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(function () { alert.style.display = 'none'; }, 500);
+      });
+    }, 5000);
+  });
+</script>
+
+{% endblock %}

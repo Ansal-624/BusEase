@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Message{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <a href="{% url 'main_inbox' %}" class="btn btn-light mb-3">← Back to inbox</a>
+
+  <div class="card">
+    <div class="card-header">
+      <strong>{{ n.subject|default:"Message" }}</strong>
+      <span class="text-muted float-end">{{ n.created_at|date:"M d, Y H:i" }}</span>
+    </div>
+    <div class="card-body">
+      <p>{{ n.body|linebreaks }}</p>
+      <p class="text-muted">From: {{ n.sender.username if n.sender else "System" }}</p>
+    </div>
+  </div>
+
+  <!-- Owner reply button (only shown if this user is owner and original sender is admin) -->
+  {% if user.role == "owner" and n.sender and (n.sender.is_superuser or n.sender.role=="admin") %}
+    <div class="mt-3">
+      <a href="{% url 'main_owner_reply' n.id %}" class="btn btn-primary">Reply to Admin</a>
+    </div>
+  {% endif %}
+
+  <!-- If this is complaint and user is admin show quick reply form -->
+  {% if user.is_superuser and n.type == "complaint" %}
+    <div class="mt-4">
+      <h5>Reply to complaint</h5>
+      <form method="post" action="{% url 'main_admin_compose' %}">
+        {% csrf_token %}
+        <input type="hidden" name="to_username" value="{{ n.sender.username }}">
+        <div class="mb-2"><input name="subject" class="form-control" placeholder="Subject (optional)"></div>
+        <div class="mb-2"><textarea name="body" rows="3" class="form-control" placeholder="Reply..."></textarea></div>
+        <button class="btn btn-success">Send Reply</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

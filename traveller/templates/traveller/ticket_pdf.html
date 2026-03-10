@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Government Bus Ticket</title>
+<style>
+  /* EXTREMELY SIMPLE - NO FLOATS, NO COMPLEX CSS */
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0;
+    padding: 20px;
+    background: white;
+  }
+
+  .ticket {
+    max-width: 600px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    page-break-inside: avoid;
+  }
+
+  /* Header - simple block */
+  .header {
+    background: #003366;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 3px solid #FFD700;
+  }
+
+  .header h1 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .header h2 {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: #FFD700;
+    font-weight: normal;
+  }
+
+  .booking-id {
+    background: rgba(255,255,255,0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  /* Content */
+  .content {
+    padding: 20px;
+  }
+
+  /* SIMPLE TABLE LAYOUT - MOST RELIABLE FOR PDF */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+  }
+
+  td {
+    padding: 8px 5px;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .label {
+    width: 100px;
+    font-weight: bold;
+    color: #003366;
+  }
+
+  .value {
+    font-weight: normal;
+  }
+
+  /* Two column table */
+  .two-col {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .two-col td {
+    width: 50%;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .col-label {
+    font-weight: bold;
+    color: #003366;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .col-value {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  /* Status */
+  .status-confirmed {
+    background: #d4edda;
+    color: #155724;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: bold;
+    border: 1px solid #c3e6cb;
+  }
+
+  /* Route - simple */
+  .route-box {
+    background: #f0f4f8;
+    padding: 12px;
+    margin: 15px 0;
+    text-align: center;
+    border: 1px solid #003366;
+    border-radius: 8px;
+  }
+
+  .route-from, .route-to {
+    font-weight: bold;
+    color: #003366;
+  }
+
+  .route-arrow {
+    margin: 0 10px;
+    font-size: 16px;
+    color: #FFD700;
+  }
+
+  /* Fare */
+  .fare-box {
+    background: #003366;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    color: white;
+  }
+
+  .fare-left {
+    display: inline-block;
+    width: 60%;
+    color: #FFD700;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .fare-right {
+    display: inline-block;
+    width: 39%;
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+    color: #FFD700;
+  }
+
+  /* QR */
+  .qr-box {
+    margin: 15px 0;
+    padding: 12px 0;
+    border-top: 2px dashed #003366;
+    border-bottom: 2px dashed #003366;
+  }
+
+  .qr-left {
+    display: inline-block;
+    width: 70%;
+    font-size: 11px;
+    color: #666;
+  }
+
+  .qr-right {
+    display: inline-block;
+    width: 28%;
+    text-align: right;
+  }
+
+  .qr-placeholder {
+    display: inline-block;
+    width: 45px;
+    height: 45px;
+    background: #f0f0f0;
+    border: 1px solid #003366;
+    text-align: center;
+    line-height: 45px;
+    font-size: 25px;
+    color: #999;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #dddddd;
+    font-size: 10px;
+    color: #666;
+  }
+
+  .footer strong {
+    color: #003366;
+    display: block;
+    margin: 5px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="ticket">
+  
+  <!-- HEADER - definitely visible -->
+  <div class="header">
+    <h1>GOVERNMENT OF INDIA</h1>
+    <h2>Ministry of Road Transport & Highways</h2>
+    <div class="booking-id">Booking ID: #{{ booking.id }}</div>
+  </div>
+
+  <!-- CONTENT - using tables for reliability -->
+  <div class="content">
+    
+    <!-- Passenger row -->
+    <table>
+      <tr>
+        <td class="label">Passenger:</td>
+        <td class="value">{{ booking.traveller.username }}</td>
+      </tr>
+    </table>
+
+    <!-- Bus row -->
+    <table>
+      <tr>
+        <td class="label">Bus:</td>
+        <td class="value">{{ booking.bus.bus_name }} ({{ booking.bus.bus_number }})</td>
+      </tr>
+    </table>
+
+    <!-- Seat and Status - two column table -->
+    <table class="two-col">
+      <tr>
+        <td>
+          <div class="col-label">Seat Number</div>
+          <div class="col-value">{{ booking.seat_number }}</div>
+        </td>
+        <td>
+          <div class="col-label">Status</div>
+          <div>
+            <span class="status-confirmed">{{ booking.status }}</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Route -->
+    <div class="route-box">
+      <span class="route-from">{{ booking.from_stop.stop_name }}</span>
+      <span class="route-arrow">→</span>
+      <span class="route-to">{{ booking.to_stop.stop_name }}</span>
+    </div>
+
+    <!-- Departure and Booking Date -->
+    <table class="two-col">
+      <tr>
+        <td>
+          <div class="col-label">Departure</div>
+          <div>{{ booking.schedule.departure_time|date:"d M Y, h:i A" }}</div>
+        </td>
+        <td>
+          <div class="col-label">Booking Date</div>
+          <div>{{ booking.booking_date|date:"d M Y, h:i A" }}</div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Fare -->
+    <div class="fare-box">
+      <span class="fare-left">TOTAL FARE PAID</span>
+      <span class="fare-right">₹{{ booking.total_fare }}</span>
+    </div>
+
+    <!-- QR Code -->
+    <div class="qr-box">
+      <span class="qr-left">📱 Scan QR code at boarding</span>
+      <span class="qr-right">
+        <span class="qr-placeholder">◼</span>
+      </span>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div>✓ Valid with government ID proof</div>
+      <strong>Computer generated authorized ticket</strong>
+      <div>Thank you for choosing Government Transport Services</div>
+      <div style="margin-top:8px;">BusEase - Government Transport Portal</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

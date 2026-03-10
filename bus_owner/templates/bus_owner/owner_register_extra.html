@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Owner Registration{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width:650px">
+
+  <h2 class="mb-4 text-center">Bus Owner Signup</h2>
+
+  <form method="POST" enctype="multipart/form-data" class="card p-4 shadow">
+    {% csrf_token %}
+
+    <!-- ============ USER ACCOUNT DETAILS ============ -->
+    <h5 class="mb-3">Account Details</h5>
+
+    <div class="mb-3">
+      <label>Username</label>
+      <input type="text" name="username" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Email Address</label>
+      <input type="email" name="email" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Password</label>
+      <input type="password" name="password" class="form-control" required>
+    </div>
+
+
+    <!-- ============ OWNER DETAILS ============ -->
+    <hr>
+    <h5 class="mb-3">Owner Details</h5>
+
+    <div class="mb-3">
+      <label>Contact Number</label>
+      <input type="text" name="contact_number" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label>Address</label>
+      <textarea name="address" class="form-control" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label>Owner Photo</label>
+      <input type="file" name="owner_photo" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label>Business License</label>
+      <input type="file" name="business_license" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label>ID Proof</label>
+      <input type="file" name="id_proof" class="form-control">
+    </div>
+
+    <button class="btn btn-success w-100">Register as Owner</button>
+  </form>
+
+</div>
+{% endblock %}

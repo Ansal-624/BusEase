@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h4>File a Complaint</h4>
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-2"><input name="subject" class="form-control" placeholder="Subject (optional)"></div>
+    <div class="mb-2"><textarea name="body" rows="5" class="form-control" placeholder="Describe your complaint..."></textarea></div>
+    <button class="btn btn-danger">Submit Complaint</button>
+  </form>
+</div>
+{% endblock %}

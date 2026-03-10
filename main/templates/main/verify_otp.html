@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Verify OTP - BusEase{% endblock %}
+{% block content %}
+
+<style>
+  /* === SAME DESIGN SYSTEM AS LOGIN === */
+  .login-wrapper {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .login-container {
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 24px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    animation: slideUp 0.6s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .login-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 30px rgba(102,126,234,0.3);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .login-icon i {
+    font-size: 2.5rem;
+    color: white;
+  }
+
+  .login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  .login-subtitle {
+    color: #666;
+    font-size: 1rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+  }
+
+  .form-control {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 1.4rem;
+    text-align: center;
+    letter-spacing: 10px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+    background: white;
+    outline: none;
+  }
+
+  .btn-login {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(102,126,234,0.4);
+  }
+
+  .resend-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.95rem;
+  }
+
+  .resend-link a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .resend-link a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-card">
+
+      <!-- Header -->
+      <div class="login-header">
+        <div class="login-icon">
+          <i class="bi bi-envelope-check"></i>
+        </div>
+        <h2 class="login-title">OTP Verification</h2>
+        <p class="login-subtitle">
+          Enter the 4-digit code sent to your email
+        </p>
+      </div>
+
+      <!-- Messages -->
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+
+      <!-- OTP Form -->
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-4">
+          <label class="form-label text-center w-100">
+            OTP Code
+          </label>
+          <input
+            type="text"
+            name="otp"
+            maxlength="4"
+            class="form-control"
+            placeholder="• • • •"
+            required
+            autofocus
+          >
+        </div>
+
+        <button type="submit" class="btn-login">
+          <i class="bi bi-check-circle"></i> Verify OTP
+        </button>
+      </form>
+
+      <!-- Resend -->
+      <div class="resend-link">
+        Didn’t receive the code?
+        <a href="{% url 'forgot_password' %}">Resend OTP</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

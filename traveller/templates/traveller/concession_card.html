@@ -1,0 +1,893 @@
+{% extends 'base.html' %}
+{% block title %}Government Concession Card - Transport Portal{% endblock %}
+{% block content %}
+
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-ecard-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fa;
+    padding: 30px 0;
+    position: relative;
+  }
+
+  .gov-ecard-container {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  /* Main Card */
+  .gov-concession-card {
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 25px 50px rgba(0,51,102,0.25);
+    overflow: hidden;
+    position: relative;
+    animation: govSlideUp 0.6s ease-out;
+    border: 2px solid var(--gov-primary);
+  }
+
+  @keyframes govSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Card Header - Government Style */
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 30px 25px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid var(--gov-secondary);
+  }
+
+  .gov-card-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+
+  .gov-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+
+  .gov-header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .gov-emblem {
+    width: 80px;
+    height: 80px;
+    background: var(--gov-secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    border: 3px solid white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+
+  .gov-emblem i {
+    font-size: 3rem;
+    color: var(--gov-primary);
+  }
+
+  .gov-card-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0 0 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Times New Roman', serif;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .gov-card-subtitle {
+    color: var(--gov-secondary);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Card Body */
+  .gov-card-body {
+    padding: 35px;
+    position: relative;
+    background: white;
+  }
+
+  .gov-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-size: 8rem;
+    color: var(--gov-primary);
+    opacity: 0.02;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .gov-watermark i {
+    font-size: inherit;
+  }
+
+  /* Photo Section */
+  .gov-photo-section {
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-photo-frame {
+    display: inline-block;
+    position: relative;
+  }
+
+  .gov-photo-frame::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    background: linear-gradient(135deg, var(--gov-primary), var(--gov-secondary));
+    border-radius: 50%;
+    z-index: -1;
+    animation: govPulse 2s infinite;
+  }
+
+  @keyframes govPulse {
+    0%, 100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+
+  .gov-traveller-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    box-shadow: 0 10px 30px rgba(0,51,102,0.3);
+  }
+
+  .gov-verified-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: var(--gov-success);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  /* Name & ID */
+  .gov-traveller-name {
+    color: var(--gov-primary);
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0 0 5px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Times New Roman', serif;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-card-id {
+    color: #666;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gov-card-id i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-card-id span {
+    color: var(--gov-primary);
+    font-weight: 700;
+  }
+
+  /* Info Grid */
+  .gov-info-grid {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-info-item {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .gov-info-item:hover {
+    border-color: var(--gov-primary);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.1);
+  }
+
+  .gov-info-icon {
+    width: 45px;
+    height: 45px;
+    background: var(--gov-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-info-icon i {
+    color: var(--gov-secondary);
+    font-size: 1.3rem;
+  }
+
+  .gov-info-content {
+    flex: 1;
+  }
+
+  .gov-info-label {
+    color: #666;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+
+  .gov-info-value {
+    color: var(--gov-primary);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  /* Route Display */
+  .gov-route-card {
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border: 2px solid var(--gov-primary);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-route-point {
+    text-align: center;
+    flex: 1;
+  }
+
+  .gov-point-icon {
+    width: 45px;
+    height: 45px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-point-icon i {
+    color: var(--gov-secondary);
+    font-size: 1.3rem;
+  }
+
+  .gov-point-label {
+    color: #666;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+
+  .gov-point-name {
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .gov-route-arrow {
+    color: var(--gov-secondary);
+    font-size: 2rem;
+  }
+
+  /* Status Badge */
+  .gov-status-container {
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 30px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 2px solid;
+  }
+
+  .gov-status-approved {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-color: #28a745;
+  }
+
+  .gov-status-pending {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+
+  .gov-status-rejected {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  /* Validity Section */
+  .gov-validity-section {
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border: 2px solid var(--gov-primary);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-validity-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--gov-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .gov-validity-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-validity-dates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .gov-validity-item {
+    text-align: center;
+  }
+
+  .gov-validity-label {
+    color: #666;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .gov-validity-value {
+    background: var(--gov-gradient);
+    color: var(--gov-secondary);
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: 1px solid var(--gov-secondary);
+  }
+
+  /* QR Code Section */
+  .gov-qr-section {
+    background: white;
+    border: 2px solid var(--gov-primary);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-qr-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--gov-primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .gov-qr-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-qr-placeholder {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, var(--gov-primary), var(--gov-accent));
+    border-radius: 20px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--gov-secondary);
+  }
+
+  .gov-qr-placeholder i {
+    color: var(--gov-secondary);
+    font-size: 4rem;
+  }
+
+  .gov-qr-text {
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .gov-qr-text i {
+    color: var(--gov-secondary);
+  }
+
+  /* Document Button */
+  .gov-document-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    border: 2px solid var(--gov-secondary);
+    border-radius: 16px;
+    padding: 15px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-document-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.3);
+  }
+
+  .gov-document-btn i {
+    font-size: 1.3rem;
+  }
+
+  /* Action Buttons */
+  .gov-action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 25px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gov-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-action-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.2);
+  }
+
+  .gov-action-btn i {
+    font-size: 1.1rem;
+  }
+
+  /* Card Footer */
+  .gov-card-footer {
+    background: var(--gov-gradient);
+    padding: 20px 25px;
+    text-align: center;
+    border-top: 3px solid var(--gov-secondary);
+    position: relative;
+  }
+
+  .gov-footer-text {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-footer-subtext {
+    color: var(--gov-secondary);
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  .gov-issuer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    color: white;
+    font-weight: 700;
+  }
+
+  .gov-issuer i {
+    color: var(--gov-secondary);
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-card-body {
+      padding: 25px;
+    }
+
+    .gov-traveller-name {
+      font-size: 1.5rem;
+    }
+
+    .gov-route-card {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .gov-route-arrow {
+      transform: rotate(90deg);
+    }
+
+    .gov-validity-dates {
+      grid-template-columns: 1fr;
+    }
+
+    .gov-action-buttons {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    .gov-back-btn,
+    .gov-action-buttons {
+      display: none;
+    }
+
+    .gov-concession-card {
+      box-shadow: none;
+      border: 2px solid #000;
+    }
+
+    .gov-card-header {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+
+<div class="gov-ecard-page">
+  <div class="gov-ecard-container">
+
+    <!-- Back Button -->
+    <a href="javascript:history.back()" class="gov-back-btn">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <!-- Main Concession Card -->
+    <div class="gov-concession-card">
+      
+      <!-- Header -->
+      <div class="gov-card-header">
+        <div class="gov-header-content">
+          <div class="gov-emblem">
+            <i class="bi bi-shield-shaded"></i>
+          </div>
+          <h2 class="gov-card-title">Government of India</h2>
+          <p class="gov-card-subtitle">Ministry of Road Transport & Highways</p>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="gov-card-body">
+        
+        <!-- Watermark -->
+        <div class="gov-watermark">
+          <i class="bi bi-shield-shaded"></i>
+        </div>
+
+        <!-- Photo Section -->
+        <div class="gov-photo-section">
+          <div class="gov-photo-frame">
+            {% if concession.photo %}
+              <img src="{{ concession.photo.url }}" alt="Traveller Photo" class="gov-traveller-photo">
+            {% else %}
+              <div class="gov-traveller-photo" style="display: flex; align-items: center; justify-content: center; background: var(--gov-gradient); color: var(--gov-secondary);">
+                <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+              </div>
+            {% endif %}
+            <div class="gov-verified-badge">
+              <i class="bi bi-patch-check-fill"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Name & ID -->
+        <h3 class="gov-traveller-name">
+          {{ concession.traveller.get_full_name|default:concession.traveller.username }}
+        </h3>
+        <p class="gov-card-id">
+          <i class="bi bi-hash"></i>
+          <span>Card ID:</span> {{ concession.id|stringformat:"06d" }}
+        </p>
+
+        <!-- College Info -->
+        <div class="gov-info-grid">
+          <div class="gov-info-item">
+            <div class="gov-info-icon">
+              <i class="bi bi-mortarboard"></i>
+            </div>
+            <div class="gov-info-content">
+              <div class="gov-info-label">Educational Institution</div>
+              <div class="gov-info-value">{{ concession.college_name }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route -->
+        <div class="gov-route-card">
+          <div class="gov-route-point">
+            <div class="gov-point-icon">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="gov-point-label">From</div>
+            <div class="gov-point-name">{{ concession.starting_location }}</div>
+          </div>
+
+          <i class="bi bi-arrow-right-circle-fill gov-route-arrow"></i>
+
+          <div class="gov-route-point">
+            <div class="gov-point-icon">
+              <i class="bi bi-flag"></i>
+            </div>
+            <div class="gov-point-label">To</div>
+            <div class="gov-point-name">{{ concession.ending_location }}</div>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="gov-status-container">
+          {% if concession.status == "Approved" %}
+            <span class="gov-status-badge gov-status-approved">
+              <i class="bi bi-check-circle-fill"></i> Approved
+            </span>
+          {% elif concession.status == "Pending" %}
+            <span class="gov-status-badge gov-status-pending">
+              <i class="bi bi-clock-history"></i> Pending Review
+            </span>
+          {% elif concession.status == "Rejected" %}
+            <span class="gov-status-badge gov-status-rejected">
+              <i class="bi bi-x-circle-fill"></i> Rejected
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Validity Dates (if approved) -->
+        {% if concession.status == "Approved" %}
+          <div class="gov-validity-section">
+            <div class="gov-validity-title">
+              <i class="bi bi-calendar-check"></i> Validity Period
+            </div>
+            <div class="gov-validity-dates">
+              <div class="gov-validity-item">
+                <div class="gov-validity-label">Valid From</div>
+                <div class="gov-validity-value">
+                  {% if concession_detail %}
+                    {{ concession_detail.valid_from|date:"d M Y" }}
+                  {% else %}
+                    {{ concession.approved_on|date:"d M Y" }}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="gov-validity-item">
+                <div class="gov-validity-label">Valid Until</div>
+                <div class="gov-validity-value">
+                  {% if concession_detail %}
+                    {{ concession_detail.valid_till|date:"d M Y" }}
+                  {% else %}
+                    ---
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code Section -->
+          <div class="gov-qr-section">
+            <div class="gov-qr-title">
+              <i class="bi bi-qr-code"></i> Verification QR
+            </div>
+            <div class="gov-qr-placeholder">
+              <i class="bi bi-qr-code"></i>
+            </div>
+            <p class="gov-qr-text">
+              <i class="bi bi-shield-check"></i> Scan to verify authenticity
+            </p>
+          </div>
+        {% endif %}
+
+        <!-- Document Link -->
+        {% if concession.document %}
+          <a href="{{ concession.document.url }}" target="_blank" class="gov-document-btn">
+            <i class="bi bi-file-earmark-pdf"></i>
+            View Supporting Document
+          </a>
+        {% endif %}
+
+        <!-- Action Buttons - FIXED: Only Print button for now -->
+        <div class="gov-action-buttons">
+          <button onclick="window.print()" class="gov-action-btn">
+            <i class="bi bi-printer"></i> Print Card
+          </button>
+          <!-- Download button removed to prevent NoReverseMatch error -->
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="gov-card-footer">
+        <p class="gov-footer-text">Issued by Ministry of Road Transport & Highways</p>
+        <p class="gov-footer-subtext">
+          Issued on: {{ concession.approved_on|date:"d M Y" }}
+        </p>
+        <div class="gov-issuer">
+          <i class="bi bi-patch-check-fill"></i>
+          <span>Digitally Verified Document</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple function for future PDF download - no template tags here!
+  function downloadCard() {
+    alert('PDF download feature coming soon!');
+  }
+</script>
+
+{% endblock %}

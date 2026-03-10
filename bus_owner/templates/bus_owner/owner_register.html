@@ -1,0 +1,722 @@
+{% extends 'base.html' %}
+{% block title %}Owner Registration - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-register-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fa;
+    padding: 40px 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  /* Government Background Watermark */
+  .gov-register-page::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    width: 800px;
+    height: 800px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    pointer-events: none;
+  }
+
+  .gov-register-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+
+  /* Header Section */
+  .gov-header-section {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .gov-header-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 10px 25px rgba(0,51,102,0.2);
+  }
+
+  .gov-header-icon i {
+    font-size: 3rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-header-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--gov-primary);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Times New Roman', serif;
+  }
+
+  .gov-header-subtitle {
+    color: #666;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gov-header-subtitle i {
+    color: var(--gov-secondary);
+  }
+
+  /* Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 30px;
+    padding: 45px;
+    box-shadow: 0 25px 50px rgba(0,51,102,0.25);
+    border: 2px solid var(--gov-primary);
+    position: relative;
+    overflow: hidden;
+    animation: govSlideUp 0.6s ease-out;
+  }
+
+  @keyframes govSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .gov-form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary), var(--gov-primary));
+  }
+
+  .gov-form-card::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 150px;
+    height: 150px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    pointer-events: none;
+  }
+
+  /* Form Sections */
+  .gov-form-section {
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  .gov-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .gov-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+
+  .gov-section-title i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .gov-section-title h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Form Groups */
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+    font-size: 1rem;
+  }
+
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
+  }
+
+  .gov-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 14px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+  }
+
+  .gov-input:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+
+  .gov-input::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+
+  .gov-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 14px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+
+  /* File Upload */
+  .gov-file-upload {
+    border: 2px dashed var(--gov-primary);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .gov-file-upload:hover {
+    background: #e9ecef;
+    border-color: var(--gov-secondary);
+  }
+
+  .gov-file-upload i {
+    font-size: 2rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+  }
+
+  .gov-file-upload p {
+    color: var(--gov-primary);
+    font-weight: 600;
+    margin: 0 0 5px;
+  }
+
+  .gov-file-upload small {
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* File Preview */
+  .gov-file-preview {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: #f0f4ff;
+    border-radius: 10px;
+    border-left: 4px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: var(--gov-primary);
+  }
+
+  .gov-file-preview i {
+    color: var(--gov-secondary);
+  }
+
+  /* Submit Button */
+  .gov-submit-btn {
+    background: var(--gov-gradient);
+    color: white;
+    border: 3px solid var(--gov-secondary);
+    border-radius: 50px;
+    padding: 18px 30px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 30px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .gov-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .gov-submit-btn:hover {
+    background: linear-gradient(135deg, #002244, #001122);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,51,102,0.4);
+  }
+
+  .gov-submit-btn:hover::before {
+    left: 100%;
+  }
+
+  .gov-submit-btn i {
+    color: var(--gov-secondary);
+    font-size: 1.3rem;
+  }
+
+  /* Login Link */
+  .gov-login-link {
+    text-align: center;
+    margin-top: 25px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px dashed var(--gov-primary);
+  }
+
+  .gov-login-link p {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  .gov-login-link a {
+    color: var(--gov-primary);
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 5px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .gov-login-link a:hover {
+    color: var(--gov-secondary);
+    text-decoration: underline;
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #856404;
+  }
+
+  .gov-alert i {
+    font-size: 1.2rem;
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    border-left-color: #28a745;
+    color: #155724;
+  }
+
+  /* Loading State */
+  .gov-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    color: transparent;
+    position: relative;
+  }
+
+  .gov-submit-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    top: 50%;
+    left: 50%;
+    margin-left: -12.5px;
+    margin-top: -12.5px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
+    border-radius: 50%;
+    animation: govSpin 0.8s linear infinite;
+  }
+
+  @keyframes govSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .gov-form-card {
+      padding: 30px 25px;
+    }
+
+    .gov-header-title {
+      font-size: 1.8rem;
+    }
+
+    .gov-section-title h3 {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .gov-form-card {
+      padding: 25px 20px;
+    }
+
+    .gov-header-title {
+      font-size: 1.5rem;
+    }
+
+    .gov-submit-btn {
+      font-size: 1rem;
+      padding: 15px 20px;
+    }
+  }
+</style>
+
+<div class="gov-register-page">
+  <div class="gov-register-container">
+
+    <!-- Header -->
+    <div class="gov-header-section">
+      <div class="gov-header-icon">
+        <i class="bi bi-person-badge-fill"></i>
+      </div>
+      <h1 class="gov-header-title">Bus Owner Registration</h1>
+      <p class="gov-header-subtitle">
+        <i class="bi bi-shield-check"></i>
+        Register as a government-approved transport operator
+        <i class="bi bi-shield-check"></i>
+      </p>
+    </div>
+
+    <!-- Display Django messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="gov-alert {% if message.tags == 'success' %}gov-alert-success{% endif %}">
+          <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="gov-form-card">
+      <form method="POST" enctype="multipart/form-data" id="ownerRegistrationForm">
+        {% csrf_token %}
+
+        <!-- Account Details Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-person-circle"></i>
+            <h3>Account Details</h3>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-person"></i>
+              Username <span class="gov-required">*</span>
+            </label>
+            <input type="text" name="username" class="gov-input" placeholder="Choose a unique username" required>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-envelope"></i>
+              Email Address <span class="gov-required">*</span>
+            </label>
+            <input type="email" name="email" class="gov-input" placeholder="your.email@example.com" required>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-lock"></i>
+              Password <span class="gov-required">*</span>
+            </label>
+            <input type="password" name="password" class="gov-input" placeholder="Create a secure password" required>
+            <small class="text-muted" style="display: block; margin-top: 5px;">
+              <i class="bi bi-info-circle" style="color: var(--gov-secondary);"></i>
+              Minimum 8 characters with mix of letters and numbers
+            </small>
+          </div>
+        </div>
+
+        <!-- Owner Details Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-briefcase"></i>
+            <h3>Owner Details</h3>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-telephone"></i>
+              Contact Number <span class="gov-required">*</span>
+            </label>
+            <input type="tel" name="contact_number" class="gov-input" placeholder="e.g., 9876543210" required>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-geo-alt"></i>
+              Address <span class="gov-required">*</span>
+            </label>
+            <textarea name="address" class="gov-textarea" placeholder="Enter your full address" required></textarea>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-camera"></i>
+              Owner Photo
+            </label>
+            <div class="gov-file-upload">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Click to upload your photo</p>
+              <small>Supported: JPG, PNG (Max 5MB)</small>
+              <input type="file" name="owner_photo" id="ownerPhoto" class="gov-file-input" accept="image/*">
+            </div>
+            <div id="ownerPhotoPreview" class="gov-file-preview" style="display: none;">
+              <i class="bi bi-check-circle-fill"></i>
+              <span id="ownerPhotoName"></span>
+            </div>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-file-earmark-text"></i>
+              Business License
+            </label>
+            <div class="gov-file-upload">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Upload your business license</p>
+              <small>Supported: PDF, JPG (Max 5MB)</small>
+              <input type="file" name="business_license" id="businessLicense" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+            <div id="licensePreview" class="gov-file-preview" style="display: none;">
+              <i class="bi bi-check-circle-fill"></i>
+              <span id="licenseName"></span>
+            </div>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-file-earmark-person"></i>
+              ID Proof
+            </label>
+            <div class="gov-file-upload">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Upload government ID (Aadhar, Voter ID, etc.)</p>
+              <small>Supported: PDF, JPG (Max 5MB)</small>
+              <input type="file" name="id_proof" id="idProof" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+            <div id="idPreview" class="gov-file-preview" style="display: none;">
+              <i class="bi bi-check-circle-fill"></i>
+              <span id="idName"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="gov-form-section">
+          <div class="gov-checkbox" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <input type="checkbox" id="terms" required style="width: 18px; height: 18px; border: 2px solid var(--gov-primary); border-radius: 4px;">
+            <label for="terms" style="color: #666; font-size: 0.95rem;">
+              I agree to the <a href="#" style="color: var(--gov-primary); font-weight: 600;">Terms of Service</a> and 
+              <a href="#" style="color: var(--gov-primary); font-weight: 600;">Privacy Policy</a> of the transport department
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="gov-submit-btn" id="submitBtn">
+          <i class="bi bi-check-circle"></i>
+          Register as Owner
+          <i class="bi bi-shield-check"></i>
+        </button>
+
+        <!-- Login Link -->
+        <div class="gov-login-link">
+          <p>
+            Already have an owner account?
+            <a href="{% url 'login' %}">LOGIN HERE</a>
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer Note -->
+    <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #999;">
+      <i class="bi bi-shield-check" style="color: var(--gov-secondary);"></i>
+      Registration is subject to verification by the transport department
+    </p>
+
+  </div>
+</div>
+
+<script>
+  // File preview functionality
+  document.getElementById('ownerPhoto').addEventListener('change', function(e) {
+    const preview = document.getElementById('ownerPhotoPreview');
+    const fileName = document.getElementById('ownerPhotoName');
+    
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+
+  document.getElementById('businessLicense').addEventListener('change', function(e) {
+    const preview = document.getElementById('licensePreview');
+    const fileName = document.getElementById('licenseName');
+    
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+
+  document.getElementById('idProof').addEventListener('change', function(e) {
+    const preview = document.getElementById('idPreview');
+    const fileName = document.getElementById('idName');
+    
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+
+  // Form submission with loading state
+  document.getElementById('ownerRegistrationForm').addEventListener('submit', function(e) {
+    const termsChecked = document.getElementById('terms').checked;
+    
+    if (!termsChecked) {
+      e.preventDefault();
+      alert('Please accept the Terms and Conditions to continue');
+      return;
+    }
+    
+    document.getElementById('submitBtn').classList.add('loading');
+  });
+
+  // Auto-hide alerts after 5 seconds
+  setTimeout(function() {
+    document.querySelectorAll('.gov-alert').forEach(alert => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => alert.style.display = 'none', 500);
+    });
+  }, 5000);
+</script>
+
+{% endblock %}

@@ -1,0 +1,722 @@
+{% extends 'base.html' %}
+{% block title %}Bus Documents - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .gov-documents-page {
+    padding: 20px 0 40px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+  }
+
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .gov-hero-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .gov-hero-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .gov-bus-badge {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid var(--gov-secondary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+  }
+
+  .gov-bus-badge i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-hero-decor {
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+    font-size: 8rem;
+    color: var(--gov-secondary);
+    opacity: 0.15;
+    transform: rotate(5deg);
+  }
+
+  /* Section Title */
+  .gov-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 30px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--gov-primary);
+  }
+
+  .gov-section-title i {
+    font-size: 2rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .gov-section-title h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-section-subtitle {
+    color: #666;
+    margin-left: auto;
+    font-size: 0.9rem;
+  }
+
+  /* Photos Grid */
+  .gov-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+
+  .gov-photo-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,51,102,0.1);
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+  }
+
+  .gov-photo-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gov-primary);
+    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+  }
+
+  .gov-photo-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f8f9fa;
+  }
+
+  .gov-photo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .gov-photo-card:hover .gov-photo-container img {
+    transform: scale(1.05);
+  }
+
+  .gov-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,51,102,0.7), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .gov-photo-card:hover .gov-photo-overlay {
+    opacity: 1;
+  }
+
+  .gov-photo-caption {
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-photo-caption i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-photo-footer {
+    padding: 15px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .gov-photo-name {
+    font-size: 0.9rem;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+
+  .gov-photo-view {
+    color: var(--gov-primary);
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .gov-photo-view:hover {
+    color: var(--gov-secondary);
+  }
+
+  .gov-empty-photos {
+    background: white;
+    border: 2px dashed var(--gov-primary);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    color: #666;
+  }
+
+  .gov-empty-photos i {
+    font-size: 3rem;
+    color: var(--gov-secondary);
+    margin-bottom: 10px;
+  }
+
+  /* Documents Card */
+  .gov-documents-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,51,102,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    margin: 30px 0;
+  }
+
+  .gov-documents-header {
+    background: var(--gov-gradient);
+    padding: 20px 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+  }
+
+  .gov-documents-header h4 {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-documents-header h4 i {
+    color: var(--gov-secondary);
+  }
+
+  /* Document Table */
+  .gov-document-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .gov-document-table thead tr {
+    background: #f0f4ff;
+  }
+
+  .gov-document-table thead th {
+    color: var(--gov-primary);
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid var(--gov-primary);
+    text-align: left;
+  }
+
+  .gov-document-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .gov-document-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  }
+
+  .gov-document-table td {
+    padding: 18px 20px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .gov-document-type {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .gov-document-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gov-gradient);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gov-secondary);
+    font-size: 1.2rem;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-document-name {
+    font-weight: 600;
+    color: var(--gov-primary);
+    font-size: 1rem;
+  }
+
+  /* Document Action Buttons */
+  .gov-doc-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .gov-doc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .gov-doc-view {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    border-color: var(--gov-secondary);
+  }
+
+  .gov-doc-view:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,51,102,0.3);
+    color: var(--gov-secondary);
+  }
+
+  .gov-doc-download {
+    background: var(--gov-success);
+    color: white;
+    border-color: var(--gov-success);
+  }
+
+  .gov-doc-download:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  }
+
+  .gov-doc-disabled {
+    background: #e9ecef;
+    color: #999;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    display: inline-block;
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    background: white;
+    border: 2px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    transform: translateX(-5px);
+  }
+
+  /* Photo Modal */
+  .gov-photo-modal .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 3px solid var(--gov-secondary);
+  }
+
+  .gov-photo-modal .modal-header {
+    background: var(--gov-gradient);
+    color: white;
+    border-bottom: 2px solid var(--gov-secondary);
+    padding: 15px 20px;
+  }
+
+  .gov-photo-modal .modal-header h5 {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .gov-photo-modal .modal-header .btn-close {
+    background-color: white;
+    opacity: 1;
+  }
+
+  .gov-photo-modal .modal-body {
+    padding: 0;
+    background: #000;
+  }
+
+  .gov-photo-modal .modal-body img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .gov-photo-modal .modal-footer {
+    background: var(--gov-gradient);
+    border-top: 2px solid var(--gov-secondary);
+    padding: 15px;
+  }
+
+  .gov-photo-modal .btn-download {
+    background: var(--gov-secondary);
+    color: var(--gov-primary);
+    border: 2px solid white;
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .gov-photo-modal .btn-download:hover {
+    background: white;
+    color: var(--gov-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .gov-photos-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .gov-document-table td {
+      min-width: 200px;
+    }
+  }
+</style>
+
+<div class="gov-documents-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <h1 class="gov-hero-title">
+          <i class="bi bi-file-earmark-text"></i> Bus Documents
+        </h1>
+        <div class="gov-hero-subtitle">
+          <span class="gov-bus-badge">
+            <i class="bi bi-bus-front"></i> {{ bus.bus_name }} ({{ bus.bus_number }})
+          </span>
+        </div>
+      </div>
+      <i class="bi bi-files gov-hero-decor"></i>
+    </div>
+
+    <!-- Bus Photos Section -->
+    <div class="gov-section-title">
+      <i class="bi bi-images"></i>
+      <h3>Bus Gallery</h3>
+      <span class="gov-section-subtitle">{{ photos|length }} photo{{ photos|length|pluralize }}</span>
+    </div>
+
+    {% if photos %}
+      <div class="gov-photos-grid">
+        {% for photo in photos %}
+          <div class="gov-photo-card">
+            <div class="gov-photo-container" onclick="openPhotoModal('{{ photo.image.url }}')">
+              <img src="{{ photo.image.url }}" alt="Bus photo">
+              <div class="gov-photo-overlay">
+                <span class="gov-photo-caption">
+                  <i class="bi bi-zoom-in"></i> Click to enlarge
+                </span>
+              </div>
+            </div>
+            <div class="gov-photo-footer">
+              <span class="gov-photo-name">Photo {{ forloop.counter }}</span>
+              <a href="{{ photo.image.url }}" target="_blank" class="gov-photo-view" title="View full size">
+                <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="gov-empty-photos">
+        <i class="bi bi-images"></i>
+        <p>No photos uploaded for this bus.</p>
+      </div>
+    {% endif %}
+
+    <!-- Documents Section -->
+    <div class="gov-section-title">
+      <i class="bi bi-file-earmark-text"></i>
+      <h3>Official Documents</h3>
+    </div>
+
+    <div class="gov-documents-card">
+      <div class="gov-documents-header">
+        <h4>
+          <i class="bi bi-list-check"></i>
+          Document Verification
+        </h4>
+      </div>
+
+      <table class="gov-document-table">
+        <thead>
+          <tr>
+            <th>Document Type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="gov-document-type">
+                <div class="gov-document-icon">
+                  <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <span class="gov-document-name">Registration Certificate</span>
+              </div>
+            </td>
+            <td>
+              {% if bus.registration_document %}
+                <div class="gov-doc-actions">
+                  <a href="{{ bus.registration_document.url }}" target="_blank" class="gov-doc-btn gov-doc-view">
+                    <i class="bi bi-eye"></i> View
+                  </a>
+                  <a href="{{ bus.registration_document.url }}" download class="gov-doc-btn gov-doc-download">
+                    <i class="bi bi-download"></i> Download
+                  </a>
+                </div>
+              {% else %}
+                <span class="gov-doc-disabled">
+                  <i class="bi bi-x-circle"></i> Not Uploaded
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="gov-document-type">
+                <div class="gov-document-icon">
+                  <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <span class="gov-document-name">Pollution Test Certificate</span>
+              </div>
+            </td>
+            <td>
+              {% if bus.pollution_test_certificate %}
+                <div class="gov-doc-actions">
+                  <a href="{{ bus.pollution_test_certificate.url }}" target="_blank" class="gov-doc-btn gov-doc-view">
+                    <i class="bi bi-eye"></i> View
+                  </a>
+                  <a href="{{ bus.pollution_test_certificate.url }}" download class="gov-doc-btn gov-doc-download">
+                    <i class="bi bi-download"></i> Download
+                  </a>
+                </div>
+              {% else %}
+                <span class="gov-doc-disabled">
+                  <i class="bi bi-x-circle"></i> Not Uploaded
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="gov-document-type">
+                <div class="gov-document-icon">
+                  <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <span class="gov-document-name">Insurance Document</span>
+              </div>
+            </td>
+            <td>
+              {% if bus.insurance_document %}
+                <div class="gov-doc-actions">
+                  <a href="{{ bus.insurance_document.url }}" target="_blank" class="gov-doc-btn gov-doc-view">
+                    <i class="bi bi-eye"></i> View
+                  </a>
+                  <a href="{{ bus.insurance_document.url }}" download class="gov-doc-btn gov-doc-download">
+                    <i class="bi bi-download"></i> Download
+                  </a>
+                </div>
+              {% else %}
+                <span class="gov-doc-disabled">
+                  <i class="bi bi-x-circle"></i> Not Uploaded
+                </span>
+              {% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Back Button -->
+    <a href="{% url 'admin_dashboard' %}" class="gov-back-btn">
+      <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+
+  </div>
+</div>
+
+<!-- Photo Modal -->
+<div class="modal fade gov-photo-modal" id="photoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-image me-2"></i>
+          Bus Photo
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <img id="modalPhotoImage" src="" alt="Bus photo">
+      </div>
+      <div class="modal-footer">
+        <a id="modalDownloadLink" href="#" download class="btn-download">
+          <i class="bi bi-download"></i> Download
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openPhotoModal(imageUrl) {
+    const modal = new bootstrap.Modal(document.getElementById('photoModal'));
+    document.getElementById('modalPhotoImage').src = imageUrl;
+    document.getElementById('modalDownloadLink').href = imageUrl;
+    modal.show();
+  }
+
+  // Auto-hide any alerts
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.querySelectorAll('.gov-alert').forEach(alert => {
+        if (alert) {
+          alert.style.transition = 'opacity 0.5s ease';
+          alert.style.opacity = '0';
+          setTimeout(() => {
+            if (alert) alert.style.display = 'none';
+          }, 500);
+        }
+      });
+    }, 5000);
+  });
+</script>
+
+{% endblock %}
