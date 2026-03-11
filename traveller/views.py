@@ -113,6 +113,8 @@ def view_schedules(request, bus_id):
     })
 
 
+from datetime import timedelta
+
 @login_required
 def book_bus(request, schedule_id):
     """Book a bus seat with Razorpay payment"""
@@ -161,6 +163,25 @@ def book_bus(request, schedule_id):
         stops_travelled = to_stop.order - from_stop.order
         base_fare = Decimal(schedule.fare)
         total_fare = base_fare + (stops_travelled * PRICE_PER_STOP)
+        
+        # Calculate journey duration between selected stops
+        # Assuming stops have arrival times, we can calculate the difference
+        journey_duration = None
+        try:
+            # Convert time to datetime for calculation
+            from datetime import datetime, timedelta
+            from_stop_time = datetime.combine(datetime.today(), from_stop.arrival_time)
+            to_stop_time = datetime.combine(datetime.today(), to_stop.arrival_time)
+            
+            # If to_stop_time is less than from_stop_time, it means it's next day
+            if to_stop_time < from_stop_time:
+                to_stop_time += timedelta(days=1)
+            
+            journey_duration = to_stop_time - from_stop_time
+        except Exception as e:
+            # Fallback if time calculation fails
+            journey_duration = timedelta(hours=2, minutes=30)  # Default 2h30m
+            print(f"Error calculating duration: {e}")
 
         # Verify payment if payment_id exists
         if payment_id:
@@ -179,7 +200,8 @@ def book_bus(request, schedule_id):
                     total_fare=total_fare,
                     status="Confirmed",
                     payment_id=payment_id,
-                    payment_status="Paid"
+                    payment_status="Paid",
+                    journey_duration=journey_duration  # Store the calculated duration
                 )
                 
                 messages.success(
@@ -321,8 +343,8 @@ def track_bus(request, bus_id):
     else:
         status = "On the Way"
 
-    # Get route stops
-    stops = list(schedule.route.stops.order_by('arrival_time'))
+    # Get route stops - ORDER BY 'order' field, NOT by arrival_time
+    stops = list(schedule.route.stops.all().order_by('order'))
     
     # ========== FARE CALCULATION ==========
     # Same constants as in booking page
@@ -334,19 +356,29 @@ def track_bus(request, bus_id):
         last_stop = stops[-1]
         stops_travelled = last_stop.order - first_stop.order
         total_fare = Decimal(schedule.fare) + (stops_travelled * PRICE_PER_STOP)
+        stops_travelled_count = stops_travelled
     else:
         total_fare = Decimal(schedule.fare)
+        stops_travelled_count = 0
     
     # ========== CURRENT/NEXT STOP LOGIC ==========
     current_stop = None
     next_stop = None
     current_time = now.time()
 
-    for stop in stops:
+    # Find current and next stop based on order and time
+    for i, stop in enumerate(stops):
+        # If this stop's arrival time is in the future
         if stop.arrival_time > current_time:
             next_stop = stop
+            # The previous stop is the current stop (if exists)
+            if i > 0:
+                current_stop = stops[i-1]
             break
-        current_stop = stop
+    
+    # If we've passed all stops, the last stop is current
+    if next_stop is None and stops:
+        current_stop = stops[-1]
 
     return render(request, 'traveller/track_bus.html', {
         'bus': bus,
@@ -361,7 +393,7 @@ def track_bus(request, bus_id):
         'base_fare': schedule.fare,
         'price_per_stop': PRICE_PER_STOP,
         'stops_count': len(stops),
-        'stops_travelled': stops_travelled if stops and len(stops) >= 2 else 0,
+        'stops_travelled': stops_travelled_count,
     })
 @login_required
 def track_bus_list(request):
@@ -477,7 +509,20 @@ def available_buses(request):
 def traveller_bookings_page(request):
     """View all bookings for the logged-in traveller"""
     bookings = Booking.objects.filter(traveller=request.user).order_by('-booking_date')
-    return render(request, 'traveller/traveller_bookings.html', {'bookings': bookings})
+    
+    # Calculate counts for stats cards
+    confirmed_count = bookings.filter(status="Confirmed").count()
+    pending_count = bookings.filter(status="Pending").count()
+    cancelled_count = bookings.filter(status="Cancelled").count()
+    
+    context = {
+        'bookings': bookings,
+        'confirmed_count': confirmed_count,
+        'pending_count': pending_count,
+        'cancelled_count': cancelled_count,
+    }
+    
+    return render(request, 'traveller/traveller_bookings.html', context)
 
 
 @login_required

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
+{% load booking_extras %}
 {% block title %}Your Bookings - Government Transport Portal{% endblock %}
+
 {% block content %}
 
 <style>
@@ -814,6 +816,18 @@
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
+  
+  /* Duration Badge */
+  .gov-duration-badge {
+    display: inline-block;
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--gov-secondary);
+  }
 </style>
 
 <div class="gov-bookings-page">
@@ -841,7 +855,7 @@
   </a>
 
   {% if bookings %}
-    <!-- Stats Summary -->
+    <!-- Stats Summary - Using counts from view -->
     <div class="gov-stats-grid">
       <div class="gov-stat-card">
         <div class="gov-stat-icon">
@@ -854,24 +868,27 @@
       </div>
 
       <div class="gov-stat-card">
-  <div class="gov-stat-icon">
-    <i class="bi bi-check-circle"></i>
-  </div>
-  <div class="gov-stat-content">
-    <div class="gov-stat-label">Confirmed</div>
-    <div class="gov-stat-number">
-      {{ bookings|length }}  <!-- Temporary fix - replace this -->
-    </div>
-  </div>
-</div>
-      <div class="gov-stat-card">
         <div class="gov-stat-icon">
-          <i class="bi bi-clock-history"></i>
+          <i class="bi bi-check-circle"></i>
         </div>
         <div class="gov-stat-content">
-          <div class="gov-stat-label">Upcoming Trips</div>
+          <div class="gov-stat-label">Confirmed</div>
+          <div class="gov-stat-number">{{ confirmed_count|default:"0" }}</div>
+        </div>
+      </div>
+      
+      <div class="gov-stat-card">
+        <div class="gov-stat-icon">
+          <i class="bi bi-x-circle"></i>
+        </div>
+        <div class="gov-stat-content">
+          <div class="gov-stat-label">Cancelled/Pending</div>
           <div class="gov-stat-number">
-            {{ bookings|length }}
+            {% with cancel=cancelled_count|default:0 %}
+              {% with pend=pending_count|default:0 %}
+                {{ cancel|add:pend }}
+              {% endwith %}
+            {% endwith %}
           </div>
         </div>
       </div>
@@ -974,7 +991,7 @@
                 <div class="gov-detail-label">Departure</div>
                 <div class="gov-detail-value">
                   {% if booking.schedule %}
-                    {{ booking.schedule.departure_time|date:"H:i"|default:"N/A" }}
+                    {{ booking.schedule.departure_time|date:"H:i" }}
                   {% else %}
                     N/A
                   {% endif %}
@@ -986,7 +1003,13 @@
                   <i class="bi bi-stopwatch"></i>
                 </div>
                 <div class="gov-detail-label">Duration</div>
-                <div class="gov-detail-value">2h 30m</div>
+                <div class="gov-detail-value">
+                  {% if booking.from_stop and booking.to_stop %}
+                    {{ booking.from_stop|calculate_duration:booking.to_stop }}
+                  {% else %}
+                    <span class="gov-duration-badge">Not available</span>
+                  {% endif %}
+                </div>
               </div>
             </div>
 
@@ -999,7 +1022,7 @@
               <div class="gov-fare-amount">₹{{ booking.total_fare|default:"0" }}</div>
             </div>
 
-            <!-- Payment Status (optional) -->
+            <!-- Payment Status -->
             {% if booking.payment_status %}
             <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
               <span class="gov-payment-badge 

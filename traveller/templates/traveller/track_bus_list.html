@@ -1,65 +1,535 @@
 {% extends "base.html" %}
+{% block title %}Track Buses - Government Transport Portal{% endblock %}
+
 {% block content %}
+<style>
+  /* Government Transport Portal Theme */
+  :root {
+    --gov-primary: #003366;
+    --gov-secondary: #FFD700;
+    --gov-accent: #002244;
+    --gov-light: #f0f4f8;
+    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
 
-<div class="container mt-4">
-    <h3 class="mb-4">🚌 Available Buses for Tracking</h3>
+  .gov-track-list-page {
+    padding: 20px 0 40px;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
 
-    <div class="card shadow">
-        <div class="card-body">
+  .gov-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
 
-            <table class="table table-bordered table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Bus Name</th>
-                        <th>Bus Number</th>
-                        <th>Route</th>
-                        <th>Owner</th>
-                        <th>Track</th>
-                    </tr>
-                </thead>
-               <tbody>
-    {% for item in bus_data %}
-    <tr>
-        <td>{{ item.bus.bus_name }}</td>
-        <td>{{ item.bus.bus_number }}</td>
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 24px;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+  }
 
-        <td>
-            {% if item.schedule %}
-                {{ item.schedule.route.start_location }}
-                →
-                {{ item.schedule.route.end_location }}
-            {% else %}
-                <span class="text-danger">No Active Schedule</span>
-            {% endif %}
-        </td>
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
 
-        <td>{{ item.bus.owner.user.username }}</td>
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
 
-        <td>
-            {% if item.schedule %}
-                <a href="{% url 'track_bus' item.bus.id %}" 
-                   class="btn btn-primary btn-sm">
-                    Track Bus
-                </a>
-            {% else %}
-                <button class="btn btn-secondary btn-sm" disabled>
-                    Not Available
-                </button>
-            {% endif %}
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5" class="text-center">
-            No approved buses available.
-        </td>
-    </tr>
-    {% endfor %}
-</tbody>
-            </table>
+  .gov-hero-content h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
 
-        </div>
+  .gov-hero-content p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-hero-content p i {
+    color: var(--gov-secondary);
+  }
+
+  /* Stats Cards */
+  .gov-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .gov-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,51,102,0.05);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .gov-stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gov-primary);
+    box-shadow: 0 15px 30px rgba(0,51,102,0.15);
+  }
+
+  .gov-stat-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--gov-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--gov-secondary);
+  }
+
+  .gov-stat-icon i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-stat-content {
+    flex: 1;
+  }
+
+  .gov-stat-label {
+    color: #666;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+
+  .gov-stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--gov-primary);
+    line-height: 1;
+  }
+
+  /* Main Card */
+  .gov-main-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,51,102,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 20px 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .gov-card-title {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .gov-card-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-card-subtitle {
+    color: var(--gov-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  /* Table Styles */
+  .gov-table-container {
+    overflow-x: auto;
+    padding: 20px;
+  }
+
+  .gov-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .gov-table thead tr {
+    background: #f0f4ff;
+  }
+
+  .gov-table thead th {
+    color: var(--gov-primary);
+    padding: 15px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid var(--gov-primary);
+    text-align: left;
+  }
+
+  .gov-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .gov-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .gov-table td {
+    padding: 15px;
+    vertical-align: middle;
+  }
+
+  /* Bus Info */
+  .gov-bus-name {
+    font-weight: 600;
+    color: var(--gov-primary);
+  }
+
+  .gov-bus-number {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  /* Route Info */
+  .gov-route-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f4ff;
+    padding: 5px 12px;
+    border-radius: 30px;
+    color: var(--gov-primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid var(--gov-primary);
+  }
+
+  .gov-route-badge i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-no-schedule {
+    color: var(--gov-danger);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Action Buttons */
+  .gov-track-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    border: 2px solid var(--gov-secondary);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .gov-track-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,51,102,0.3);
+  }
+
+  .gov-track-btn i {
+    font-size: 0.9rem;
+  }
+
+  .gov-btn-disabled {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #e9ecef;
+    color: #999;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: not-allowed;
+  }
+
+  /* Owner Info */
+  .gov-owner-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-owner-avatar {
+    width: 30px;
+    height: 30px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gov-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--gov-secondary);
+  }
+
+  /* Empty State */
+  .gov-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .gov-empty-icon {
+    font-size: 4rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 3px solid var(--gov-secondary);
+  }
+
+  .gov-empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin-bottom: 10px;
+  }
+
+  .gov-empty-text {
+    color: #666;
+    margin-bottom: 20px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .gov-stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .gov-table td {
+      min-width: 120px;
+    }
+  }
+</style>
+
+<div class="gov-track-list-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <h1>
+          <i class="bi bi-geo-alt-fill"></i> Live Bus Tracking
+        </h1>
+        <p>
+          <i class="bi bi-shield-check"></i>
+          Track government approved buses in real-time
+        </p>
+      </div>
     </div>
+
+    <!-- Stats Cards -->
+    <div class="gov-stats-grid">
+      <div class="gov-stat-card">
+        <div class="gov-stat-icon">
+          <i class="bi bi-bus-front"></i>
+        </div>
+        <div class="gov-stat-content">
+          <div class="gov-stat-label">Total Buses</div>
+          <div class="gov-stat-number">{{ buses|length }}</div>
+        </div>
+      </div>
+
+      <div class="gov-stat-card">
+        <div class="gov-stat-icon">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="gov-stat-content">
+          <div class="gov-stat-label">Active Schedules</div>
+          <div class="gov-stat-number">
+            {% with active=0 %}
+              {% for bus in buses %}
+                {% if bus.schedules.exists %}
+                  {% with active=active|add:1 %}{% endwith %}
+                {% endif %}
+              {% endfor %}
+              {{ active }}
+            {% endwith %}
+          </div>
+        </div>
+      </div>
+
+      <div class="gov-stat-card">
+        <div class="gov-stat-icon">
+          <i class="bi bi-building"></i>
+        </div>
+        <div class="gov-stat-content">
+          <div class="gov-stat-label">Total Owners</div>
+          <div class="gov-stat-number">{{ buses|length }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="gov-main-card">
+      <div class="gov-card-header">
+        <h5 class="gov-card-title">
+          <i class="bi bi-list-ul"></i>
+          Available Buses for Tracking
+        </h5>
+        <span class="gov-card-subtitle">
+          <i class="bi bi-info-circle"></i> {{ buses|length }} buses found
+        </span>
+      </div>
+
+      <div class="gov-table-container">
+        {% if buses %}
+          <table class="gov-table">
+            <thead>
+              <tr>
+                <th>Bus Details</th>
+                <th>Owner</th>
+                <th>Current Route</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for bus in buses %}
+              <tr>
+                <td>
+                  <div class="gov-bus-name">{{ bus.bus_name }}</div>
+                  <div class="gov-bus-number">
+                    <i class="bi bi-hash"></i> {{ bus.bus_number }}
+                  </div>
+                </td>
+
+                <td>
+                  <div class="gov-owner-info">
+                    <div class="gov-owner-avatar">
+                      {{ bus.owner.user.username|slice:":1"|upper }}
+                    </div>
+                    <span>{{ bus.owner.user.username }}</span>
+                  </div>
+                </td>
+
+                <td>
+                  {% with schedule=bus.schedules.first %}
+                    {% if schedule %}
+                      <span class="gov-route-badge">
+                        <i class="bi bi-geo-alt"></i>
+                        {{ schedule.route.start_location }}
+                        <i class="bi bi-arrow-right"></i>
+                        <i class="bi bi-flag"></i>
+                        {{ schedule.route.end_location }}
+                      </span>
+                    {% else %}
+                      <span class="gov-no-schedule">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        No active schedule
+                      </span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+
+                <td>
+                  {% with schedule=bus.schedules.first %}
+                    {% if schedule %}
+                      <a href="{% url 'track_bus' bus.id %}" class="gov-track-btn">
+                        <i class="bi bi-geo-alt-fill"></i> Track Now
+                      </a>
+                    {% else %}
+                      <span class="gov-btn-disabled">
+                        <i class="bi bi-x-circle"></i> Unavailable
+                      </span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="gov-empty-state">
+            <div class="gov-empty-icon">
+              <i class="bi bi-bus-front"></i>
+            </div>
+            <h3 class="gov-empty-title">No Buses Available</h3>
+            <p class="gov-empty-text">
+              There are no approved buses available for tracking at this time.
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+  // Auto-hide any alerts
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.querySelectorAll('.gov-alert').forEach(alert => {
+        alert.style.opacity = '0';
+        setTimeout(() => alert.style.display = 'none', 500);
+      });
+    }, 5000);
+  });
+</script>
 
 {% endblock %}
