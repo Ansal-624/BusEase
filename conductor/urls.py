@@ -18,9 +18,15 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from . import views
 urlpatterns = [
-   
+    path('dashboard/', views.conductor_dashboard, name='conductor_dashboard'),
+    path('seat-management/<int:bus_id>/', views.conductor_seat_management, name='conductor_seat_management'),
+    path('update-seat-status/', views.conductor_update_seat_status, name='conductor_update_seat_status'),
+    path('duty/current/', views.conductor_current_duty, name='conductor_current_duty'),
+    path('schedules/', views.conductor_schedules, name='conductor_schedules'),
+    path('bookings/', views.conductor_bookings, name='conductor_bookings'),
+    path('cancel-booking/<int:booking_id>/', views.conductor_cancel_booking, name='conductor_cancel_booking'),
 ]
 
 

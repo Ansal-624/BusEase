@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Conductor Dashboard - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  .gov-conductor-dashboard {
+    padding: 20px 0;
+    background: #f5f7fa;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    border: 2px solid var(--gov-secondary);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,215,0,0.1);
+    border-radius: 50%;
+  }
+
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .gov-hero-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+
+  .gov-hero-subtitle {
+    color: rgba(255,255,255,0.9);
+    font-size: 1rem;
+  }
+
+  .gov-hero-subtitle i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-assigned-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+
+  .gov-card-header {
+    background: var(--gov-gradient);
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-secondary);
+  }
+
+  .gov-card-title {
+    color: white;
+    margin: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-card-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-assigned-content {
+    padding: 25px;
+  }
+
+  .gov-bus-details {
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    border: 2px solid var(--gov-primary);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .gov-bus-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    margin-bottom: 10px;
+  }
+
+  .gov-bus-number {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
+
+  .gov-bus-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e0e0e0;
+  }
+
+  .gov-bus-info-label {
+    font-weight: 600;
+    color: var(--gov-primary);
+  }
+
+  .gov-bus-info-value {
+    color: #333;
+  }
+
+  .gov-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    border: 2px solid var(--gov-secondary);
+    border-radius: 8px;
+    padding: 12px 24px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .gov-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,51,102,0.2);
+  }
+
+  .gov-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+  }
+
+  .gov-empty-icon {
+    font-size: 4rem;
+    color: var(--gov-secondary);
+    opacity: 0.5;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .gov-hero-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="gov-conductor-dashboard">
+  <div class="container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <div class="gov-hero-content">
+        <h1 class="gov-hero-title">
+          <i class="bi bi-person-badge me-2"></i>Welcome, {{ conductor.user.get_full_name|default:conductor.user.username }}
+        </h1>
+        <p class="gov-hero-subtitle">
+          <i class="bi bi-qr-code"></i> Employee ID: {{ conductor.employee_id }}
+          <span class="mx-2">•</span>
+          <i class="bi bi-building"></i> {{ conductor.owner.user.username }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Assigned Bus Card -->
+    {% if has_assignment %}
+    <div class="gov-assigned-card">
+      <div class="gov-card-header">
+        <h5 class="gov-card-title">
+          <i class="bi bi-bus-front"></i> Your Assigned Bus
+        </h5>
+      </div>
+      <div class="gov-assigned-content">
+        <div class="gov-bus-details">
+          <div class="gov-bus-name">{{ assigned_bus.bus_name }}</div>
+          <div class="gov-bus-number">
+            <i class="bi bi-hash"></i> {{ assigned_bus.bus_number }}
+          </div>
+          
+          <div class="gov-bus-info-row">
+            <span class="gov-bus-info-label">Total Seats</span>
+            <span class="gov-bus-info-value">{{ assigned_bus.total_seats }}</span>
+          </div>
+          <div class="gov-bus-info-row">
+            <span class="gov-bus-info-label">Owner</span>
+            <span class="gov-bus-info-value">{{ assigned_bus.owner.user.username }}</span>
+          </div>
+          <div class="gov-bus-info-row">
+            <span class="gov-bus-info-label">Status</span>
+            <span class="gov-bus-info-value">
+              {% if assigned_bus.approved %}
+                <span style="color: #28a745;">Approved</span>
+              {% else %}
+                <span style="color: #ffc107;">Pending</span>
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        
+        <div style="text-align: center;">
+          <a href="{% url 'conductor_seat_management' %}" class="gov-btn">
+            <i class="bi bi-pencil-square"></i> Manage Seats
+          </a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- No Assignment Message -->
+    <div class="gov-assigned-card">
+      <div class="gov-card-header">
+        <h5 class="gov-card-title">
+          <i class="bi bi-exclamation-triangle"></i> No Bus Assigned
+        </h5>
+      </div>
+      <div class="gov-empty-state">
+        <div class="gov-empty-icon">
+          <i class="bi bi-bus-front"></i>
+        </div>
+        <h4>No Bus Assigned Yet</h4>
+        <p>You have not been assigned to any bus. Please contact your bus owner.</p>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

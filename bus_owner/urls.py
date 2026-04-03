@@ -33,7 +33,18 @@ urlpatterns = [
     # path('bus/<int:bus_id>/', views.bus_detail, name='bus_detail'),
     # path('bus/<int:bus_id>/schedules/', views.bus_schedules, name='bus_schedules'),
     path('bus-schedules/', views.bus_schedules, name='bus_schedules'),
-  
+    path('conductors/', views.owner_conductors_list, name='owner_conductors_list'),
+path('conductors/add/', views.owner_add_conductor, name='owner_add_conductor'),
+path('conductors/edit/<int:conductor_id>/', views.owner_edit_conductor, name='owner_edit_conductor'),
+path('conductors/delete/<int:conductor_id>/', views.owner_delete_conductor, name='owner_delete_conductor'),
+
+# Duty Assignment
+path('duties/', views.owner_duty_assignments, name='owner_duty_assignments'),
+path('duties/assign/', views.owner_assign_duty, name='owner_assign_duty'),
+path('duties/cancel/<int:duty_id>/', views.owner_cancel_duty, name='owner_cancel_duty'),
+path('conductor/unassign/<int:conductor_id>/', views.owner_unassign_conductor, name='owner_unassign_conductor'),
+
+
  
 
      

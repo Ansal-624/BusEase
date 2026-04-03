@@ -111,7 +111,7 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        # 🔎 Check if user exists first
+        # Check if user exists first
         if not User.objects.filter(username=username).exists():
             messages.error(request, "User does not exist.")
             return render(request, "main/login.html")
@@ -122,25 +122,40 @@ def login_view(request):
             messages.error(request, "Invalid password.")
             return render(request, "main/login.html")
 
-        # ✅ Login user
+        # Login user
         login(request, user)
 
-        # ✅ Safe role-based redirect
-        if user.is_superuser or getattr(user, "role", None) == "admin":
+        # Get user role
+        user_role = getattr(user, "role", None)
+
+        # Role-based redirect
+        if user.is_superuser or user_role == "admin":
             return redirect("admin_dashboard")
 
-        elif getattr(user, "role", None) == "owner":
+        elif user_role == "owner":
             return redirect("owner_dashboard")
 
-        elif getattr(user, "role", None) == "traveller":
+        elif user_role == "traveller":
             return redirect("traveller_dashboard")
+
+        elif user_role == "conductor":
+            # Check if conductor is active
+            try:
+                conductor = user.conductor_profile
+                if conductor.is_active:
+                    return redirect("conductor_dashboard")
+                else:
+                    messages.error(request, "Your conductor account is inactive. Please contact your bus owner.")
+                    return redirect("home")
+            except:
+                messages.error(request, "Conductor profile not found.")
+                return redirect("home")
 
         else:
             messages.warning(request, "No dashboard assigned for this role.")
             return redirect("home")
 
     return render(request, "main/login.html")
-
 
 
 

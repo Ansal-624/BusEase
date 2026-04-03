@@ -102,3 +102,90 @@ class RouteStop(models.Model):
 
     def __str__(self):
         return f"{self.stop_name} ({self.route.route_name})"
+    
+    # Add this to bus_owner/models.py
+
+from django.conf import settings
+
+from django.conf import settings
+from main.models import User  # Import your custom User model
+
+# 👨‍✈️ Conductor Model
+class Conductor(models.Model):
+    """Model for bus conductors"""
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='conductor_profile'
+    )
+    owner = models.ForeignKey(
+        'BusOwnerProfile',
+        on_delete=models.CASCADE,
+        related_name='conductors'
+    )
+    phone = models.CharField(max_length=15)
+    address = models.TextField(blank=True)
+    profile_photo = models.ImageField(upload_to='conductor_photos/', blank=True, null=True)
+    employee_id = models.CharField(max_length=50, unique=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def save(self, *args, **kwargs):
+        if not self.employee_id:
+            import time
+            self.employee_id = f"COND{int(time.time())}{self.user.id}"
+        super().save(*args, **kwargs)
+    
+    @property
+    def assigned_bus(self):
+        """Get the bus assigned to this conductor"""
+        try:
+            # Use select_related to optimize and ensure fresh data
+            duty = ConductorDuty.objects.select_related('bus').filter(
+                conductor=self, 
+                is_active=True
+            ).first()
+            return duty.bus if duty else None
+        except Exception as e:
+            print(f"Error getting assigned bus: {e}")
+            return None
+    
+    def has_assigned_bus(self):
+        """Check if conductor has an assigned bus"""
+        return self.assigned_bus is not None
+    
+    def __str__(self):
+        return f"{self.user.get_full_name() or self.user.username} - {self.employee_id}"
+
+
+# 📋 Conductor Duty Model (Permanent Assignment)
+class ConductorDuty(models.Model):
+    """Model for assigning conductors to buses (Permanent assignment)"""
+    conductor = models.OneToOneField(
+        'Conductor',
+        on_delete=models.CASCADE,
+        related_name='duty_assignment'  # Changed from 'assigned_bus' to avoid confusion
+    )
+    bus = models.ForeignKey(
+        'Bus',
+        on_delete=models.CASCADE,
+        related_name='assigned_conductors'
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    assigned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='assigned_conductors'
+    )
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        unique_together = ['conductor', 'bus']
+        ordering = ['-assigned_at']
+    
+    def __str__(self):
+        return f"{self.conductor} → {self.bus.bus_number}"

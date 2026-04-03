@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Unassign Conductor - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  .gov-confirm-card {
+    max-width: 600px;
+    margin: 50px auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 51, 102, 0.1);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .gov-confirm-header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    padding: 20px;
+    color: white;
+  }
+  
+  .gov-confirm-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .gov-confirm-body {
+    padding: 30px;
+  }
+  
+  .gov-warning-icon {
+    text-align: center;
+    font-size: 4rem;
+    color: #dc3545;
+    margin-bottom: 20px;
+  }
+  
+  .gov-conductor-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  
+  .gov-conductor-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+  }
+  
+  .gov-bus-info {
+    color: #28a745;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+  
+  .gov-confirm-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  
+  .gov-btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .gov-btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+  }
+  
+  .gov-btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .gov-btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="container">
+  <div class="gov-confirm-card">
+    <div class="gov-confirm-header">
+      <h3>
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Unassign Conductor
+      </h3>
+    </div>
+    <div class="gov-confirm-body">
+      <div class="gov-warning-icon">
+        <i class="bi bi-person-x-fill"></i>
+      </div>
+      
+      <p style="text-align: center; font-size: 1.1rem;">
+        Are you sure you want to unassign 
+        <strong>{{ conductor.user.get_full_name }}</strong> from their assigned bus?
+      </p>
+      
+      <div class="gov-conductor-info">
+        <div class="gov-conductor-name">
+          <i class="bi bi-person-badge"></i> {{ conductor.user.get_full_name }}
+        </div>
+        <div class="gov-bus-info">
+          {% if assigned_bus %}
+            <i class="bi bi-bus-front"></i> Currently assigned to: {{ assigned_bus.bus_name }} ({{ assigned_bus.bus_number }})
+          {% else %}
+            <span class="text-muted">No bus assigned</span>
+          {% endif %}
+        </div>
+        <div class="mt-2">
+          <small class="text-muted">Employee ID: {{ conductor.employee_id }}</small>
+        </div>
+      </div>
+      
+      <p style="text-align: center; color: #dc3545; font-weight: 600;">
+        <i class="bi bi-info-circle"></i> 
+        The conductor will no longer be associated with any bus.
+      </p>
+      
+      <div class="gov-confirm-actions">
+        <form method="POST">
+          {% csrf_token %}
+          <button type="submit" class="gov-btn-danger">
+            <i class="bi bi-check-circle"></i> Yes, Unassign
+          </button>
+        </form>
+        <a href="{% url 'owner_conductors_list' %}" class="gov-btn-secondary">
+          <i class="bi bi-x-circle"></i> Cancel
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

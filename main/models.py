@@ -40,6 +40,7 @@ class User(AbstractUser):
         ('admin', 'RTO Admin'),
         ('owner', 'Bus Owner'),
         ('traveller', 'Traveller'),
+        ('conductor', 'Bus Conductor'),  # Add this line
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='traveller')
@@ -52,8 +53,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.role})"
-
-
 # ------------------------------------
 # Notification System Model
 # ------------------------------------

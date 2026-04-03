@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% block title %}Add Conductor - Government Transport Portal{% endblock %}
+
+{% block content %}
+<style>
+  .gov-form-container {
+    max-width: 800px;
+    margin: 40px auto;
+  }
+  
+  .gov-form-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    border: 2px solid var(--gov-primary);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .gov-form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary));
+  }
+  
+  .gov-form-title {
+    color: var(--gov-primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .gov-form-title i {
+    color: var(--gov-secondary);
+  }
+  
+  .gov-form-group {
+    margin-bottom: 25px;
+  }
+  
+  .gov-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+  }
+  
+  .gov-label i {
+    color: var(--gov-secondary);
+  }
+  
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
+  }
+  
+  .gov-input, .gov-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+  }
+  
+  .gov-input:focus, .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    outline: none;
+    background: white;
+  }
+  
+  .gov-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .gov-file-upload {
+    border: 2px dashed var(--gov-primary);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .gov-file-upload:hover {
+    background: #e9ecef;
+    border-color: var(--gov-secondary);
+  }
+  
+  .gov-file-upload i {
+    font-size: 2rem;
+    color: var(--gov-secondary);
+    background: var(--gov-primary);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+  }
+  
+  .gov-file-upload p {
+    color: var(--gov-primary);
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .gov-file-preview {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+  
+  .gov-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  
+  .gov-btn-submit {
+    flex: 1;
+    background: var(--gov-gradient);
+    color: white;
+    border: 2px solid var(--gov-secondary);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .gov-btn-submit:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+  }
+  
+  .gov-btn-cancel {
+    flex: 1;
+    background: white;
+    color: var(--gov-primary);
+    border: 2px solid var(--gov-primary);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .gov-btn-cancel:hover {
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+  }
+  
+  @media (max-width: 768px) {
+    .gov-form-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .gov-action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="gov-form-container">
+  <div class="gov-form-card">
+    <h2 class="gov-form-title">
+      <i class="bi bi-person-plus-fill"></i>
+      Add New Conductor
+    </h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="gov-form-row">
+        <div class="gov-form-group">
+          <label class="gov-label">
+            <i class="bi bi-person"></i>
+            First Name <span class="gov-required">*</span>
+          </label>
+          <input type="text" name="first_name" class="gov-input" required>
+        </div>
+        
+        <div class="gov-form-group">
+          <label class="gov-label">
+            <i class="bi bi-person"></i>
+            Last Name <span class="gov-required">*</span>
+          </label>
+          <input type="text" name="last_name" class="gov-input" required>
+        </div>
+      </div>
+      
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-envelope"></i>
+          Email Address <span class="gov-required">*</span>
+        </label>
+        <input type="email" name="email" class="gov-input" required>
+      </div>
+      
+      <div class="gov-form-row">
+        <div class="gov-form-group">
+          <label class="gov-label">
+            <i class="bi bi-person-badge"></i>
+            Username <span class="gov-required">*</span>
+          </label>
+          <input type="text" name="username" class="gov-input" required>
+        </div>
+        
+        <div class="gov-form-group">
+          <label class="gov-label">
+            <i class="bi bi-telephone"></i>
+            Phone Number <span class="gov-required">*</span>
+          </label>
+          <input type="tel" name="phone" class="gov-input" required>
+        </div>
+      </div>
+      
+      <div class="gov-form-row">
+        <div class="gov-form-group">
+          <label class="gov-label">
+            <i class="bi bi-lock"></i>
+            Password <span class="gov-required">*</span>
+          </label>
+          <input type="password" name="password" class="gov-input" required>
+        </div>
+        
+        <div class="gov-form-group">
+          <label class="gov-label">
+            <i class="bi bi-lock-fill"></i>
+            Confirm Password <span class="gov-required">*</span>
+          </label>
+          <input type="password" name="confirm_password" class="gov-input" required>
+        </div>
+      </div>
+      
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-geo-alt"></i>
+          Address
+        </label>
+        <textarea name="address" class="gov-textarea" placeholder="Enter complete address"></textarea>
+      </div>
+      
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-camera"></i>
+          Profile Photo
+        </label>
+        <div class="gov-file-upload" id="fileUploadArea">
+          <i class="bi bi-cloud-upload"></i>
+          <p>Click to upload photo</p>
+          <small>Supported: JPG, PNG (Max 5MB)</small>
+          <input type="file" name="profile_photo" id="profilePhoto" class="gov-file-input" accept="image/*">
+        </div>
+        <div id="filePreview" class="gov-file-preview" style="display: none;">
+          <i class="bi bi-image"></i>
+          <span id="fileName"></span>
+        </div>
+      </div>
+      
+      <div class="gov-action-buttons">
+        <button type="submit" class="gov-btn-submit">
+          <i class="bi bi-check-circle"></i> Create Conductor
+        </button>
+        <a href="{% url 'owner_conductors_list' %}" class="gov-btn-cancel">
+          <i class="bi bi-x-circle"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('profilePhoto');
+  const filePreview = document.getElementById('filePreview');
+  const fileName = document.getElementById('fileName');
+  
+  fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      filePreview.style.display = 'flex';
+    } else {
+      filePreview.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %}

@@ -1,13 +1,5 @@
 from django.contrib import admin
-from bus_owner.models import BusOwnerProfile
-# Register your models here.
-# admin.site.register(BusOwnerProfile)
-# admin.site.register()
-
-from django.contrib import admin
-from .models import BusOwnerProfile, Route, Bus, BusSchedule
-from django.contrib import admin
-from .models import Route, BusSchedule, RouteStop
+from .models import BusOwnerProfile, Route, Bus, BusSchedule, RouteStop, Conductor, ConductorDuty
 
 
 # 🧍 Bus Owner Profile Admin
@@ -16,7 +8,7 @@ class BusOwnerProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'contact_number', 'approved', 'registered_on')
     search_fields = ('user__username', 'contact_number')
     list_filter = ('approved',)
-
+    readonly_fields = ('registered_on',)
 
 
 # 🛣️ Route Admin
@@ -30,9 +22,9 @@ class RouteAdmin(admin.ModelAdmin):
 # 🚌 Bus Admin
 @admin.register(Bus)
 class BusAdmin(admin.ModelAdmin):
-    list_display = ('bus_number', 'owner', 'total_seats', 'approved')
+    list_display = ('bus_number', 'bus_name', 'owner', 'total_seats', 'approved')
     list_filter = ('approved',)
-    search_fields = ('bus_number', 'owner__company_name')
+    search_fields = ('bus_number', 'bus_name', 'owner__user__username')
     ordering = ('bus_number',)
 
 
@@ -44,3 +36,50 @@ class BusScheduleAdmin(admin.ModelAdmin):
     search_fields = ('bus__bus_number', 'route__route_name')
     ordering = ('departure_time',)
     autocomplete_fields = ('bus', 'route')
+
+
+# 👨‍✈️ Conductor Admin
+@admin.register(Conductor)
+class ConductorAdmin(admin.ModelAdmin):
+    list_display = ('employee_id', 'user', 'owner', 'phone', 'is_active', 'created_at')
+    list_filter = ('is_active', 'owner')
+    search_fields = ('employee_id', 'user__username', 'user__first_name', 'user__last_name', 'phone')
+    readonly_fields = ('employee_id', 'created_at')
+    autocomplete_fields = ('user', 'owner')
+    
+    fieldsets = (
+        ('Personal Information', {
+            'fields': ('user', 'employee_id', 'phone', 'address', 'profile_photo')
+        }),
+        ('Employment Details', {
+            'fields': ('owner', 'is_active', 'created_at')
+        }),
+    )
+
+
+# 🚍 Conductor Duty (Bus Assignment) Admin
+@admin.register(ConductorDuty)
+class ConductorDutyAdmin(admin.ModelAdmin):
+    list_display = ('conductor', 'bus', 'assigned_at', 'is_active')
+    list_filter = ('is_active', 'assigned_at')
+    search_fields = ('conductor__user__username', 'conductor__employee_id', 'bus__bus_number')
+    readonly_fields = ('assigned_at',)
+    autocomplete_fields = ('conductor', 'bus', 'assigned_by')
+    
+    fieldsets = (
+        ('Assignment Details', {
+            'fields': ('conductor', 'bus', 'is_active')
+        }),
+        ('Assignment Metadata', {
+            'fields': ('assigned_by', 'assigned_at')
+        }),
+    )
+
+
+# 🚏 Route Stop Admin (if you want to register it)
+@admin.register(RouteStop)
+class RouteStopAdmin(admin.ModelAdmin):
+    list_display = ('stop_name', 'route', 'order', 'arrival_time')
+    list_filter = ('route',)
+    search_fields = ('stop_name',)
+    ordering = ('route', 'order')
