@@ -4,20 +4,34 @@
 
 {% block content %}
 <style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
   .gov-conductor-dashboard {
     padding: 20px 0;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
   .gov-hero-section {
     background: var(--gov-gradient);
-    border-radius: 20px;
-    padding: 30px;
+    border-radius: 8px;
+    padding: 25px 30px;
     margin-bottom: 25px;
-    border: 2px solid var(--gov-secondary);
+    border-bottom: 3px solid var(--gov-secondary);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   .gov-hero-section::before {
@@ -27,7 +41,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -38,7 +52,7 @@
     left: -5%;
     width: 250px;
     height: 250px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.05);
     border-radius: 50%;
   }
 
@@ -49,14 +63,19 @@
 
   .gov-hero-title {
     color: white;
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 600;
     margin-bottom: 5px;
+  }
+
+  .gov-hero-title i {
+    color: var(--gov-secondary);
+    margin-right: 8px;
   }
 
   .gov-hero-subtitle {
     color: rgba(255,255,255,0.9);
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .gov-hero-subtitle i {
@@ -65,25 +84,27 @@
 
   .gov-assigned-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 6px;
     border: 1px solid #e0e0e0;
     overflow: hidden;
     margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
   .gov-card-header {
-    background: var(--gov-gradient);
+    background: #fafafa;
     padding: 15px 20px;
-    border-bottom: 2px solid var(--gov-secondary);
+    border-bottom: 2px solid var(--gov-primary);
   }
 
   .gov-card-title {
-    color: white;
+    color: var(--gov-primary);
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .gov-card-title i {
@@ -91,44 +112,49 @@
   }
 
   .gov-assigned-content {
-    padding: 25px;
+    padding: 20px;
   }
 
   .gov-bus-details {
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
-    border: 2px solid var(--gov-primary);
-    border-radius: 16px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     padding: 20px;
     margin-bottom: 20px;
   }
 
   .gov-bus-name {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: var(--gov-primary);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .gov-bus-number {
-    color: #666;
-    font-size: 1rem;
+    color: #888;
+    font-size: 0.85rem;
     margin-bottom: 15px;
   }
 
   .gov-bus-info-row {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px dashed #e0e0e0;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.85rem;
+  }
+
+  .gov-bus-info-row:last-child {
+    border-bottom: none;
   }
 
   .gov-bus-info-label {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--gov-primary);
   }
 
   .gov-bus-info-value {
-    color: #333;
+    color: #555;
   }
 
   .gov-btn {
@@ -136,38 +162,47 @@
     align-items: center;
     gap: 8px;
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border: 2px solid var(--gov-secondary);
-    border-radius: 8px;
-    padding: 12px 24px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
     text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    font-weight: 500;
+    transition: all 0.2s ease;
     cursor: pointer;
   }
 
   .gov-btn:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,51,102,0.2);
   }
 
   .gov-empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: #666;
+    padding: 50px 20px;
+    color: #888;
   }
 
   .gov-empty-icon {
-    font-size: 4rem;
+    font-size: 3rem;
     color: var(--gov-secondary);
     opacity: 0.5;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+  }
+
+  .gov-empty-state h4 {
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
   }
 
   @media (max-width: 768px) {
     .gov-hero-title {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
+    }
+    .gov-bus-info-row {
+      flex-direction: column;
+      gap: 5px;
     }
   }
 </style>
@@ -225,7 +260,7 @@
         </div>
         
         <div style="text-align: center;">
-          <a href="{% url 'conductor_seat_management' %}" class="gov-btn">
+          <a href="{% url 'conductor_seat_management' assigned_bus.id %}" class="gov-btn">
             <i class="bi bi-pencil-square"></i> Manage Seats
           </a>
         </div>

@@ -1,64 +1,434 @@
 {% extends 'base.html' %}
-{% block title %}Owner Registration{% endblock %}
+{% block title %}Owner Registration - Government Transport Portal{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width:650px">
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
 
-  <h2 class="mb-4 text-center">Bus Owner Signup</h2>
+  .gov-register-container {
+    max-width: 650px;
+    margin: 50px auto;
+    padding: 0 20px;
+  }
 
-  <form method="POST" enctype="multipart/form-data" class="card p-4 shadow">
-    {% csrf_token %}
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 8px;
+    padding: 25px 30px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--gov-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
 
-    <!-- ============ USER ACCOUNT DETAILS ============ -->
-    <h5 class="mb-3">Account Details</h5>
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,143,0,0.08);
+    border-radius: 50%;
+  }
 
-    <div class="mb-3">
-      <label>Username</label>
-      <input type="text" name="username" class="form-control" required>
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,143,0,0.05);
+    border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .gov-hero-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 5px;
+  }
+
+  .gov-hero-title i {
+    color: var(--gov-secondary);
+    margin-right: 8px;
+  }
+
+  .gov-hero-subtitle {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.85rem;
+  }
+
+  .gov-form-card {
+    background: white;
+    border-radius: 6px;
+    padding: 30px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+  }
+
+  .gov-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin: 20px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gov-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-section-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-section-title:first-of-type {
+    margin-top: 0;
+  }
+
+  .gov-form-group {
+    margin-bottom: 15px;
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: var(--gov-primary);
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
+  }
+
+  .gov-input, .gov-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .gov-input:focus, .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0,105,92,0.1);
+    outline: none;
+  }
+
+  .gov-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .gov-file-upload {
+    border: 1px dashed var(--gov-primary);
+    border-radius: 4px;
+    padding: 15px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .gov-file-upload:hover {
+    background: var(--gov-light);
+    border-color: var(--gov-secondary);
+  }
+
+  .gov-file-upload i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+    margin-bottom: 8px;
+  }
+
+  .gov-file-upload p {
+    color: var(--gov-primary);
+    font-weight: 500;
+    margin: 0;
+    font-size: 0.8rem;
+  }
+
+  .gov-file-upload small {
+    font-size: 0.7rem;
+    color: #888;
+  }
+
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .gov-file-preview {
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: var(--gov-light);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--gov-primary);
+  }
+
+  .gov-btn-submit {
+    width: 100%;
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gov-btn-submit:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+  }
+
+  .gov-login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .gov-login-link a {
+    color: var(--gov-primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .gov-login-link a:hover {
+    text-decoration: underline;
+  }
+
+  hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+  }
+</style>
+
+<div class="gov-register-container">
+  <!-- Hero Section -->
+  <div class="gov-hero-section">
+    <div class="gov-hero-content">
+      <h1 class="gov-hero-title">
+        <i class="bi bi-bus-front"></i> Bus Owner Signup
+      </h1>
+      <p class="gov-hero-subtitle">
+        <i class="bi bi-shield-check"></i> Register your transport business with the government portal
+      </p>
     </div>
+  </div>
 
-    <div class="mb-3">
-      <label>Email Address</label>
-      <input type="email" name="email" class="form-control" required>
-    </div>
+  <!-- Form Card -->
+  <div class="gov-form-card">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
 
-    <div class="mb-3">
-      <label>Password</label>
-      <input type="password" name="password" class="form-control" required>
-    </div>
+      <!-- Account Details Section -->
+      <div class="gov-section-title">
+        <i class="bi bi-person-circle"></i>
+        Account Details
+      </div>
 
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-person-badge"></i>
+          Username <span class="gov-required">*</span>
+        </label>
+        <input type="text" name="username" class="gov-input" placeholder="Choose a username" required>
+      </div>
 
-    <!-- ============ OWNER DETAILS ============ -->
-    <hr>
-    <h5 class="mb-3">Owner Details</h5>
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-envelope"></i>
+          Email Address <span class="gov-required">*</span>
+        </label>
+        <input type="email" name="email" class="gov-input" placeholder="you@example.com" required>
+      </div>
 
-    <div class="mb-3">
-      <label>Contact Number</label>
-      <input type="text" name="contact_number" class="form-control" required>
-    </div>
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-lock"></i>
+          Password <span class="gov-required">*</span>
+        </label>
+        <input type="password" name="password" class="gov-input" placeholder="Create a strong password" required>
+      </div>
 
-    <div class="mb-3">
-      <label>Address</label>
-      <textarea name="address" class="form-control" required></textarea>
-    </div>
+      <hr>
 
-    <div class="mb-3">
-      <label>Owner Photo</label>
-      <input type="file" name="owner_photo" class="form-control">
-    </div>
+      <!-- Owner Details Section -->
+      <div class="gov-section-title">
+        <i class="bi bi-building"></i>
+        Owner Details
+      </div>
 
-    <div class="mb-3">
-      <label>Business License</label>
-      <input type="file" name="business_license" class="form-control">
-    </div>
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-telephone"></i>
+          Contact Number <span class="gov-required">*</span>
+        </label>
+        <input type="tel" name="contact_number" class="gov-input" placeholder="e.g., 9876543210" required>
+      </div>
 
-    <div class="mb-3">
-      <label>ID Proof</label>
-      <input type="file" name="id_proof" class="form-control">
-    </div>
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-geo-alt"></i>
+          Address <span class="gov-required">*</span>
+        </label>
+        <textarea name="address" class="gov-textarea" placeholder="Enter your complete business address" required></textarea>
+      </div>
 
-    <button class="btn btn-success w-100">Register as Owner</button>
-  </form>
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-camera"></i>
+          Owner Photo
+        </label>
+        <div class="gov-file-upload" id="photoUploadArea">
+          <i class="bi bi-cloud-upload"></i>
+          <p>Click to upload owner photo</p>
+          <small>Supported: JPG, PNG (Max 5MB)</small>
+          <input type="file" name="owner_photo" id="ownerPhoto" class="gov-file-input" accept="image/*">
+        </div>
+        <div id="photoPreview" class="gov-file-preview" style="display: none;">
+          <i class="bi bi-image"></i>
+          <span id="photoFileName"></span>
+        </div>
+      </div>
 
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-file-earmark-text"></i>
+          Business License
+        </label>
+        <div class="gov-file-upload" id="licenseUploadArea">
+          <i class="bi bi-cloud-upload"></i>
+          <p>Click to upload business license</p>
+          <small>Supported: PDF, JPG, PNG (Max 5MB)</small>
+          <input type="file" name="business_license" id="businessLicense" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+        <div id="licensePreview" class="gov-file-preview" style="display: none;">
+          <i class="bi bi-file-earmark-check"></i>
+          <span id="licenseFileName"></span>
+        </div>
+      </div>
+
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-person-badge"></i>
+          ID Proof
+        </label>
+        <div class="gov-file-upload" id="idUploadArea">
+          <i class="bi bi-cloud-upload"></i>
+          <p>Click to upload ID proof (Aadhar/PAN)</p>
+          <small>Supported: PDF, JPG, PNG (Max 5MB)</small>
+          <input type="file" name="id_proof" id="idProof" class="gov-file-input" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+        <div id="idPreview" class="gov-file-preview" style="display: none;">
+          <i class="bi bi-file-earmark-check"></i>
+          <span id="idFileName"></span>
+        </div>
+      </div>
+
+      <button type="submit" class="gov-btn-submit">
+        <i class="bi bi-check-circle"></i>
+        Register as Owner
+      </button>
+
+      <div class="gov-login-link">
+        Already have an account? <a href="{% url 'login' %}">Login here</a>
+      </div>
+    </form>
+  </div>
 </div>
+
+<script>
+  // Owner Photo Preview
+  const photoInput = document.getElementById('ownerPhoto');
+  const photoPreview = document.getElementById('photoPreview');
+  const photoFileName = document.getElementById('photoFileName');
+  
+  photoInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      photoFileName.textContent = this.files[0].name;
+      photoPreview.style.display = 'flex';
+    } else {
+      photoPreview.style.display = 'none';
+    }
+  });
+
+  // Business License Preview
+  const licenseInput = document.getElementById('businessLicense');
+  const licensePreview = document.getElementById('licensePreview');
+  const licenseFileName = document.getElementById('licenseFileName');
+  
+  licenseInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      licenseFileName.textContent = this.files[0].name;
+      licensePreview.style.display = 'flex';
+    } else {
+      licensePreview.style.display = 'none';
+    }
+  });
+
+  // ID Proof Preview
+  const idInput = document.getElementById('idProof');
+  const idPreview = document.getElementById('idPreview');
+  const idFileName = document.getElementById('idFileName');
+  
+  idInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      idFileName.textContent = this.files[0].name;
+      idPreview.style.display = 'flex';
+    } else {
+      idPreview.style.display = 'none';
+    }
+  });
+</script>
+
 {% endblock %}

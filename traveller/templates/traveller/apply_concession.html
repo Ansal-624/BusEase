@@ -1,47 +1,591 @@
 {% extends 'base.html' %}
-{% block title %}Apply for Concession{% endblock %}
+{% load static %}
+{% block title %}Apply for Concession - Government Transport Portal{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Apply for Concession</h2>
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
 
-{% if error %}
-<div class="alert alert-danger">{{ error }}</div>
-{% endif %}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-<form method="POST" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
-  {% csrf_token %}
+  .gov-concession-page {
+    padding: 30px 0 50px;
+    background: #eef2f5;
+    min-height: calc(100vh - 80px);
+  }
 
-  <div class="mb-3">
-    <label for="college_name" class="form-label">College Name</label>
-    <input type="text" name="college_name" id="college_name" class="form-control" placeholder="Enter your college name" required>
-  </div>
+  .gov-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label for="starting_location" class="form-label">Starting Location</label>
-      <input type="text" name="starting_location" id="starting_location" class="form-control" placeholder="Enter starting point" required>
+  /* Header Section */
+  .gov-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .gov-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .gov-title-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--gov-gradient);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gov-title-icon i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-title-text h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin: 0 0 5px;
+  }
+
+  .gov-title-text p {
+    color: #666;
+    font-size: 0.85rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-title-text p i {
+    color: var(--gov-secondary);
+  }
+
+  /* Back Button */
+  .gov-back-btn {
+    background: white;
+    border: 1px solid var(--gov-primary);
+    color: var(--gov-primary);
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+  }
+
+  .gov-back-btn:hover {
+    background: var(--gov-primary);
+    color: white;
+    transform: translateX(-3px);
+  }
+
+  /* Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 6px;
+    padding: 35px 30px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+    position: relative;
+  }
+
+  /* Form Sections */
+  .gov-form-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .gov-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .gov-section-title i {
+    font-size: 1.2rem;
+    color: var(--gov-secondary);
+  }
+
+  .gov-section-title h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin: 0;
+  }
+
+  /* Form Grid */
+  .gov-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .gov-form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Form Groups */
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-form-group.full-width {
+    grid-column: span 2;
+  }
+
+  @media (max-width: 768px) {
+    .gov-form-group.full-width {
+      grid-column: span 1;
+    }
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+    font-size: 0.85rem;
+  }
+
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
+  }
+
+  .gov-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .gov-input:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
+    outline: none;
+  }
+
+  .gov-input::placeholder {
+    color: #bbb;
+  }
+
+  /* File Upload */
+  .gov-file-upload {
+    border: 1px dashed var(--gov-primary);
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .gov-file-upload:hover {
+    background: var(--gov-light);
+    border-color: var(--gov-secondary);
+  }
+
+  .gov-file-upload i {
+    font-size: 2rem;
+    color: var(--gov-secondary);
+    margin-bottom: 10px;
+  }
+
+  .gov-file-upload p {
+    color: var(--gov-primary);
+    font-weight: 500;
+    margin: 0 0 5px;
+    font-size: 0.85rem;
+  }
+
+  .gov-file-upload small {
+    color: #888;
+    font-size: 0.7rem;
+  }
+
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* File Preview */
+  .gov-file-preview {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--gov-light);
+    border-radius: 4px;
+    border-left: 3px solid var(--gov-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-file-preview i {
+    color: var(--gov-secondary);
+    font-size: 1rem;
+  }
+
+  .gov-file-preview span {
+    color: var(--gov-primary);
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+
+  /* Button Group */
+  .gov-button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  /* Submit Button */
+  .gov-submit-btn {
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    flex: 1;
+  }
+
+  .gov-submit-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
+  }
+
+  .gov-submit-btn i {
+    font-size: 1rem;
+  }
+
+  /* Cancel Button */
+  .gov-cancel-btn {
+    background: white;
+    border: 1px solid var(--gov-danger);
+    color: var(--gov-danger);
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    flex: 1;
+  }
+
+  .gov-cancel-btn:hover {
+    background: var(--gov-danger);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .gov-cancel-btn i {
+    font-size: 1rem;
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    background: #fff8e1;
+    border-left: 3px solid #ffc107;
+    border-radius: 4px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #856404;
+    font-size: 0.85rem;
+  }
+
+  .gov-alert i {
+    font-size: 1rem;
+  }
+
+  .gov-alert-error {
+    background: #f8d7da;
+    border-left-color: var(--gov-danger);
+    color: #721c24;
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    border-left-color: var(--gov-success);
+    color: #155724;
+  }
+
+  /* Loading State */
+  .gov-submit-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-form-card {
+      padding: 25px 20px;
+    }
+    .gov-header-section {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .gov-title-text h1 {
+      font-size: 1.3rem;
+    }
+    .gov-button-group {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<div class="gov-concession-page">
+  <div class="gov-container">
+
+    <!-- Header Section with Back Button -->
+    <div class="gov-header-section">
+      <div class="gov-title-wrapper">
+        <div class="gov-title-icon">
+          <i class="bi bi-ticket-perforated"></i>
+        </div>
+        <div class="gov-title-text">
+          <h1>Apply for Concession</h1>
+          <p>
+            <i class="bi bi-shield-check"></i>
+            Student concession application for government transport
+          </p>
+        </div>
+      </div>
+      <a href="{% url 'traveller_dashboard' %}" class="gov-back-btn">
+        <i class="bi bi-arrow-left"></i> Dashboard
+      </a>
     </div>
-    <div class="col-md-6 mb-3">
-      <label for="ending_location" class="form-label">Ending Location</label>
-      <input type="text" name="ending_location" id="ending_location" class="form-control" placeholder="Enter destination" required>
+
+    <!-- Display error messages -->
+    {% if error %}
+    <div class="gov-alert gov-alert-error">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="gov-form-card">
+      <form method="POST" enctype="multipart/form-data" id="concessionForm">
+        {% csrf_token %}
+
+        <!-- Personal Information Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-person-badge"></i>
+            <h3>Personal Information</h3>
+          </div>
+
+          <div class="gov-form-group">
+            <label class="gov-label" for="college_name">
+              <i class="bi bi-building"></i> College Name <span class="gov-required">*</span>
+            </label>
+            <input type="text" name="college_name" id="college_name" class="gov-input" 
+                   placeholder="Enter your college name" required>
+          </div>
+        </div>
+
+        <!-- Travel Details Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-geo-alt"></i>
+            <h3>Travel Details</h3>
+          </div>
+
+          <div class="gov-form-grid">
+            <div class="gov-form-group">
+              <label class="gov-label" for="starting_location">
+                <i class="bi bi-play-circle"></i> Starting Location <span class="gov-required">*</span>
+              </label>
+              <input type="text" name="starting_location" id="starting_location" class="gov-input" 
+                     placeholder="Enter starting point" required>
+            </div>
+
+            <div class="gov-form-group">
+              <label class="gov-label" for="ending_location">
+                <i class="bi bi-stop-circle"></i> Ending Location <span class="gov-required">*</span>
+              </label>
+              <input type="text" name="ending_location" id="ending_location" class="gov-input" 
+                     placeholder="Enter destination" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="gov-form-section">
+          <div class="gov-section-title">
+            <i class="bi bi-folder"></i>
+            <h3>Supporting Documents</h3>
+          </div>
+
+          <!-- ID Proof Upload -->
+          <div class="gov-form-group">
+            <label class="gov-label" for="document">
+              <i class="bi bi-file-earmark-text"></i> ID Proof <span class="gov-required">*</span>
+            </label>
+            <div class="gov-file-upload">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Click to upload ID proof</p>
+              <small>Accepted formats: JPG, PNG, PDF (Max 5MB)</small>
+              <input type="file" name="document" id="document" class="gov-file-input" accept=".jpg,.jpeg,.png,.pdf" required>
+            </div>
+            <div id="documentPreview" class="gov-file-preview" style="display: none;">
+              <i class="bi bi-file-earmark-check"></i>
+              <span id="documentName"></span>
+            </div>
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="gov-form-group">
+            <label class="gov-label" for="photo">
+              <i class="bi bi-camera"></i> Passport Size Photo <span class="gov-required">*</span>
+            </label>
+            <div class="gov-file-upload">
+              <i class="bi bi-cloud-upload"></i>
+              <p>Click to upload passport size photo</p>
+              <small>Accepted formats: JPG, PNG (Max 2MB)</small>
+              <input type="file" name="photo" id="photo" class="gov-file-input" accept=".jpg,.jpeg,.png" required>
+            </div>
+            <div id="photoPreview" class="gov-file-preview" style="display: none;">
+              <i class="bi bi-image"></i>
+              <span id="photoName"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Note -->
+        <p style="margin-top: 20px; font-size: 0.75rem; color: #888; text-align: center;">
+          <i class="bi bi-info-circle"></i>
+          All documents will be verified by the transport department. Concession approval may take 5-7 business days.
+        </p>
+
+        <!-- Button Group -->
+        <div class="gov-button-group">
+          <a href="{% url 'traveller_dashboard' %}" class="gov-cancel-btn">
+            <i class="bi bi-x-circle"></i> Cancel
+          </a>
+          <button type="submit" class="gov-submit-btn" id="submitBtn">
+            <i class="bi bi-check-circle"></i> Submit Application
+          </button>
+        </div>
+
+      </form>
     </div>
   </div>
+</div>
 
-  <div class="mb-3">
-    <label for="document" class="form-label">Upload ID Proof</label>
-    <input type="file" name="document" id="document" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
-    <small class="text-muted">Accepted formats: JPG, PNG, or PDF.</small>
-  </div>
+<script>
+  // Document file preview
+  document.getElementById('document').addEventListener('change', function(e) {
+    const preview = document.getElementById('documentPreview');
+    const fileName = document.getElementById('documentName');
+    
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
 
-  <div class="mb-3">
-    <label for="photo" class="form-label">Upload Passport Size Photo</label>
-    <input type="file" name="photo" id="photo" class="form-control" accept=".jpg,.jpeg,.png" required>
-    <small class="text-muted">Accepted formats: JPG or PNG only.</small>
-  </div>
+  // Photo file preview
+  document.getElementById('photo').addEventListener('change', function(e) {
+    const preview = document.getElementById('photoPreview');
+    const fileName = document.getElementById('photoName');
+    
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      preview.style.display = 'flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
 
-  <div class="d-flex justify-content-between">
-    <a href="{% url 'traveller_dashboard' %}" class="btn btn-secondary">Back</a>
-    <button type="submit" class="btn btn-primary">Submit Application</button>
-  </div>
-</form>
+  // Form submission with loading state
+  document.getElementById('concessionForm').addEventListener('submit', function() {
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Submitting...';
+  });
+
+  // Auto-hide alerts after 5 seconds
+  setTimeout(function() {
+    document.querySelectorAll('.gov-alert').forEach(alert => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => {
+        if (alert) alert.style.display = 'none';
+      }, 500);
+    });
+  }, 5000);
+</script>
+
 {% endblock %}

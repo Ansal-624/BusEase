@@ -130,8 +130,16 @@ def book_bus(request, schedule_id):
     # Stops
     stops = list(route.stops.all().order_by("order"))
 
-    booked_seats = Booking.objects.filter(schedule=schedule).count()
-    available_seats = bus.total_seats - booked_seats
+    # Get booked seats list for this schedule
+    booked_seats_list = list(Booking.objects.filter(
+        schedule=schedule
+    ).values_list('seat_number', flat=True))
+    
+    booked_seats_count = len(booked_seats_list)
+    available_seats = bus.total_seats - booked_seats_count
+    
+    # Create seat range for the template (1 to total_seats)
+    seat_range = range(1, bus.total_seats + 1)
 
     PRICE_PER_STOP = Decimal("5.00")  # FIXED RATE
 
@@ -163,25 +171,6 @@ def book_bus(request, schedule_id):
         stops_travelled = to_stop.order - from_stop.order
         base_fare = Decimal(schedule.fare)
         total_fare = base_fare + (stops_travelled * PRICE_PER_STOP)
-        
-        # Calculate journey duration between selected stops
-        # Assuming stops have arrival times, we can calculate the difference
-        journey_duration = None
-        try:
-            # Convert time to datetime for calculation
-            from datetime import datetime, timedelta
-            from_stop_time = datetime.combine(datetime.today(), from_stop.arrival_time)
-            to_stop_time = datetime.combine(datetime.today(), to_stop.arrival_time)
-            
-            # If to_stop_time is less than from_stop_time, it means it's next day
-            if to_stop_time < from_stop_time:
-                to_stop_time += timedelta(days=1)
-            
-            journey_duration = to_stop_time - from_stop_time
-        except Exception as e:
-            # Fallback if time calculation fails
-            journey_duration = timedelta(hours=2, minutes=30)  # Default 2h30m
-            print(f"Error calculating duration: {e}")
 
         # Verify payment if payment_id exists
         if payment_id:
@@ -201,12 +190,13 @@ def book_bus(request, schedule_id):
                     status="Confirmed",
                     payment_id=payment_id,
                     payment_status="Paid",
-                    journey_duration=journey_duration  # Store the calculated duration
+                    payment_amount=total_fare,
+                    booking_date=timezone.now()
                 )
                 
                 messages.success(
                     request,
-                    f"Booking successful! Ticket Price: ₹{total_fare}"
+                    f"Booking successful! Seat {seat_number} booked. Ticket Price: ₹{total_fare}"
                 )
                 return redirect("traveller_bookings_page")
                 
@@ -222,13 +212,14 @@ def book_bus(request, schedule_id):
         "schedule": schedule,
         "stops": stops,
         "available_seats": available_seats,
+        "booked_seats": booked_seats_list,  # Add this for the template
+        "seat_range": seat_range,  # Add this for the seat grid
+        "total_seats": bus.total_seats,  # Add this for display
         "photos": photos,
         "price_per_stop": PRICE_PER_STOP,
         "razorpay_key": settings.RAZORPAY_KEY_ID,
         "currency": "INR",
     })
-
-
 # ============================================================
 # RAZORPAY PAYMENT INTEGRATION
 # ============================================================
@@ -395,6 +386,7 @@ def track_bus(request, bus_id):
         'stops_count': len(stops),
         'stops_travelled': stops_travelled_count,
     })
+
 @login_required
 def track_bus_list(request):
     """List all available buses for tracking"""

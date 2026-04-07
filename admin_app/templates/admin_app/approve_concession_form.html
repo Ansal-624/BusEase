@@ -1,10 +1,322 @@
 {% extends 'base.html' %}
+{% block title %}Approve Concession - Government Transport Portal{% endblock %}
+
 {% block content %}
-<h3>Approve Concession for {{ concession.traveller.username }}</h3>
-<form method="post">{% csrf_token %}
-  <label>Enter Validity (days):</label>
-  <input type="number" name="expiry_days" value="180" class="form-control mb-3" required>
-  <button type="submit" class="btn btn-success">Approve</button>
-  <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
-</form>
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  .gov-approve-page {
+    padding: 40px 0;
+    background: #eef2f5;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 8px;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .gov-hero-section h2 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .gov-hero-section p {
+    color: rgba(255,255,255,0.9);
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+  }
+
+  .gov-hero-section i {
+    color: var(--gov-secondary);
+    margin-right: 8px;
+  }
+
+  /* Applicant Info Card */
+  .gov-info-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-info-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-info-header h4 {
+    margin: 0;
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-info-header h4 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-info-body {
+    padding: 20px;
+  }
+
+  .gov-info-row {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .gov-info-row:last-child {
+    border-bottom: none;
+  }
+
+  .gov-info-label {
+    width: 120px;
+    font-weight: 600;
+    color: var(--gov-primary);
+  }
+
+  .gov-info-value {
+    flex: 1;
+    color: #444;
+  }
+
+  /* Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-form-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-form-header h4 {
+    margin: 0;
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-form-header h4 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-form-body {
+    padding: 25px;
+  }
+
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+  }
+
+  .gov-input:focus {
+    border-color: var(--gov-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,105,92,0.1);
+  }
+
+  .gov-help-text {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 5px;
+  }
+
+  /* Action Buttons */
+  .gov-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .gov-btn {
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-btn-success {
+    background: var(--gov-success);
+    color: white;
+  }
+
+  .gov-btn-success:hover {
+    background: #218838;
+  }
+
+  .gov-btn-secondary {
+    background: #6c757d;
+    color: white;
+  }
+
+  .gov-btn-secondary:hover {
+    background: #5a6268;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-info-row {
+      flex-direction: column;
+    }
+    .gov-info-label {
+      width: auto;
+      margin-bottom: 5px;
+    }
+    .gov-action-buttons {
+      flex-direction: column;
+    }
+    .gov-btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="gov-approve-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <h2>
+        <i class="bi bi-check-circle"></i> Approve Concession Application
+      </h2>
+      <p>
+        <i class="bi bi-shield-check"></i> Review and approve student/senior citizen concession
+      </p>
+    </div>
+
+    <!-- Applicant Information -->
+    <div class="gov-info-card">
+      <div class="gov-info-header">
+        <h4>
+          <i class="bi bi-person-badge"></i> Applicant Details
+        </h4>
+      </div>
+      <div class="gov-info-body">
+        <div class="gov-info-row">
+          <div class="gov-info-label">Applicant Name:</div>
+          <div class="gov-info-value">{{ concession.traveller.get_full_name|default:concession.traveller.username }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">Username:</div>
+          <div class="gov-info-value">@{{ concession.traveller.username }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">College/Institution:</div>
+          <div class="gov-info-value">{{ concession.college_name }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">Route:</div>
+          <div class="gov-info-value">{{ concession.starting_location }} → {{ concession.ending_location }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">Applied On:</div>
+          <div class="gov-info-value">{{ concession.applied_on|date:"d M Y, h:i A" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approval Form -->
+    <div class="gov-form-card">
+      <div class="gov-form-header">
+        <h4>
+          <i class="bi bi-calendar-check"></i> Set Concession Validity
+        </h4>
+      </div>
+      <div class="gov-form-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-calendar-plus"></i> Validity Period
+            </label>
+            <input type="number" name="expiry_days" value="180" class="gov-input" required>
+            <div class="gov-help-text">
+              <i class="bi bi-info-circle"></i> Number of days the concession will remain valid (default: 180 days)
+            </div>
+          </div>
+
+          <div class="gov-action-buttons">
+            <button type="submit" class="gov-btn gov-btn-success">
+              <i class="bi bi-check-circle"></i> Approve Concession
+            </button>
+            <a href="{% url 'admin_dashboard' %}" class="gov-btn gov-btn-secondary">
+              <i class="bi bi-x-circle"></i> Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

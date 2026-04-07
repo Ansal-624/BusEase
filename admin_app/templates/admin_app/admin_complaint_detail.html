@@ -3,13 +3,13 @@
 
 {% block content %}
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -18,7 +18,7 @@
 
   .gov-detail-page {
     padding: 30px 0;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
@@ -31,12 +31,13 @@
   /* Hero Section */
   .gov-hero-section {
     background: var(--gov-gradient);
-    border-radius: 20px;
+    border-radius: 8px;
     padding: 30px;
     margin-bottom: 25px;
-    border: 2px solid var(--gov-secondary);
+    border-bottom: 3px solid var(--gov-secondary);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   .gov-hero-section::before {
@@ -46,7 +47,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -57,17 +58,15 @@
     left: -5%;
     width: 250px;
     height: 250px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.05);
     border-radius: 50%;
   }
 
   .gov-hero-section h1 {
     color: white;
-    font-size: 1.8rem;
-    font-weight: 700;
+    font-size: 1.6rem;
+    font-weight: 600;
     margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     position: relative;
     z-index: 2;
   }
@@ -78,68 +77,66 @@
     align-items: center;
     gap: 8px;
     background: white;
-    border: 2px solid var(--gov-primary);
+    border: 1px solid var(--gov-primary);
     color: var(--gov-primary);
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-weight: 600;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: 500;
     text-decoration: none;
     margin-bottom: 20px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .gov-back-btn:hover {
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    transform: translateX(-5px);
+    color: white;
+    transform: translateX(-3px);
   }
 
   /* Detail Card */
   .gov-detail-card {
     background: white;
-    border-radius: 24px;
+    border-radius: 6px;
     border: 1px solid #e0e0e0;
     overflow: hidden;
-    box-shadow: 0 15px 40px rgba(0,51,102,0.15);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
   .gov-card-header {
-    background: var(--gov-gradient);
-    padding: 20px 25px;
-    border-bottom: 3px solid var(--gov-secondary);
+    background: #fafafa;
+    padding: 16px 20px;
+    border-bottom: 2px solid var(--gov-primary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .gov-card-header i {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--gov-secondary);
   }
 
   .gov-card-header h3 {
-    color: white;
+    color: var(--gov-primary);
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
   .gov-card-body {
-    padding: 30px;
+    padding: 25px;
   }
 
   /* Status Badge */
   .gov-status-badge-large {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 25px;
-    border-radius: 40px;
-    font-weight: 700;
-    font-size: 1rem;
-    border: 2px solid;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid;
     margin-bottom: 25px;
   }
 
@@ -177,9 +174,9 @@
 
   .gov-info-item {
     background: #f8f9fa;
-    padding: 18px;
-    border-radius: 12px;
-    border-left: 4px solid var(--gov-secondary);
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 3px solid var(--gov-secondary);
   }
 
   .gov-info-item.full-width {
@@ -188,7 +185,7 @@
 
   .gov-info-label {
     color: #666;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     margin-bottom: 5px;
     display: flex;
@@ -209,40 +206,39 @@
   /* Description Box */
   .gov-description-box {
     background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
+    padding: 20px;
+    border-radius: 6px;
     margin-bottom: 25px;
-    border-left: 4px solid var(--gov-secondary);
+    border-left: 3px solid var(--gov-secondary);
     line-height: 1.6;
     color: #333;
   }
 
   /* Attachment Box */
   .gov-attachment-box {
-    background: #f0f4ff;
+    background: var(--gov-light);
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 6px;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
     border: 1px dashed var(--gov-primary);
   }
 
   .gov-attachment-icon {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     background: var(--gov-gradient);
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--gov-secondary);
   }
 
   .gov-attachment-icon i {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--gov-secondary);
   }
 
@@ -257,7 +253,7 @@
   }
 
   .gov-attachment-size {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #666;
   }
 
@@ -269,33 +265,32 @@
   .gov-attachment-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border: 2px solid var(--gov-secondary);
-    border-radius: 30px;
-    padding: 10px 20px;
+    color: white;
+    border-radius: 4px;
+    padding: 6px 14px;
     text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
   }
 
   .gov-attachment-link:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,51,102,0.3);
   }
 
   .gov-attachment-link i {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   /* Admin Note */
   .gov-admin-note {
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
+    background: #fff8e1;
+    border-left: 3px solid #ffc107;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 6px;
     margin: 25px 0;
   }
 
@@ -306,6 +301,7 @@
     align-items: center;
     gap: 8px;
     font-weight: 600;
+    font-size: 0.95rem;
   }
 
   .gov-admin-note p {
@@ -327,35 +323,33 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 25px;
-    border-radius: 10px;
+    padding: 10px 20px;
+    border-radius: 4px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
   }
 
   .gov-action-update {
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border-color: var(--gov-secondary);
+    color: white;
   }
 
   .gov-action-update:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
   }
 
   .gov-action-back {
-    background: white;
-    color: var(--gov-primary);
-    border-color: var(--gov-primary);
+    background: #f0f0f0;
+    color: #555;
   }
 
   .gov-action-back:hover {
-    background: var(--gov-primary);
-    color: var(--gov-secondary);
+    background: #e0e0e0;
+    transform: translateY(-2px);
   }
 
   /* Responsive */
@@ -455,7 +449,7 @@
         </div>
 
         <!-- Description -->
-        <h5 style="color: var(--gov-primary); margin-bottom: 10px;">
+        <h5 style="color: var(--gov-primary); margin-bottom: 10px; font-size: 0.95rem;">
           <i class="bi bi-chat-left-text"></i> Description
         </h5>
         <div class="gov-description-box">
@@ -464,7 +458,7 @@
 
         <!-- Attachment -->
         {% if complaint.attachment %}
-        <h5 style="color: var(--gov-primary); margin-bottom: 10px;">
+        <h5 style="color: var(--gov-primary); margin-bottom: 10px; font-size: 0.95rem;">
           <i class="bi bi-paperclip"></i> Attached File
         </h5>
         <div class="gov-attachment-box">

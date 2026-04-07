@@ -677,13 +677,15 @@ def owner_assign_duty(request):
         conductor = get_object_or_404(Conductor, id=conductor_id, owner=owner_profile)
         bus = get_object_or_404(Bus, id=bus_id, owner=owner_profile)
         
-        # Check if conductor already has an assigned bus
-        existing_assignment = ConductorDuty.objects.filter(conductor=conductor, is_active=True).first()
+        # Check if conductor already has an assignment (active or inactive)
+        existing_assignment = ConductorDuty.objects.filter(conductor=conductor).first()
         
         if existing_assignment:
-            # Update existing assignment
+            # Update existing assignment instead of creating new one
             existing_assignment.bus = bus
             existing_assignment.assigned_by = request.user
+            existing_assignment.is_active = True
+            existing_assignment.assigned_at = timezone.now()  # Update timestamp
             existing_assignment.save()
             messages.success(
                 request, 
@@ -709,9 +711,9 @@ def owner_assign_duty(request):
     buses = Bus.objects.filter(owner=owner_profile, approved=True)
     
     # Get current assignments
-    assignments = {duty.conductor_id: duty.bus_id for duty in ConductorDuty.objects.filter(
-        conductor__owner=owner_profile, is_active=True
-    )}
+    assignments = {}
+    for duty in ConductorDuty.objects.filter(conductor__owner=owner_profile, is_active=True):
+        assignments[duty.conductor_id] = duty.bus_id
     
     context = {
         'conductors': conductors,
@@ -733,11 +735,13 @@ def owner_unassign_conductor(request, conductor_id):
     conductor = get_object_or_404(Conductor, id=conductor_id, owner=owner_profile)
     
     if request.method == 'POST':
-        # Get the assignment and delete it
-        assignment = ConductorDuty.objects.filter(conductor=conductor, is_active=True).first()
+        # Get the assignment and deactivate it (don't delete to maintain history)
+        assignment = ConductorDuty.objects.filter(conductor=conductor).first()
         
         if assignment:
-            assignment.delete()  # This removes the assignment entirely
+            # Either delete it or set is_active=False
+            assignment.is_active = False
+            assignment.save()
             messages.success(request, f"Conductor {conductor.user.get_full_name()} has been unassigned from their bus.")
         else:
             messages.warning(request, "This conductor is not assigned to any bus.")

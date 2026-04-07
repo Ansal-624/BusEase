@@ -5,13 +5,13 @@
 {% block content %}
 
 <style>
-  /* Government Transport Portal Theme - Your existing CSS remains the same */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -26,7 +26,7 @@
 
   .gov-bookings-page {
     padding: 20px 0 40px;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
@@ -39,7 +39,7 @@
     position: relative;
     overflow: hidden;
     border: 3px solid var(--gov-secondary);
-    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+    box-shadow: 0 15px 40px rgba(0,105,92,0.2);
   }
 
   .gov-hero-section::before {
@@ -49,7 +49,7 @@
     right: -10%;
     width: 400px;
     height: 400px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.1);
     border-radius: 50%;
   }
 
@@ -60,7 +60,7 @@
     left: -5%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -79,6 +79,10 @@
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
   }
 
+  .gov-hero-title i {
+    color: var(--gov-secondary);
+  }
+
   .gov-hero-subtitle {
     font-size: 1.1rem;
     color: rgba(255,255,255,0.95);
@@ -90,6 +94,14 @@
 
   .gov-hero-subtitle i {
     color: var(--gov-secondary);
+  }
+
+  .gov-hero-badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid var(--gov-secondary);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
   }
 
   .gov-hero-decor {
@@ -116,7 +128,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 25px;
-    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    box-shadow: 0 4px 15px rgba(0,105,92,0.08);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.9rem;
@@ -140,7 +152,7 @@
     background: white;
     border-radius: 16px;
     padding: 25px;
-    box-shadow: 0 5px 20px rgba(0,51,102,0.05);
+    box-shadow: 0 5px 20px rgba(0,105,92,0.05);
     border: 1px solid #e0e0e0;
     transition: all 0.3s ease;
     position: relative;
@@ -164,7 +176,7 @@
 
   .gov-stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,51,102,0.15);
+    box-shadow: 0 15px 30px rgba(0,105,92,0.15);
     border-color: var(--gov-primary);
   }
 
@@ -259,7 +271,7 @@
 
   .gov-filter-tab:hover {
     border-color: var(--gov-primary);
-    background: #f0f4ff;
+    background: var(--gov-light);
     color: var(--gov-primary);
   }
 
@@ -281,7 +293,7 @@
     background: white;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.08);
     transition: all 0.3s ease;
     border: 2px solid #e0e0e0;
     animation: govFadeIn 0.5s ease-out;
@@ -300,7 +312,7 @@
 
   .gov-booking-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    box-shadow: 0 20px 40px rgba(0,105,92,0.15);
     border-color: var(--gov-primary);
   }
 
@@ -456,7 +468,7 @@
   }
 
   .gov-detail-card:hover {
-    background: #f0f4ff;
+    background: var(--gov-light);
     border-color: var(--gov-primary);
   }
 
@@ -492,7 +504,7 @@
 
   /* Fare Display */
   .gov-fare-card {
-    background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+    background: linear-gradient(135deg, var(--gov-light), #e6f0ff);
     border: 2px solid var(--gov-primary);
     border-radius: 12px;
     padding: 15px 20px;
@@ -579,7 +591,7 @@
   .gov-btn-track:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+    box-shadow: 0 8px 20px rgba(0,105,92,0.3);
     color: var(--gov-secondary);
   }
 
@@ -671,7 +683,7 @@
     padding: 80px 20px;
     background: white;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.08);
     border: 2px dashed var(--gov-primary);
   }
 
@@ -725,7 +737,19 @@
   .gov-btn-browse:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0,51,102,0.3);
+    box-shadow: 0 10px 25px rgba(0,105,92,0.3);
+  }
+
+  /* Duration Badge */
+  .gov-duration-badge {
+    display: inline-block;
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--gov-secondary);
   }
 
   /* Responsive */
@@ -807,7 +831,7 @@
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255,215,0,0.3);
+    border: 3px solid rgba(255,143,0,0.3);
     border-radius: 50%;
     border-top-color: var(--gov-secondary);
     animation: spin 1s linear infinite;
@@ -815,18 +839,6 @@
 
   @keyframes spin {
     to { transform: rotate(360deg); }
-  }
-  
-  /* Duration Badge */
-  .gov-duration-badge {
-    display: inline-block;
-    background: var(--gov-primary);
-    color: var(--gov-secondary);
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border: 1px solid var(--gov-secondary);
   }
 </style>
 
@@ -855,7 +867,7 @@
   </a>
 
   {% if bookings %}
-    <!-- Stats Summary - Using counts from view -->
+    <!-- Stats Summary -->
     <div class="gov-stats-grid">
       <div class="gov-stat-card">
         <div class="gov-stat-icon">

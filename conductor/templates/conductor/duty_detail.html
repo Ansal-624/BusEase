@@ -3,29 +3,220 @@
 {% block title %}Duty Details - {{ bus.bus_name }}{% endblock %}
 
 {% block content %}
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  .gov-main-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-card-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-card-header h3 {
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-card-header h3 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .gov-info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .gov-info-item {
+    margin-bottom: 15px;
+  }
+
+  .gov-info-label {
+    font-weight: 500;
+    color: var(--gov-primary);
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+  }
+
+  .gov-info-value {
+    color: #444;
+    font-size: 0.95rem;
+  }
+
+  .gov-info-value strong {
+    color: var(--gov-primary);
+  }
+
+  .gov-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .gov-stats-row:last-child {
+    border-bottom: none;
+  }
+
+  .gov-stats-label {
+    font-weight: 500;
+    color: #666;
+  }
+
+  .gov-stats-value {
+    font-weight: 600;
+    color: var(--gov-primary);
+  }
+
+  .gov-progress {
+    background: #e0e0e0;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+
+  .gov-progress-bar {
+    background: var(--gov-primary);
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  .gov-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 10px;
+  }
+
+  .gov-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+  }
+
+  .gov-btn-secondary {
+    background: #6c757d;
+  }
+
+  .gov-btn-secondary:hover {
+    background: #5a6268;
+  }
+
+  .gov-content-padding {
+    padding: 20px;
+  }
+
+  .text-muted {
+    color: #888 !important;
+  }
+</style>
+
 <div class="container mt-4">
   <div class="gov-main-card">
     <div class="gov-card-header">
       <h3><i class="bi bi-bus-front"></i> Duty Details</h3>
     </div>
-    <div style="padding: 25px;">
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>Bus:</strong> {{ bus.bus_name }} ({{ bus.bus_number }})</p>
-          <p><strong>Route:</strong> {% if schedule %}{{ schedule.route.start_location }} → {{ schedule.route.end_location }}{% else %}Not specified{% endif %}</p>
-          <p><strong>Date:</strong> {{ duty.duty_date|date:"d M Y" }}</p>
-          <p><strong>Time:</strong> {{ duty.start_time|time:"h:i A" }} - {{ duty.end_time|time:"h:i A" }}</p>
+    <div class="gov-content-padding">
+      <div class="gov-info-grid">
+        <!-- Left Column -->
+        <div>
+          <div class="gov-info-item">
+            <div class="gov-info-label">Bus</div>
+            <div class="gov-info-value"><strong>{{ bus.bus_name }}</strong> ({{ bus.bus_number }})</div>
+          </div>
+          <div class="gov-info-item">
+            <div class="gov-info-label">Route</div>
+            <div class="gov-info-value">
+              {% if schedule %}
+                {{ schedule.route.start_location }} → {{ schedule.route.end_location }}
+              {% else %}
+                <span class="text-muted">Not specified</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="gov-info-item">
+            <div class="gov-info-label">Date</div>
+            <div class="gov-info-value">{{ duty.duty_date|date:"d M Y" }}</div>
+          </div>
+          <div class="gov-info-item">
+            <div class="gov-info-label">Time</div>
+            <div class="gov-info-value">{{ duty.start_time|time:"h:i A" }} - {{ duty.end_time|time:"h:i A" }}</div>
+          </div>
         </div>
-        <div class="col-md-6">
-          <p><strong>Total Seats:</strong> {{ total_seats }}</p>
-          <p><strong>Booked Seats:</strong> {{ booked_seats|length }}</p>
-          <p><strong>Available Seats:</strong> {{ available_seats }}</p>
-          <p><strong>Occupancy Rate:</strong> {% widthratio booked_seats|length total_seats 100 %}%</p>
+
+        <!-- Right Column -->
+        <div>
+          <div class="gov-stats-row">
+            <span class="gov-stats-label">Total Seats</span>
+            <span class="gov-stats-value">{{ total_seats }}</span>
+          </div>
+          <div class="gov-stats-row">
+            <span class="gov-stats-label">Booked Seats</span>
+            <span class="gov-stats-value">{{ booked_seats|length }}</span>
+          </div>
+          <div class="gov-stats-row">
+            <span class="gov-stats-label">Available Seats</span>
+            <span class="gov-stats-value">{{ available_seats }}</span>
+          </div>
+          <div class="gov-stats-row">
+            <span class="gov-stats-label">Occupancy Rate</span>
+            <span class="gov-stats-value">{% widthratio booked_seats|length total_seats 100 %}%</span>
+          </div>
+          <div class="gov-progress">
+            <div class="gov-progress-bar" style="width: '{% widthratio booked_seats|length total_seats 100 %}%'"></div>
+          </div>
         </div>
       </div>
-      <div class="mt-3">
-        <a href="{% url 'conductor_seat_management' duty.id %}" class="gov-btn">Manage Seats</a>
-        <a href="{% url 'conductor_dashboard' %}" class="gov-btn">Back to Dashboard</a>
+
+      <div class="mt-4">
+        <a href="{% url 'conductor_seat_management' duty.id %}" class="gov-btn">
+          <i class="bi bi-pencil-square"></i> Manage Seats
+        </a>
+        <a href="{% url 'conductor_dashboard' %}" class="gov-btn gov-btn-secondary">
+          <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
       </div>
     </div>
   </div>

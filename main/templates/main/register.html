@@ -1,12 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Government Registration - BusEase Transport Portal{% endblock %}
+
 {% block content %}
 
 <style>
-  /* Government Registration Theme */
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
   .gov-register-wrapper {
     min-height: calc(100vh - 200px);
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    background: #f5f5f5;
     padding: 40px 20px;
     display: flex;
     align-items: center;
@@ -23,7 +37,7 @@
     transform: translate(-50%, -50%);
     width: 600px;
     height: 600px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%2300695c"/></svg>') center/contain no-repeat;
     pointer-events: none;
   }
 
@@ -37,9 +51,9 @@
   /* Official Registration Card */
   .gov-register-card {
     background: white;
-    border-radius: 20px;
-    padding: 45px 40px;
-    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    border-radius: 6px;
+    padding: 40px 35px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     border: 1px solid #e0e0e0;
     position: relative;
     animation: govSlideUp 0.6s ease-out;
@@ -62,104 +76,116 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #003366, #FFD700, #003366);
-    border-radius: 20px 20px 0 0;
-  }
-
-  .gov-register-card::after {
-    content: '';
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 80px;
-    height: 80px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
-    pointer-events: none;
+    height: 4px;
+    background: var(--gov-gradient);
+    border-radius: 6px 6px 0 0;
   }
 
   /* Registration Header */
   .gov-register-header {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
   }
 
   .gov-register-icon {
-    width: 90px;
-    height: 90px;
-    background: linear-gradient(135deg, #003366, #002244);
+    width: 80px;
+    height: 80px;
+    background: var(--gov-gradient);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    border: 3px solid #FFD700;
-    box-shadow: 0 10px 25px rgba(0,51,102,0.3);
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
     position: relative;
   }
 
   .gov-register-icon i {
-    font-size: 3rem;
-    color: #FFD700;
-  }
-
-  .gov-register-icon::after {
-    content: '';
-    position: absolute;
-    bottom: 5px;
-    left: 15px;
-    right: 15px;
-    height: 2px;
-    background: rgba(255,215,0,0.3);
-    border-radius: 1px;
+    font-size: 2.5rem;
+    color: var(--gov-secondary);
   }
 
   .gov-register-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #003366;
-    margin-bottom: 10px;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-family: 'Times New Roman', serif;
   }
 
   .gov-register-subtitle {
     color: #666;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
   }
 
   /* Security Notice */
   .gov-security-badge {
-    background: #f8f9fa;
-    border: 1px solid #003366;
-    border-radius: 8px;
+    background: var(--gov-light);
+    border: 1px solid var(--gov-primary);
+    border-radius: 4px;
     padding: 12px 15px;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .gov-security-badge i {
-    color: #003366;
-    font-size: 1.3rem;
+    color: var(--gov-primary);
+    font-size: 1.2rem;
   }
 
   .gov-security-badge strong {
-    color: #003366;
+    color: var(--gov-primary);
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: var(--gov-success);
+  }
+
+  .gov-alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: var(--gov-danger);
+  }
+
+  .gov-alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left-color: var(--gov-warning);
+  }
+
+  .gov-alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left-color: var(--gov-info);
   }
 
   /* Form Labels */
   .gov-form-label {
     font-weight: 600;
-    color: #003366;
+    color: var(--gov-primary);
     margin-bottom: 8px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: flex;
@@ -168,39 +194,34 @@
   }
 
   .gov-form-label i {
-    color: #FFD700;
-    font-size: 1rem;
-    background: #003366;
-    padding: 4px;
-    border-radius: 50%;
+    color: var(--gov-secondary);
+    font-size: 0.9rem;
   }
 
   /* Form Controls */
   .gov-form-control {
-    border: 2px solid #dee2e6;
-    border-radius: 10px;
-    padding: 14px 18px 14px 48px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 15px 10px 45px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
     background: #fff;
     width: 100%;
   }
 
   .gov-form-control:focus {
-    border-color: #003366;
-    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
     outline: none;
     background: #fff;
   }
 
   .gov-form-control.is-invalid {
-    border-color: #dc3545;
-    background-image: none;
+    border-color: var(--gov-danger);
   }
 
   .gov-form-control.is-valid {
-    border-color: #28a745;
-    background-image: none;
+    border-color: var(--gov-success);
   }
 
   .gov-input-group {
@@ -209,40 +230,40 @@
 
   .gov-input-icon {
     position: absolute;
-    left: 16px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #003366;
-    font-size: 1.2rem;
+    color: var(--gov-primary);
+    font-size: 1rem;
     z-index: 10;
   }
 
   /* Password Toggle */
   .gov-password-toggle {
     position: absolute;
-    right: 16px;
+    right: 15px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #003366;
+    color: var(--gov-primary);
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1rem;
     padding: 0;
     z-index: 10;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .gov-password-toggle:hover {
-    color: #FFD700;
+    color: var(--gov-secondary);
   }
 
   /* Password Strength Indicator */
   .gov-password-strength {
     margin-top: 8px;
-    height: 6px;
+    height: 4px;
     background: #e0e0e0;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     display: none;
   }
@@ -254,26 +275,26 @@
   .gov-strength-bar {
     height: 100%;
     transition: all 0.3s ease;
-    border-radius: 3px;
+    border-radius: 2px;
   }
 
   .gov-strength-weak {
     width: 33%;
-    background: #dc3545;
+    background: var(--gov-danger);
   }
 
   .gov-strength-medium {
     width: 66%;
-    background: #ffc107;
+    background: var(--gov-warning);
   }
 
   .gov-strength-strong {
     width: 100%;
-    background: #28a745;
+    background: var(--gov-success);
   }
 
   .gov-password-hint {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #666;
     margin-top: 5px;
     display: flex;
@@ -282,7 +303,7 @@
   }
 
   .gov-password-hint i {
-    color: #003366;
+    color: var(--gov-primary);
   }
 
   /* Confirm Password Field Specific Styles */
@@ -292,144 +313,51 @@
 
   .password-match-indicator {
     margin-top: 5px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     gap: 5px;
   }
 
   .password-match-indicator i {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .password-match-indicator.match {
-    color: #28a745;
+    color: var(--gov-success);
   }
 
   .password-match-indicator.no-match {
-    color: #dc3545;
-  }
-
-  /* Role Selector Cards */
-  .gov-role-selector {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin: 10px 0 15px;
-  }
-
-  .gov-role-option {
-    position: relative;
-  }
-
-  .gov-role-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .gov-role-card {
-    border: 2px solid #dee2e6;
-    border-radius: 12px;
-    padding: 20px 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: #fff;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .gov-role-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #003366, #FFD700);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .gov-role-card:hover::before {
-    transform: translateX(0);
-  }
-
-  .gov-role-card:hover {
-    border-color: #003366;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.15);
-  }
-
-  .gov-role-option input[type="radio"]:checked + .gov-role-card {
-    border-color: #003366;
-    background: #f0f4ff;
-    box-shadow: 0 8px 20px rgba(0,51,102,0.2);
-  }
-
-  .gov-role-option input[type="radio"]:checked + .gov-role-card::before {
-    transform: translateX(0);
-  }
-
-  .gov-role-icon {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
-    color: #003366;
-  }
-
-  .gov-role-name {
-    font-weight: 700;
-    color: #003366;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    font-size: 0.95rem;
-  }
-
-  .gov-role-description {
-    font-size: 0.8rem;
-    color: #666;
-    margin: 0;
+    color: var(--gov-danger);
   }
 
   /* Submit Button */
   .gov-btn-register {
-    background: #003366;
-    border: 2px solid #FFD700;
-    border-radius: 10px;
-    padding: 15px;
-    font-size: 1.1rem;
-    font-weight: 700;
+    background: var(--gov-primary);
+    border: 1px solid var(--gov-secondary);
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: white;
     width: 100%;
     margin: 20px 0 15px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   .gov-btn-register:hover {
-    background: #002244;
+    background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
-  }
-
-  .gov-btn-register::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .gov-btn-register:hover::before {
-    left: 100%;
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
   }
 
   /* Terms Checkbox */
@@ -437,38 +365,38 @@
     margin: 20px 0;
     padding: 15px;
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #dee2e6;
   }
 
   .gov-checkbox-input {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #003366;
-    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gov-primary);
+    border-radius: 3px;
     cursor: pointer;
     margin-right: 10px;
   }
 
   .gov-checkbox-input:checked {
-    background-color: #003366;
-    border-color: #003366;
+    background-color: var(--gov-primary);
+    border-color: var(--gov-primary);
   }
 
   .gov-checkbox-label {
     color: #495057;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     cursor: pointer;
   }
 
   .gov-checkbox-label a {
-    color: #003366;
+    color: var(--gov-primary);
     text-decoration: none;
     font-weight: 600;
   }
 
   .gov-checkbox-label a:hover {
-    color: #FFD700;
+    color: var(--gov-secondary);
     text-decoration: underline;
   }
 
@@ -479,19 +407,19 @@
     text-align: center;
     margin: 25px 0;
     color: #999;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .gov-divider::before,
   .gov-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
   }
 
   .gov-divider span {
     padding: 0 15px;
-    color: #003366;
+    color: var(--gov-primary);
     font-weight: 600;
   }
 
@@ -501,78 +429,51 @@
     margin-top: 20px;
     padding: 15px;
     background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px dashed #003366;
+    border-radius: 4px;
+    border: 1px dashed var(--gov-primary);
   }
 
   .gov-login-link p {
     margin: 0;
     color: #495057;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .gov-login-link a {
-    color: #003366;
+    color: var(--gov-primary);
     text-decoration: none;
     font-weight: 700;
     margin-left: 5px;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .gov-login-link a:hover {
-    color: #FFD700;
+    color: var(--gov-secondary);
     text-decoration: underline;
   }
 
   /* Validation Feedback */
   .gov-invalid-feedback {
     display: none;
-    color: #dc3545;
-    font-size: 0.8rem;
+    color: var(--gov-danger);
+    font-size: 0.75rem;
     margin-top: 5px;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .gov-invalid-feedback.show {
     display: block;
   }
 
-  /* Document Upload Section (Optional) */
-  .gov-doc-upload {
-    margin: 20px 0;
-    padding: 20px;
-    border: 2px dashed #003366;
-    border-radius: 10px;
-    text-align: center;
-    background: #f8f9fa;
-  }
-
-  .gov-doc-upload i {
-    font-size: 2rem;
-    color: #003366;
-    margin-bottom: 10px;
-  }
-
-  .gov-doc-upload p {
-    margin: 0;
-    color: #666;
-    font-size: 0.9rem;
-  }
-
-  .gov-doc-upload small {
-    color: #999;
-    font-size: 0.8rem;
-  }
-
   /* Responsive Design */
   @media (max-width: 576px) {
     .gov-register-card {
-      padding: 35px 25px;
+      padding: 30px 20px;
     }
 
     .gov-register-title {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
     }
 
     .gov-register-icon {
@@ -581,18 +482,14 @@
     }
 
     .gov-register-icon i {
-      font-size: 2.2rem;
-    }
-
-    .gov-role-selector {
-      grid-template-columns: 1fr;
-      gap: 10px;
+      font-size: 2rem;
     }
   }
 
   /* Loading Animation */
   .gov-btn-register.loading {
     pointer-events: none;
+    opacity: 0.8;
     position: relative;
     color: transparent;
   }
@@ -606,8 +503,8 @@
     left: 50%;
     margin-left: -10px;
     margin-top: -10px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-top-color: #FFD700;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
     border-radius: 50%;
     animation: gov-spin 0.8s linear infinite;
   }
@@ -616,22 +513,12 @@
     to { transform: rotate(360deg); }
   }
 
-  /* Success Animation */
-  .gov-success-check {
-    text-align: center;
-    padding: 20px;
+  i.bi {
+    font-size: 0.9rem;
   }
 
-  .gov-success-check i {
-    font-size: 4rem;
-    color: #28a745;
-    animation: gov-scale 0.5s ease;
-  }
-
-  @keyframes gov-scale {
-    0% { transform: scale(0); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+  .text-muted {
+    color: #888 !important;
   }
 </style>
 
@@ -656,6 +543,16 @@
           Your data will be used only for transport services.
         </div>
       </div>
+
+      <!-- Display Django messages - FIXED: No inline styles with template tags -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="gov-alert gov-alert-{{ message.tags }}">
+            <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
 
       <!-- Registration Form -->
       <form method="POST" id="govRegisterForm">
@@ -739,7 +636,7 @@
           </div>
         </div>
 
-        <!-- Confirm Password Field (NEW) -->
+        <!-- Confirm Password Field -->
         <div class="mb-4 gov-confirm-password">
           <label class="gov-form-label">
             <i class="bi bi-key"></i> CONFIRM PASSWORD
@@ -769,43 +666,6 @@
             <span>Re-enter your password for confirmation</span>
           </div>
         </div>
-
-        <!-- Role Selection (Commented as per original) -->
-        <!-- <div class="mb-4">
-          <label class="gov-form-label">
-            <i class="bi bi-person-badge"></i> REGISTER AS
-          </label>
-          <div class="gov-role-selector">
-            <div class="gov-role-option">
-              <input type="radio" name="role" value="traveller" id="roleTraveller" checked>
-              <label for="roleTraveller" class="gov-role-card">
-                <div class="gov-role-icon">
-                  <i class="bi bi-backpack"></i>
-                </div>
-                <div class="gov-role-name">Traveller</div>
-                <p class="gov-role-description">Book tickets & track buses</p>
-              </label>
-            </div>
-            <div class="gov-role-option">
-              <input type="radio" name="role" value="owner" id="roleOwner">
-              <label for="roleOwner" class="gov-role-card">
-                <div class="gov-role-icon">
-                  <i class="bi bi-bus-front"></i>
-                </div>
-                <div class="gov-role-name">Bus Operator</div>
-                <p class="gov-role-description">Manage fleet & operations</p>
-              </label>
-            </div>
-          </div>
-        </div> -->
-
-        <!-- Document Upload Section (Optional) -->
-        <!-- <div class="gov-doc-upload">
-          <i class="bi bi-file-earmark-text"></i>
-          <p><strong>Document Upload (Optional)</strong></p>
-          <p class="small">Upload ID proof for faster verification</p>
-          <small>Supported: PDF, JPG (max 2MB)</small>
-        </div> -->
 
         <!-- Terms & Conditions -->
         <div class="gov-checkbox">
@@ -855,7 +715,7 @@
 </div>
 
 <script>
-  // Updated toggle password function to handle multiple fields
+  // Toggle password function for multiple fields
   function togglePassword(inputId, iconId) {
     const passwordInput = document.getElementById(inputId);
     const toggleIcon = document.getElementById(iconId);
@@ -1002,7 +862,7 @@
       return;
     }
     
-    // Check password strength (optional)
+    // Check password strength
     if (password.length < 8) {
       e.preventDefault();
       alert('Password must be at least 8 characters long');
@@ -1011,9 +871,6 @@
     }
     
     registerBtn.classList.add('loading');
-    
-    // Note: Remove this setTimeout in production - it's just for demo
-    // The form will actually submit to your backend
   });
 
   // Auto-focus on username field
@@ -1024,42 +881,10 @@
     }
   });
 
-  // Keyboard shortcut (Ctrl+Enter) for submission
-  document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.key === 'Enter') {
-      e.preventDefault();
-      const termsCheck = document.getElementById('termsCheck');
-      const password = passwordInput.value;
-      const confirmPassword = confirmPasswordInput.value;
-      
-      if (!termsCheck.checked) {
-        alert('Please accept the Terms & Conditions first');
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
-      
-      document.getElementById('govRegisterForm').submit();
-    }
-  });
-
   // Prevent form resubmission on page refresh
   if (window.history.replaceState) {
     window.history.replaceState(null, null, window.location.href);
   }
-
-  // Role card animation (if enabled)
-  document.querySelectorAll('.gov-role-card').forEach(card => {
-    card.addEventListener('click', function() {
-      this.style.transform = 'scale(0.98)';
-      setTimeout(() => {
-        this.style.transform = '';
-      }, 100);
-    });
-  });
 </script>
 
 {% endblock %}

@@ -3,13 +3,13 @@
 {% block content %}
 
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -24,7 +24,7 @@
 
   .gov-ecard-page {
     min-height: calc(100vh - 80px);
-    background: #f5f7fa;
+    background: #eef2f5;
     padding: 30px 0;
     position: relative;
   }
@@ -50,7 +50,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 25px;
-    box-shadow: 0 4px 15px rgba(0,51,102,0.08);
+    box-shadow: 0 4px 15px rgba(0,105,92,0.08);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.9rem;
@@ -66,7 +66,7 @@
   .gov-concession-card {
     background: white;
     border-radius: 30px;
-    box-shadow: 0 25px 50px rgba(0,51,102,0.25);
+    box-shadow: 0 25px 50px rgba(0,105,92,0.25);
     overflow: hidden;
     position: relative;
     animation: govSlideUp 0.6s ease-out;
@@ -100,7 +100,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.1);
     border-radius: 50%;
   }
 
@@ -111,7 +111,7 @@
     left: -5%;
     width: 250px;
     height: 250px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -221,7 +221,7 @@
     border-radius: 50%;
     border: 4px solid white;
     object-fit: cover;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.3);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.3);
   }
 
   .gov-verified-badge {
@@ -299,7 +299,7 @@
 
   .gov-info-item:hover {
     border-color: var(--gov-primary);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.1);
+    box-shadow: 0 8px 20px rgba(0,105,92,0.1);
   }
 
   .gov-info-icon {
@@ -338,7 +338,7 @@
 
   /* Route Display */
   .gov-route-card {
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    background: linear-gradient(135deg, var(--gov-light), #ffffff);
     border: 2px solid var(--gov-primary);
     border-radius: 20px;
     padding: 20px;
@@ -432,7 +432,7 @@
 
   /* Validity Section */
   .gov-validity-section {
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    background: linear-gradient(135deg, var(--gov-light), #ffffff);
     border: 2px solid var(--gov-primary);
     border-radius: 20px;
     padding: 20px;
@@ -568,7 +568,7 @@
   .gov-document-btn:hover {
     background: var(--gov-accent);
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,51,102,0.3);
+    box-shadow: 0 10px 25px rgba(0,105,92,0.3);
   }
 
   .gov-document-btn i {
@@ -578,7 +578,7 @@
   /* Action Buttons */
   .gov-action-buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 15px;
     margin-top: 25px;
     position: relative;
@@ -608,7 +608,7 @@
     background: var(--gov-primary);
     color: var(--gov-secondary);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.2);
+    box-shadow: 0 8px 20px rgba(0,105,92,0.2);
   }
 
   .gov-action-btn i {
@@ -857,12 +857,11 @@
           </a>
         {% endif %}
 
-        <!-- Action Buttons - FIXED: Only Print button for now -->
+        <!-- Action Buttons -->
         <div class="gov-action-buttons">
           <button onclick="window.print()" class="gov-action-btn">
             <i class="bi bi-printer"></i> Print Card
           </button>
-          <!-- Download button removed to prevent NoReverseMatch error -->
         </div>
 
       </div>
@@ -884,7 +883,6 @@
 </div>
 
 <script>
-  // Simple function for future PDF download - no template tags here!
   function downloadCard() {
     alert('PDF download feature coming soon!');
   }

@@ -27,6 +27,7 @@ def conductor_dashboard(request):
     ).first()
     
     assigned_bus = current_duty.bus if current_duty else None
+    has_assignment = assigned_bus is not None  # Add this line
     
     # Get today's schedules for the assigned bus
     today = timezone.now().date()
@@ -48,6 +49,7 @@ def conductor_dashboard(request):
     context = {
         'conductor': conductor,
         'assigned_bus': assigned_bus,
+        'has_assignment': has_assignment,  # Add this
         'today_schedules': today_schedules,
         'recent_bookings': recent_bookings,
         'today': today,
@@ -78,32 +80,44 @@ def conductor_seat_management(request, bus_id):
     
     bus = get_object_or_404(Bus, id=bus_id)
     
-    # Get seat status map (you'll need to implement this based on your booking system)
-    seat_status_map = {}
-    booked_seats = []
-    
-    # Get all bookings for this bus for today
-    today = timezone.now().date()
+    # Get all bookings for this bus (get ALL bookings, not filtered by date)
+    # This will show all booked seats regardless of date
     bookings = Booking.objects.filter(
         bus=bus,
-        journey_date=today
+        status__in=['Confirmed', 'booked']  # Get both Confirmed and booked status
     ).values_list('seat_number', flat=True)
     
     booked_seats = list(bookings)
     
-    # Create seat range (assuming seats are numbered 1 to total_seats)
+    # Also check for ConductorBooking if you're using that model
+    # If you created ConductorBooking model, include those too
+    try:
+        from conductor.models import ConductorBooking
+        conductor_bookings = ConductorBooking.objects.filter(
+            bus=bus,
+            status='booked'
+        ).values_list('seat_number', flat=True)
+        booked_seats.extend(list(conductor_bookings))
+        booked_seats = list(set(booked_seats))  # Remove duplicates
+    except ImportError:
+        pass  # ConductorBooking model doesn't exist yet
+    
+    # Create seat range
     seat_range = range(1, bus.total_seats + 1)
+    
+    # Get schedule for fare display
+    schedule = BusSchedule.objects.filter(bus=bus, active=True).first()
     
     context = {
         'bus': bus,
         'seat_range': seat_range,
         'booked_seats': booked_seats,
-        'seat_status_map': seat_status_map,
+        'seat_status_map': {},
         'total_seats': bus.total_seats,
+        'schedule': schedule,
     }
     
     return render(request, 'conductor/seat_management.html', context)
-
 
 @login_required
 def conductor_update_seat_status(request):
@@ -115,6 +129,7 @@ def conductor_update_seat_status(request):
             passenger_name = request.POST.get('passenger_name')
             passenger_phone = request.POST.get('passenger_phone')
             fare_collected = request.POST.get('fare_collected')
+            payment_status = request.POST.get('payment_status')  # 'paid' or 'unpaid'
             status = request.POST.get('status')
             notes = request.POST.get('notes', '')
             
@@ -130,32 +145,76 @@ def conductor_update_seat_status(request):
             
             bus = current_duty.bus
             
-            # Create or update booking
-            booking, created = Booking.objects.update_or_create(
+            # Get or create a schedule for this bus
+            schedule = BusSchedule.objects.filter(bus=bus, active=True).first()
+            
+            if not schedule:
+                messages.error(request, 'No active schedule found for this bus.')
+                return redirect('conductor_dashboard')
+            
+            # Set payment status for booking
+            payment_status_value = 'Paid' if payment_status == 'paid' else 'Pending'
+            
+            # IMPORTANT: Explicitly set the status field
+            booking_status = 'Confirmed'  # Use 'Confirmed' as per your model default
+            
+            # Check if booking already exists
+            existing_booking = Booking.objects.filter(
                 bus=bus,
                 seat_number=seat_number,
-                journey_date=timezone.now().date(),
-                defaults={
-                    'traveller': request.user,
-                    'passenger_name': passenger_name,
-                    'passenger_phone': passenger_phone,
-                    'fare': fare_collected,
-                    'status': status,
-                    'notes': notes,
-                    'booking_date': timezone.now()
-                }
-            )
+                schedule=schedule
+            ).first()
             
-            messages.success(request, f'Seat {seat_number} marked as {status}')
+            if existing_booking:
+                # Update existing booking
+                existing_booking.traveller = conductor.user
+                existing_booking.total_fare = fare_collected or 0
+                existing_booking.status = booking_status  # Explicitly set status
+                existing_booking.payment_status = payment_status_value
+                existing_booking.payment_amount = fare_collected if payment_status == 'paid' else 0
+                existing_booking.save()
+                booking = existing_booking
+                created = False
+            else:
+                # Create new booking with ALL required fields
+                booking = Booking.objects.create(
+                    bus=bus,
+                    seat_number=seat_number,
+                    schedule=schedule,
+                    traveller=conductor.user,
+                    total_fare=fare_collected or 0,
+                    status=booking_status,  # Explicitly set status
+                    payment_status=payment_status_value,
+                    payment_amount=fare_collected if payment_status == 'paid' else 0,
+                    booking_date=timezone.now()
+                )
+                created = True
+            
+            # Store passenger details in a way that persists
+            passenger_info = f"Passenger: {passenger_name}, Phone: {passenger_phone}"
+            if notes:
+                passenger_info += f" | Notes: {notes}"
+            
+            # If your Booking model has a notes field, save it
+            if hasattr(booking, 'notes'):
+                booking.notes = passenger_info
+                booking.save()
+            
+            payment_text = "with payment" if payment_status == 'paid' else "without payment"
+            messages.success(request, f'✅ Seat {seat_number} booked for {passenger_name} {payment_text}')
+            
+            # Force redirect to refresh the page with updated data
             return redirect('conductor_seat_management', bus_id=bus.id)
             
         except Conductor.DoesNotExist:
             messages.error(request, 'Conductor profile not found')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
+            # Print the full error for debugging
+            import traceback
+            traceback.print_exc()
     
     return redirect('conductor_dashboard')
-
 
 @login_required
 def conductor_current_duty(request):
@@ -251,31 +310,50 @@ def conductor_bookings(request):
         return redirect('home')
 
 
-@require_POST
 @login_required
-def conductor_cancel_booking(request, booking_id):
-    """Cancel a booking"""
-    try:
-        conductor = Conductor.objects.get(user=request.user)
-        booking = get_object_or_404(Booking, id=booking_id)
+def conductor_cancel_booking(request):
+    """Cancel a booked seat - DELETE the booking"""
+    if request.method == 'POST':
+        try:
+            conductor = Conductor.objects.get(user=request.user)
+            seat_number = request.POST.get('seat_number')
+            cancel_reason = request.POST.get('cancel_reason', '')
+            
+            # Get the bus from conductor's assignment
+            current_duty = ConductorDuty.objects.filter(
+                conductor=conductor,
+                is_active=True
+            ).first()
+            
+            if not current_duty:
+                messages.error(request, 'No bus assigned')
+                return redirect('conductor_dashboard')
+            
+            bus = current_duty.bus
+            
+            # Find and DELETE the booking
+            booking = Booking.objects.filter(
+                bus=bus,
+                seat_number=seat_number
+            ).first()
+            
+            if booking:
+                # Optional: Log cancellation reason if you want to track it
+                if cancel_reason:
+                    # You can print or log this for audit purposes
+                    print(f"Seat {seat_number} on bus {bus.bus_number} cancelled by {conductor.user.username}. Reason: {cancel_reason}")
+                
+                # Delete the booking
+                booking.delete()
+                messages.success(request, f'✅ Seat {seat_number} booking has been cancelled and is now available!')
+            else:
+                messages.warning(request, f'No booking found for seat {seat_number}')
+            
+        except Conductor.DoesNotExist:
+            messages.error(request, 'Conductor profile not found')
+        except Exception as e:
+            messages.error(request, f'Error cancelling booking: {str(e)}')
         
-        # Verify conductor is assigned to this bus
-        current_duty = ConductorDuty.objects.filter(
-            conductor=conductor,
-            bus=booking.bus,
-            is_active=True
-        ).first()
-        
-        if not current_duty:
-            messages.error(request, "You are not authorized to cancel this booking.")
-            return redirect('conductor_dashboard')
-        
-        booking.status = 'cancelled'
-        booking.save()
-        
-        messages.success(request, f'Booking for seat {booking.seat_number} has been cancelled.')
-        
-    except Conductor.DoesNotExist:
-        messages.error(request, "Conductor profile not found.")
+        return redirect('conductor_seat_management', bus_id=bus.id)
     
-    return redirect('conductor_bookings')
+    return redirect('conductor_dashboard')

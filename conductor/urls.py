@@ -26,7 +26,7 @@ urlpatterns = [
     path('duty/current/', views.conductor_current_duty, name='conductor_current_duty'),
     path('schedules/', views.conductor_schedules, name='conductor_schedules'),
     path('bookings/', views.conductor_bookings, name='conductor_bookings'),
-    path('cancel-booking/<int:booking_id>/', views.conductor_cancel_booking, name='conductor_cancel_booking'),
+    path('cancel-booking/', views.conductor_cancel_booking, name='conductor_cancel_booking'),  # Add 
 ]
 
 

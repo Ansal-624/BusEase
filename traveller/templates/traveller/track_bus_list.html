@@ -3,13 +3,13 @@
 
 {% block content %}
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -18,7 +18,7 @@
 
   .gov-track-list-page {
     padding: 20px 0 40px;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
@@ -37,7 +37,7 @@
     position: relative;
     overflow: hidden;
     border: 3px solid var(--gov-secondary);
-    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+    box-shadow: 0 15px 40px rgba(0,105,92,0.2);
   }
 
   .gov-hero-section::before {
@@ -47,7 +47,7 @@
     right: -10%;
     width: 400px;
     height: 400px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.1);
     border-radius: 50%;
   }
 
@@ -58,8 +58,13 @@
     left: -5%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
+  }
+
+  .gov-hero-content {
+    position: relative;
+    z-index: 2;
   }
 
   .gov-hero-content h1 {
@@ -70,6 +75,10 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .gov-hero-content h1 i {
+    color: var(--gov-secondary);
   }
 
   .gov-hero-content p {
@@ -96,7 +105,7 @@
     background: white;
     border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 5px 20px rgba(0,51,102,0.05);
+    box-shadow: 0 5px 20px rgba(0,105,92,0.05);
     border: 1px solid #e0e0e0;
     transition: all 0.3s ease;
     display: flex;
@@ -107,7 +116,7 @@
   .gov-stat-card:hover {
     transform: translateY(-5px);
     border-color: var(--gov-primary);
-    box-shadow: 0 15px 30px rgba(0,51,102,0.15);
+    box-shadow: 0 15px 30px rgba(0,105,92,0.15);
   }
 
   .gov-stat-icon {
@@ -149,7 +158,7 @@
   .gov-main-card {
     background: white;
     border-radius: 24px;
-    box-shadow: 0 15px 40px rgba(0,51,102,0.12);
+    box-shadow: 0 15px 40px rgba(0,105,92,0.12);
     overflow: hidden;
     border: 1px solid #e0e0e0;
   }
@@ -199,7 +208,7 @@
   }
 
   .gov-table thead tr {
-    background: #f0f4ff;
+    background: var(--gov-light);
   }
 
   .gov-table thead th {
@@ -243,7 +252,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #f0f4ff;
+    background: var(--gov-light);
     padding: 5px 12px;
     border-radius: 30px;
     color: var(--gov-primary);
@@ -283,7 +292,7 @@
   .gov-track-btn:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,51,102,0.3);
+    box-shadow: 0 5px 15px rgba(0,105,92,0.3);
   }
 
   .gov-track-btn i {
@@ -364,6 +373,25 @@
     }
     .gov-table td {
       min-width: 120px;
+    }
+    .gov-hero-section {
+      padding: 30px;
+    }
+    .gov-hero-content h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .gov-hero-section {
+      padding: 20px;
+    }
+    .gov-hero-content h1 {
+      font-size: 1.2rem;
+    }
+    .gov-card-header {
+      flex-direction: column;
+      text-align: center;
     }
   }
 </style>
@@ -458,7 +486,6 @@
                     <i class="bi bi-hash"></i> {{ bus.bus_number }}
                   </div>
                 </td>
-
                 <td>
                   <div class="gov-owner-info">
                     <div class="gov-owner-avatar">
@@ -467,7 +494,6 @@
                     <span>{{ bus.owner.user.username }}</span>
                   </div>
                 </td>
-
                 <td>
                   {% with schedule=bus.schedules.first %}
                     {% if schedule %}
@@ -486,7 +512,6 @@
                     {% endif %}
                   {% endwith %}
                 </td>
-
                 <td>
                   {% with schedule=bus.schedules.first %}
                     {% if schedule %}

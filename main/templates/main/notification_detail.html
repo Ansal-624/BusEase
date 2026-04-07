@@ -1,39 +1,369 @@
 {% extends "base.html" %}
-{% block title %}Message{% endblock %}
-{% block content %}
-<div class="container mt-4">
-  <a href="{% url 'main_inbox' %}" class="btn btn-light mb-3">← Back to inbox</a>
+{% load static %}
+{% block title %}Message - BusEase{% endblock %}
 
-  <div class="card">
-    <div class="card-header">
-      <strong>{{ n.subject|default:"Message" }}</strong>
-      <span class="text-muted float-end">{{ n.created_at|date:"M d, Y H:i" }}</span>
+{% block content %}
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  .gov-main-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-card-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .gov-card-header h3 {
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-card-header h3 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-card-body {
+    padding: 25px;
+  }
+
+  .gov-message-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .gov-message-subject {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--gov-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-message-subject i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-message-date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+
+  .gov-message-date i {
+    margin-right: 5px;
+  }
+
+  .gov-message-content {
+    background: #fafafa;
+    padding: 20px;
+    border-radius: 6px;
+    margin: 20px 0;
+    line-height: 1.6;
+    color: #444;
+    border-left: 4px solid var(--gov-primary);
+  }
+
+  .gov-message-sender {
+    color: #666;
+    font-size: 0.9rem;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-message-sender i {
+    color: var(--gov-primary);
+  }
+
+  .gov-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .gov-btn:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
+    color: white;
+  }
+
+  .gov-btn-secondary {
+    background: #6c757d;
+  }
+
+  .gov-btn-secondary:hover {
+    background: #5a6268;
+  }
+
+  .gov-btn-success {
+    background: var(--gov-success);
+  }
+
+  .gov-btn-success:hover {
+    background: #218838;
+  }
+
+  .gov-btn-light {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+
+  .gov-btn-light:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+  }
+
+  .gov-reply-section {
+    margin-top: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .gov-reply-section h5 {
+    color: var(--gov-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-reply-section h5 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-form-group {
+    margin-bottom: 15px;
+  }
+
+  .gov-form-label {
+    font-weight: 500;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    display: block;
+  }
+
+  .gov-form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .gov-form-control:focus {
+    outline: none;
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
+  }
+
+  textarea.gov-form-control {
+    resize: vertical;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  i.bi {
+    font-size: 0.9rem;
+  }
+
+  .message-type-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-left: 10px;
+  }
+
+  .badge-complaint {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .badge-notification {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  .badge-message {
+    background: #d4edda;
+    color: #155724;
+  }
+</style>
+
+<div class="container mt-4">
+  <!-- Back Button -->
+  <div class="mb-3">
+    <a href="{% url 'main_inbox' %}" class="gov-btn gov-btn-light">
+      <i class="bi bi-arrow-left"></i> Back to Inbox
+    </a>
+  </div>
+
+  <!-- Message Card -->
+  <div class="gov-main-card">
+    <div class="gov-card-header">
+      <h3>
+        <i class="bi bi-envelope-paper"></i> 
+        Message Details
+      </h3>
+      {% if n.type %}
+        <span class="message-type-badge 
+          {% if n.type == 'complaint' %}badge-complaint
+          {% elif n.type == 'notification' %}badge-notification
+          {% else %}badge-message{% endif %}">
+          <i class="bi bi-{% if n.type == 'complaint' %}exclamation-triangle{% elif n.type == 'notification' %}bell{% else %}chat{% endif %}"></i>
+          {{ n.type|title }}
+        </span>
+      {% endif %}
     </div>
-    <div class="card-body">
-      <p>{{ n.body|linebreaks }}</p>
-      <p class="text-muted">From: {{ n.sender.username if n.sender else "System" }}</p>
+    
+    <div class="gov-card-body">
+      <!-- Message Header -->
+      <div class="gov-message-meta">
+        <div class="gov-message-subject">
+          <i class="bi bi-tag"></i>
+          {{ n.subject|default:"Message" }}
+        </div>
+        <div class="gov-message-date">
+          <i class="bi bi-calendar"></i> 
+          {{ n.created_at|date:"M d, Y H:i" }}
+        </div>
+      </div>
+
+      <!-- Message Content -->
+      <div class="gov-message-content">
+        {{ n.body|linebreaks }}
+      </div>
+
+      <!-- Sender Info -->
+      <div class="gov-message-sender">
+        <i class="bi bi-person-circle"></i>
+        <strong>From:</strong> 
+        {% if n.sender %}
+          {% if n.sender.is_superuser or n.sender.role == "admin" %}
+            <span class="text-primary">Admin: {{ n.sender.username }}</span>
+          {% else %}
+            {{ n.sender.username }}
+          {% endif %}
+        {% else %}
+          System
+        {% endif %}
+      </div>
     </div>
   </div>
 
-  <!-- Owner reply button (only shown if this user is owner and original sender is admin) -->
-  {% if user.role == "owner" and n.sender and (n.sender.is_superuser or n.sender.role=="admin") %}
+  <!-- Owner Reply Button (if owner and sender is admin) -->
+  {% if user.role == "owner" and n.sender and n.sender.is_superuser or n.sender.role == "admin" %}
     <div class="mt-3">
-      <a href="{% url 'main_owner_reply' n.id %}" class="btn btn-primary">Reply to Admin</a>
+      <a href="{% url 'main_owner_reply' n.id %}" class="gov-btn">
+        <i class="bi bi-reply-fill"></i> Reply to Admin
+      </a>
     </div>
   {% endif %}
 
-  <!-- If this is complaint and user is admin show quick reply form -->
+  <!-- Admin Quick Reply Form (for complaints) -->
   {% if user.is_superuser and n.type == "complaint" %}
-    <div class="mt-4">
-      <h5>Reply to complaint</h5>
+    <div class="gov-reply-section">
+      <h5>
+        <i class="bi bi-chat-dots"></i> 
+        Reply to Complaint
+      </h5>
       <form method="post" action="{% url 'main_admin_compose' %}">
         {% csrf_token %}
         <input type="hidden" name="to_username" value="{{ n.sender.username }}">
-        <div class="mb-2"><input name="subject" class="form-control" placeholder="Subject (optional)"></div>
-        <div class="mb-2"><textarea name="body" rows="3" class="form-control" placeholder="Reply..."></textarea></div>
-        <button class="btn btn-success">Send Reply</button>
+        
+        <div class="gov-form-group">
+          <label class="gov-form-label">
+            <i class="bi bi-tag"></i> Subject (Optional)
+          </label>
+          <input type="text" name="subject" class="gov-form-control" placeholder="Enter reply subject">
+        </div>
+        
+        <div class="gov-form-group">
+          <label class="gov-form-label">
+            <i class="bi bi-chat-text"></i> Reply Message
+          </label>
+          <textarea name="body" rows="4" class="gov-form-control" placeholder="Type your reply here..." required></textarea>
+        </div>
+        
+        <div class="btn-group">
+          <button type="submit" class="gov-btn gov-btn-success">
+            <i class="bi bi-send"></i> Send Reply
+          </button>
+          <button type="reset" class="gov-btn gov-btn-secondary">
+            <i class="bi bi-eraser"></i> Clear
+          </button>
+        </div>
       </form>
     </div>
   {% endif %}
+
+  <!-- Quick Actions -->
+  <div class="mt-3 text-muted" style="font-size: 0.85rem;">
+    <i class="bi bi-info-circle"></i> 
+    {% if n.read %}
+      ✓ Read on {{ n.read_at|date:"M d, Y H:i"|default:"read" }}
+    {% else %}
+      Unread message
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Available Buses - Government Transport Portal{% endblock %}
 {% load static %}
+{% block title %}Available Buses - Government Transport Portal{% endblock %}
 
 {% block content %}
 
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -26,7 +26,7 @@
 
   .gov-buses-page {
     padding: 20px 0 40px;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
@@ -39,7 +39,7 @@
     position: relative;
     overflow: hidden;
     border: 3px solid var(--gov-secondary);
-    box-shadow: 0 15px 40px rgba(0,51,102,0.2);
+    box-shadow: 0 15px 40px rgba(0,105,92,0.2);
   }
 
   .gov-hero-content {
@@ -77,7 +77,7 @@
     background: rgba(255,255,255,0.1);
     padding: 10px 20px;
     border-radius: 30px;
-    border: 1px solid rgba(255,215,0,0.3);
+    border: 1px solid rgba(255,143,0,0.3);
   }
 
   .gov-hero-stat i {
@@ -96,7 +96,7 @@
     right: -30px;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.05);
+    background: rgba(255,143,0,0.05);
     border-radius: 50%;
     z-index: 1;
   }
@@ -107,7 +107,7 @@
     left: -50px;
     width: 250px;
     height: 250px;
-    background: rgba(255,215,0,0.03);
+    background: rgba(255,143,0,0.03);
     border-radius: 50%;
     z-index: 1;
   }
@@ -127,7 +127,7 @@
     background: white;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.08);
     margin-bottom: 30px;
     border: 1px solid #e0e0e0;
     position: relative;
@@ -185,7 +185,7 @@
 
   .gov-search-input:focus {
     border-color: var(--gov-primary);
-    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    box-shadow: 0 0 0 4px rgba(0,105,92,0.1);
     outline: none;
     background: white;
   }
@@ -208,7 +208,7 @@
   .gov-search-btn:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+    box-shadow: 0 8px 20px rgba(0,105,92,0.3);
   }
 
   /* Filter Chips */
@@ -252,7 +252,7 @@
 
   .gov-filter-chip:hover {
     border-color: var(--gov-primary);
-    background: #f0f4ff;
+    background: var(--gov-light);
     transform: translateY(-2px);
   }
 
@@ -339,11 +339,15 @@
     margin-bottom: 40px;
   }
 
+  .gov-buses-grid.active {
+    display: grid;
+  }
+
   .gov-bus-card {
     background: white;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.08);
     transition: all 0.3s ease;
     border: 2px solid #e0e0e0;
     animation: govFadeIn 0.5s ease-out;
@@ -363,7 +367,7 @@
 
   .gov-bus-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    box-shadow: 0 20px 40px rgba(0,105,92,0.15);
     border-color: var(--gov-primary);
   }
 
@@ -443,7 +447,7 @@
 
   .gov-bus-number {
     display: inline-block;
-    background: #f0f4ff;
+    background: var(--gov-light);
     color: var(--gov-primary);
     padding: 4px 12px;
     border-radius: 20px;
@@ -471,7 +475,7 @@
   }
 
   .gov-route-info {
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    background: linear-gradient(135deg, var(--gov-light), #ffffff);
     border: 1px solid var(--gov-primary);
     border-radius: 12px;
     padding: 15px;
@@ -571,7 +575,7 @@
   .gov-btn-primary:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
+    box-shadow: 0 8px 20px rgba(0,105,92,0.3);
     color: white;
   }
 
@@ -630,7 +634,7 @@
     border-radius: 16px;
     padding: 25px;
     margin-bottom: 15px;
-    box-shadow: 0 5px 20px rgba(0,51,102,0.08);
+    box-shadow: 0 5px 20px rgba(0,105,92,0.08);
     transition: all 0.3s ease;
     border: 2px solid #e0e0e0;
     display: flex;
@@ -641,7 +645,7 @@
   .gov-list-item:hover {
     transform: translateX(5px);
     border-color: var(--gov-primary);
-    box-shadow: 0 10px 30px rgba(0,51,102,0.15);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.15);
   }
 
   .gov-list-image {
@@ -704,7 +708,7 @@
     padding: 80px 20px;
     background: white;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.08);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.08);
     border: 2px dashed var(--gov-primary);
     margin-bottom: 30px;
   }
@@ -856,7 +860,7 @@
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(255,215,0,0.3);
+    border: 3px solid rgba(255,143,0,0.3);
     border-radius: 50%;
     border-top-color: var(--gov-secondary);
     animation: spin 1s linear infinite;
@@ -1183,9 +1187,6 @@
     });
   }
 
-  // Real-time search
-  document.getElementById('govSearchInput')?.addEventListener('input', searchBuses);
-
   // Filter functionality
   function filterBuses(type, element) {
     // Remove active class from all chips
@@ -1198,9 +1199,6 @@
     
     // Add your filtering logic here based on bus types
     console.log('Filtering by:', type);
-    
-    // You can implement actual filtering based on bus attributes
-    // For example, if you have AC/non-AC fields in your bus model
   }
 
   // Favorite button functionality

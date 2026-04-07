@@ -1,21 +1,205 @@
 {% extends "base.html" %}
-{% block title %}Inbox{% endblock %}
+{% load static %}
+{% block title %}Inbox - BusEase{% endblock %}
+
 {% block content %}
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  .gov-main-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-card-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-card-header h3 {
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-card-header h3 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-content-padding {
+    padding: 20px;
+  }
+
+  .gov-list-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .gov-notification-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: block;
+    position: relative;
+  }
+
+  .gov-notification-item:hover {
+    border-color: var(--gov-primary);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 105, 92, 0.1);
+  }
+
+  .gov-notification-item.unread {
+    background: #fef9e6;
+    border-left: 4px solid var(--gov-secondary);
+  }
+
+  .gov-notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .gov-notification-subject {
+    font-weight: 600;
+    color: var(--gov-primary);
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .gov-notification-date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .gov-notification-body {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .gov-notification-footer {
+    display: flex;
+    gap: 15px;
+    font-size: 0.75rem;
+    color: #999;
+  }
+
+  .gov-notification-footer i {
+    font-size: 0.7rem;
+    margin-right: 3px;
+  }
+
+  .gov-alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left-color: var(--gov-info);
+  }
+
+  .unread-badge {
+    background: var(--gov-secondary);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  i.bi {
+    font-size: 0.9rem;
+  }
+</style>
+
 <div class="container mt-4">
-  <h3>Inbox</h3>
-  <div class="list-group">
-    {% for n in notifications %}
-      <a href="{% url 'main_notification_detail' n.id %}" class="list-group-item list-group-item-action {% if not n.read %}list-group-item-warning{% endif %}">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{ n.subject|default:n.type|title }}</h5>
-          <small>{{ n.created_at|date:"M d, Y H:i" }}</small>
+  <div class="gov-main-card">
+    <div class="gov-card-header">
+      <h3>
+        <i class="bi bi-inbox"></i> 
+        Inbox
+      </h3>
+    </div>
+    <div class="gov-content-padding">
+      {% if notifications %}
+        <div class="gov-list-group">
+          {% for notification in notifications %}
+            <a href="{% url 'main_notification_detail' notification.id %}" class="gov-notification-item {% if not notification.read %}unread{% endif %}">
+              <div class="gov-notification-header">
+                <div class="gov-notification-subject">
+                  {{ notification.subject|default:notification.type|title }}
+                  {% if not notification.read %}
+                    <span class="unread-badge">New</span>
+                  {% endif %}
+                </div>
+                <div class="gov-notification-date">
+                  <i class="bi bi-calendar"></i> {{ notification.created_at|date:"M d, Y H:i" }}
+                </div>
+              </div>
+              
+              <div class="gov-notification-body">
+                {{ notification.body|truncatewords:20 }}
+              </div>
+              
+              <div class="gov-notification-footer">
+                <span>
+                  <i class="bi bi-person"></i> 
+                  From: {% if notification.sender %}{{ notification.sender.username }}{% else %}System{% endif %}
+                </span>
+                <span>
+                  <i class="bi bi-tag"></i> 
+                  Type: {{ notification.type|title }}
+                </span>
+                {% if not notification.read %}
+                  <span>
+                    <i class="bi bi-envelope"></i> 
+                    Unread
+                  </span>
+                {% endif %}
+              </div>
+            </a>
+          {% endfor %}
         </div>
-        <p class="mb-1 text-truncate">{{ n.body }}</p>
-        <small>From: {{ n.sender.username if n.sender else "System" }} — Type: {{ n.type }}</small>
-      </a>
-    {% empty %}
-      <div class="alert alert-info">No notifications yet.</div>
-    {% endfor %}
+      {% else %}
+        <div class="gov-alert gov-alert-info">
+          <i class="bi bi-info-circle"></i>
+          No notifications yet. Your inbox is empty.
+        </div>
+      {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}

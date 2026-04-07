@@ -1,11 +1,26 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Verify OTP - BusEase{% endblock %}
+
 {% block content %}
 
 <style>
-  /* === SAME DESIGN SYSTEM AS LOGIN === */
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
   .login-wrapper {
     min-height: calc(100vh - 200px);
+    background: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,12 +34,12 @@
 
   .login-card {
     background: white;
-    border-radius: 24px;
-    padding: 50px 40px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 40px 35px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     position: relative;
     overflow: hidden;
-    border: none;
+    border: 1px solid #e0e0e0;
     animation: slideUp 0.6s ease-out;
   }
 
@@ -39,110 +54,200 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    height: 4px;
+    background: var(--gov-gradient);
   }
 
   .login-header {
     text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
   }
 
   .login-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 20px;
+    width: 70px;
+    height: 70px;
+    background: var(--gov-gradient);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    box-shadow: 0 10px 30px rgba(102,126,234,0.3);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
   }
 
   .login-icon i {
-    font-size: 2.5rem;
-    color: white;
+    font-size: 2rem;
+    color: var(--gov-secondary);
   }
 
   .login-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #333;
+    color: var(--gov-primary);
     margin-bottom: 8px;
   }
 
   .login-subtitle {
     color: #666;
-    font-size: 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Alert Messages */
+  .gov-alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: var(--gov-success);
+  }
+
+  .gov-alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: var(--gov-danger);
+  }
+
+  .gov-alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left-color: var(--gov-warning);
+  }
+
+  .gov-alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left-color: var(--gov-info);
   }
 
   .form-label {
     font-weight: 600;
-    color: #444;
+    color: var(--gov-primary);
     margin-bottom: 8px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    text-align: center;
   }
 
   .form-control {
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 16px 18px;
-    font-size: 1.4rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 14px 18px;
+    font-size: 1.3rem;
     text-align: center;
     letter-spacing: 10px;
-    background: #f8f9fa;
-    transition: all 0.3s ease;
+    background: #fff;
+    transition: all 0.2s ease;
+    width: 100%;
+    font-weight: 600;
   }
 
   .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
     background: white;
     outline: none;
   }
 
+  /* OTP Input Special Styling */
+  .otp-input {
+    font-family: monospace;
+    font-size: 1.5rem;
+    letter-spacing: 12px;
+    text-indent: 8px;
+  }
+
   .btn-login {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--gov-primary);
     border: none;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 1.1rem;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
     font-weight: 600;
     color: white;
     width: 100%;
     margin-top: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 8px 20px rgba(102,126,234,0.3);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   .btn-login:hover {
+    background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(102,126,234,0.4);
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
   }
 
   .resend-link {
     text-align: center;
     margin-top: 25px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   .resend-link a {
-    color: #667eea;
+    color: var(--gov-primary);
     font-weight: 600;
     text-decoration: none;
   }
 
   .resend-link a:hover {
-    color: #764ba2;
+    color: var(--gov-secondary);
     text-decoration: underline;
+  }
+
+  /* Countdown Timer */
+  .timer-text {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  .timer-text i {
+    color: var(--gov-primary);
+  }
+
+  .resend-disabled {
+    color: #999 !important;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  i.bi {
+    font-size: 0.9rem;
+  }
+
+  .otp-hint {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  /* Loading state for button */
+  .btn-login.loading {
+    pointer-events: none;
+    opacity: 0.8;
+  }
+  
+  .resend-disabled {
+    color: #999 !important;
+    pointer-events: none;
+    cursor: not-allowed;
   }
 </style>
 
@@ -153,7 +258,7 @@
       <!-- Header -->
       <div class="login-header">
         <div class="login-icon">
-          <i class="bi bi-envelope-check"></i>
+          <i class="bi bi-envelope-check-fill"></i>
         </div>
         <h2 class="login-title">OTP Verification</h2>
         <p class="login-subtitle">
@@ -162,42 +267,149 @@
       </div>
 
       <!-- Messages -->
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-      {% endfor %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="gov-alert gov-alert-{{ message.tags }}">
+            <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
 
       <!-- OTP Form -->
-      <form method="POST">
+      <form method="POST" id="otpForm">
         {% csrf_token %}
 
         <div class="mb-4">
-          <label class="form-label text-center w-100">
-            OTP Code
+          <label class="form-label">
+            <i class="bi bi-shield-lock"></i> OTP Code
           </label>
           <input
             type="text"
             name="otp"
+            id="otpInput"
             maxlength="4"
-            class="form-control"
-            placeholder="• • • •"
+            class="form-control otp-input"
+            placeholder="••••"
             required
             autofocus
+            pattern="[0-9]{4}"
+            title="Please enter a 4-digit OTP"
           >
+          <div class="otp-hint">
+            <i class="bi bi-info-circle"></i> Enter the 4-digit verification code
+          </div>
         </div>
 
-        <button type="submit" class="btn-login">
+        <button type="submit" class="btn-login" id="verifyBtn">
           <i class="bi bi-check-circle"></i> Verify OTP
         </button>
       </form>
 
-      <!-- Resend -->
-      <div class="resend-link">
-        Didn’t receive the code?
-        <a href="{% url 'forgot_password' %}">Resend OTP</a>
+      <!-- Resend with Timer -->
+      <div class="resend-link" id="resendSection">
+        Didn't receive the code?
+        <a href="{% url 'forgot_password' %}" id="resendLink">Resend OTP</a>
+      </div>
+      
+      <!-- Timer Display -->
+      <div class="timer-text" id="timerText">
+        <i class="bi bi-clock"></i> <span id="timer">0:00</span>
       </div>
 
     </div>
   </div>
 </div>
+
+<script>
+  // OTP input - auto move to next field (single field, just restrict to numbers)
+  const otpInput = document.getElementById('otpInput');
+  
+  otpInput.addEventListener('input', function(e) {
+    // Remove any non-digit characters
+    this.value = this.value.replace(/[^0-9]/g, '');
+    
+    // Auto-submit when 4 digits are entered
+    if (this.value.length === 4) {
+      document.getElementById('otpForm').submit();
+    }
+  });
+  
+  // Prevent letters from being typed
+  otpInput.addEventListener('keydown', function(e) {
+    // Allow backspace, delete, tab, escape, enter, etc.
+    if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+        e.key === 'Escape' || e.key === 'Enter' || e.key === 'ArrowLeft' || 
+        e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      return;
+    }
+    // Allow numbers only
+    if (!/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+  
+  // Countdown timer for resend OTP
+  let timeLeft = 60; // 60 seconds countdown
+  const timerElement = document.getElementById('timer');
+  const resendLink = document.getElementById('resendLink');
+  const timerText = document.getElementById('timerText');
+  
+  function startTimer() {
+    const timer = setInterval(function() {
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        timerElement.textContent = '0:00';
+        timerText.style.display = 'none';
+        resendLink.classList.remove('resend-disabled');
+        resendLink.style.pointerEvents = 'auto';
+        resendLink.style.opacity = '1';
+      } else {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        timerText.style.display = 'block';
+        resendLink.classList.add('resend-disabled');
+        resendLink.style.pointerEvents = 'none';
+        resendLink.style.opacity = '0.5';
+      }
+    }, 1000);
+  }
+  
+  // Start timer on page load
+  startTimer();
+  
+  // Form submission with loading state
+  document.getElementById('otpForm').addEventListener('submit', function(e) {
+    const verifyBtn = document.getElementById('verifyBtn');
+    const otpValue = otpInput.value;
+    
+    // Validate OTP is exactly 4 digits
+    if (otpValue.length !== 4) {
+      e.preventDefault();
+      alert('Please enter a valid 4-digit OTP');
+      otpInput.focus();
+      return;
+    }
+    
+    // Show loading state
+    verifyBtn.classList.add('loading');
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Verifying...';
+  });
+  
+  // Prevent form resubmission on page refresh
+  if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+  }
+  
+  // Auto-focus on OTP field
+  document.addEventListener('DOMContentLoaded', function() {
+    if (otpInput) {
+      otpInput.focus();
+    }
+  });
+</script>
 
 {% endblock %}

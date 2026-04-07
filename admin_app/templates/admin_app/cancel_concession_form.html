@@ -1,10 +1,352 @@
 {% extends 'base.html' %}
+{% block title %}Cancel Concession - Government Transport Portal{% endblock %}
+
 {% block content %}
-<h3>Cancel E-Card for {{ concession.traveller.username }}</h3>
-<form method="post">{% csrf_token %}
-  <label>Reason for Cancellation:</label>
-  <textarea name="reason" class="form-control mb-3" required></textarea>
-  <button type="submit" class="btn btn-warning">Cancel E-Card</button>
-  <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back</a>
-</form>
+<style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
+  .gov-cancel-page {
+    padding: 40px 0;
+    background: #eef2f5;
+    min-height: calc(100vh - 80px);
+  }
+
+  .gov-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .gov-hero-section {
+    background: var(--gov-gradient);
+    border-radius: 8px;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    border-bottom: 3px solid var(--gov-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .gov-hero-section h2 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .gov-hero-section p {
+    color: rgba(255,255,255,0.9);
+    margin: 5px 0 0;
+    font-size: 0.9rem;
+  }
+
+  .gov-hero-section i {
+    color: var(--gov-secondary);
+    margin-right: 8px;
+  }
+
+  /* Applicant Info Card */
+  .gov-info-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-info-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-info-header h4 {
+    margin: 0;
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-info-header h4 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-info-body {
+    padding: 20px;
+  }
+
+  .gov-info-row {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .gov-info-row:last-child {
+    border-bottom: none;
+  }
+
+  .gov-info-label {
+    width: 120px;
+    font-weight: 600;
+    color: var(--gov-primary);
+  }
+
+  .gov-info-value {
+    flex: 1;
+    color: #444;
+  }
+
+  /* Warning Card */
+  .gov-warning-card {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+  }
+
+  .gov-warning-card i {
+    color: #ffc107;
+    font-size: 1.2rem;
+    margin-right: 10px;
+  }
+
+  .gov-warning-card span {
+    color: #856404;
+    font-weight: 500;
+  }
+
+  /* Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-form-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
+  }
+
+  .gov-form-header h4 {
+    margin: 0;
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-form-header h4 i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-form-body {
+    padding: 25px;
+  }
+
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .gov-label i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    resize: vertical;
+  }
+
+  .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,105,92,0.1);
+  }
+
+  .gov-help-text {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 5px;
+  }
+
+  /* Action Buttons */
+  .gov-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .gov-btn {
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-btn-warning {
+    background: #ffc107;
+    color: #333;
+  }
+
+  .gov-btn-warning:hover {
+    background: #e0a800;
+  }
+
+  .gov-btn-secondary {
+    background: #6c757d;
+    color: white;
+  }
+
+  .gov-btn-secondary:hover {
+    background: #5a6268;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .gov-info-row {
+      flex-direction: column;
+    }
+    .gov-info-label {
+      width: auto;
+      margin-bottom: 5px;
+    }
+    .gov-action-buttons {
+      flex-direction: column;
+    }
+    .gov-btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="gov-cancel-page">
+  <div class="gov-container">
+
+    <!-- Hero Section -->
+    <div class="gov-hero-section">
+      <h2>
+        <i class="bi bi-x-circle"></i> Cancel Concession Card
+      </h2>
+      <p>
+        <i class="bi bi-shield-check"></i> Revoke approved concession benefits
+      </p>
+    </div>
+
+    <!-- Applicant Information -->
+    <div class="gov-info-card">
+      <div class="gov-info-header">
+        <h4>
+          <i class="bi bi-person-badge"></i> Applicant Details
+        </h4>
+      </div>
+      <div class="gov-info-body">
+        <div class="gov-info-row">
+          <div class="gov-info-label">Applicant Name:</div>
+          <div class="gov-info-value">{{ concession.traveller.get_full_name|default:concession.traveller.username }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">Username:</div>
+          <div class="gov-info-value">@{{ concession.traveller.username }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">College/Institution:</div>
+          <div class="gov-info-value">{{ concession.college_name }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">Route:</div>
+          <div class="gov-info-value">{{ concession.starting_location }} → {{ concession.ending_location }}</div>
+        </div>
+        <div class="gov-info-row">
+          <div class="gov-info-label">Status:</div>
+          <div class="gov-info-value">
+            <span style="background: #28a745; color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem;">{{ concession.status }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warning Notice -->
+    <div class="gov-warning-card">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>Warning: This action cannot be undone. The concession card will be permanently cancelled and the user will lose all concession benefits.</span>
+    </div>
+
+    <!-- Cancellation Form -->
+    <div class="gov-form-card">
+      <div class="gov-form-header">
+        <h4>
+          <i class="bi bi-pencil-square"></i> Cancellation Details
+        </h4>
+      </div>
+      <div class="gov-form-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="gov-form-group">
+            <label class="gov-label">
+              <i class="bi bi-chat-text"></i> Reason for Cancellation
+            </label>
+            <textarea name="reason" class="gov-textarea" rows="4" placeholder="Please provide a detailed reason for cancelling this concession..." required></textarea>
+            <div class="gov-help-text">
+              <i class="bi bi-info-circle"></i> This reason will be recorded for audit purposes.
+            </div>
+          </div>
+
+          <div class="gov-action-buttons">
+            <button type="submit" class="gov-btn gov-btn-warning">
+              <i class="bi bi-x-circle"></i> Cancel Concession
+            </button>
+            <a href="{% url 'admin_dashboard' %}" class="gov-btn gov-btn-secondary">
+              <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

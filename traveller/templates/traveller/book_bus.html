@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Book Bus - Government Transport Portal{% endblock %}
 
 {% block content %}
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -24,12 +25,12 @@
 
   .gov-booking-page {
     padding: 30px 0 50px;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
   .gov-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
   }
@@ -52,7 +53,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.1);
     border-radius: 50%;
   }
 
@@ -63,7 +64,7 @@
     left: -5%;
     width: 250px;
     height: 250px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -79,6 +80,10 @@
     margin: 0 0 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
+  }
+
+  .gov-hero-content h1 i {
+    color: var(--gov-secondary);
   }
 
   .gov-bus-badge {
@@ -98,11 +103,18 @@
     color: var(--gov-secondary);
   }
 
-  /* Booking Card */
-  .gov-booking-card {
+  /* Two Column Layout */
+  .gov-two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+  }
+
+  /* Seat Map Card */
+  .gov-seat-card {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,51,102,0.12);
+    box-shadow: 0 10px 30px rgba(0,105,92,0.12);
     border: 1px solid #e0e0e0;
     overflow: hidden;
   }
@@ -115,7 +127,7 @@
 
   .gov-card-header h3 {
     color: white;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin: 0;
     display: flex;
@@ -131,45 +143,100 @@
     padding: 25px;
   }
 
-  /* Info Grid */
-  .gov-info-grid {
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 25px;
-    border: 1px solid #e0e0e0;
+  /* Seat Grid */
+  .gov-seat-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
   }
 
-  .gov-info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  .gov-seat {
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
   }
 
-  .gov-info-label {
-    font-size: 0.8rem;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  .gov-seat:hover:not(.booked) {
+    transform: translateY(-3px);
+    border-color: var(--gov-primary);
+    background: var(--gov-light);
   }
 
-  .gov-info-label i {
-    color: var(--gov-secondary);
+  .gov-seat.booked {
+    background: #f8d7da;
+    border-color: var(--gov-danger);
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
-  .gov-info-value {
-    font-size: 1.1rem;
-    font-weight: 600;
+  .gov-seat.selected {
+    background: var(--gov-success);
+    border-color: var(--gov-success);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .gov-seat.selected .gov-seat-number {
+    color: white;
+  }
+
+  .gov-seat-number {
+    font-size: 1.2rem;
+    font-weight: 700;
     color: var(--gov-primary);
   }
 
-  /* Form Styles */
+  .gov-seat-status {
+    font-size: 0.65rem;
+    margin-top: 5px;
+    color: #666;
+  }
+
+  .gov-seat.selected .gov-seat-status {
+    color: white;
+  }
+
+  /* Legend */
+  .gov-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 15px;
+  }
+
+  .gov-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+  }
+
+  .gov-legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+
+  /* Booking Form Card */
+  .gov-form-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,105,92,0.12);
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+  }
+
   .gov-form-group {
     margin-bottom: 20px;
   }
@@ -183,7 +250,7 @@
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .gov-label i {
@@ -195,26 +262,25 @@
     padding: 12px 16px;
     border: 2px solid #dee2e6;
     border-radius: 10px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
     background: #f8f9fa;
   }
 
   .gov-select:focus, .gov-input:focus {
     border-color: var(--gov-primary);
-    box-shadow: 0 0 0 3px rgba(0,51,102,0.1);
+    box-shadow: 0 0 0 3px rgba(0,105,92,0.1);
     outline: none;
     background: white;
   }
 
   /* Price Box */
   .gov-price-box {
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    background: linear-gradient(135deg, var(--gov-light), #ffffff);
     border: 2px solid var(--gov-primary);
     border-radius: 14px;
     padding: 20px;
     margin: 20px 0;
-    transition: all 0.3s ease;
   }
 
   .gov-price-header {
@@ -224,7 +290,7 @@
     color: var(--gov-primary);
     font-weight: 600;
     margin-bottom: 15px;
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .gov-price-header i {
@@ -235,7 +301,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     padding-bottom: 12px;
     border-bottom: 1px dashed #e0e0e0;
   }
@@ -246,13 +312,10 @@
     gap: 8px;
     color: var(--gov-primary);
     font-weight: 500;
+    font-size: 0.9rem;
   }
 
   .gov-price-route-item i {
-    color: var(--gov-secondary);
-  }
-
-  .gov-price-arrow {
     color: var(--gov-secondary);
   }
 
@@ -275,25 +338,28 @@
     border-bottom: none;
   }
 
-  .gov-price-label {
-    color: #666;
-  }
-
-  .gov-price-value {
-    font-weight: 600;
-    color: var(--gov-primary);
-  }
-
   .gov-total-price {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: var(--gov-primary);
-    font-family: 'Times New Roman', serif;
     text-align: right;
     margin-top: 10px;
   }
 
-  /* Action Buttons */
+  .selected-seat-info {
+    background: var(--gov-success);
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .selected-seat-info i {
+    font-size: 1.2rem;
+  }
+
+  /* Buttons */
   .gov-btn {
     display: inline-flex;
     align-items: center;
@@ -317,38 +383,55 @@
     border: 2px solid var(--gov-secondary);
   }
 
-  .gov-btn-primary:hover {
+  .gov-btn-primary:hover:not(:disabled) {
     background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
-  }
-
-  .gov-btn-primary i {
-    color: var(--gov-secondary);
+    box-shadow: 0 8px 20px rgba(0,105,92,0.3);
   }
 
   .gov-btn-primary:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
   }
 
   .gov-btn-secondary {
-    background: white;
-    color: var(--gov-primary);
-    border: 2px solid var(--gov-primary);
+    background: #6c757d;
+    color: white;
+    border: none;
     margin-top: 10px;
   }
 
-  .gov-btn-secondary:hover {
-    background: var(--gov-primary);
-    color: var(--gov-secondary);
+  /* Info Grid */
+  .gov-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
   }
 
-  /* No Seats Alert */
+  .gov-info-item {
+    text-align: center;
+  }
+
+  .gov-info-label {
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  .gov-info-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gov-primary);
+  }
+
+  /* Alert */
   .gov-alert {
     background: #f8d7da;
-    border-left: 4px solid #dc3545;
+    border-left: 4px solid var(--gov-danger);
     padding: 15px 20px;
     border-radius: 10px;
     display: flex;
@@ -358,13 +441,34 @@
   }
 
   .gov-alert i {
-    font-size: 1.3rem;
+    color: var(--gov-danger);
   }
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    .gov-info-grid {
+  @media (max-width: 992px) {
+    .gov-two-columns {
       grid-template-columns: 1fr;
+    }
+    .gov-form-card {
+      position: static;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .gov-seat-grid {
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+    .gov-seat {
+      padding: 8px;
+    }
+    .gov-seat-number {
+      font-size: 1rem;
+    }
+    .gov-price-route {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .gov-legend {
+      flex-wrap: wrap;
     }
   }
 </style>
@@ -384,357 +488,398 @@
       </div>
     </div>
 
-    <!-- Booking Card -->
-    <div class="gov-booking-card">
-      <div class="gov-card-header">
-        <h3>
-          <i class="bi bi-pencil-square"></i>
-          Booking Details
-        </h3>
-      </div>
+    <!-- Two Column Layout -->
+    <div class="gov-two-columns">
+      
+      <!-- Left Column: Seat Map -->
+      <div class="gov-seat-card">
+        <div class="gov-card-header">
+          <h3>
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+            Select Your Seat
+          </h3>
+        </div>
+        <div class="gov-card-body">
+          <!-- Seat Grid -->
+          <div class="gov-seat-grid">
+            {% for seat_number in seat_range %}
+              {% if seat_number in booked_seats %}
+                <div class="gov-seat booked" data-seat="{{ seat_number }}" data-status="booked">
+                  <div class="gov-seat-number">{{ seat_number }}</div>
+                  <div class="gov-seat-status">Booked</div>
+                </div>
+              {% else %}
+                <div class="gov-seat available" data-seat="{{ seat_number }}" data-status="available" onclick="selectSeat('{{ seat_number }}')">
+                  <div class="gov-seat-number">{{ seat_number }}</div>
+                  <div class="gov-seat-status">Available</div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
 
-      <div class="gov-card-body">
-        <!-- Bus Info -->
-        <div class="gov-info-grid">
-          <div class="gov-info-item">
-            <div class="gov-info-label">
-              <i class="bi bi-geo-alt"></i> Route
+          <!-- Legend -->
+          <div class="gov-legend">
+            <div class="gov-legend-item">
+              <div class="gov-legend-color" style="background: white; border: 2px solid #dee2e6;"></div>
+              <span>Available</span>
             </div>
-            <div class="gov-info-value">
-              {{ schedule.route.start_location }} → {{ schedule.route.end_location }}
+            <div class="gov-legend-item">
+              <div class="gov-legend-color" style="background: var(--gov-success); border: 2px solid var(--gov-success);"></div>
+              <span>Selected</span>
+            </div>
+            <div class="gov-legend-item">
+              <div class="gov-legend-color" style="background: #f8d7da; border: 2px solid var(--gov-danger);"></div>
+              <span>Booked</span>
             </div>
           </div>
-          <div class="gov-info-item">
-            <div class="gov-info-label">
-              <i class="bi bi-clock"></i> Departure
+
+          <!-- Bus Info -->
+          <div class="gov-info-grid">
+            <div class="gov-info-item">
+              <div class="gov-info-label">Total Seats</div>
+              <div class="gov-info-value">{{ bus.total_seats }}</div>
             </div>
-            <div class="gov-info-value">{{ schedule.departure_time|date:"d M Y, h:i A" }}</div>
-          </div>
-          <div class="gov-info-item">
-            <div class="gov-info-label">
-              <i class="bi bi-cash"></i> Base Fare
+            <div class="gov-info-item">
+              <div class="gov-info-label">Available Seats</div>
+              <div class="gov-info-value">{{ available_seats }}</div>
             </div>
-            <div class="gov-info-value">₹{{ schedule.fare }}</div>
-          </div>
-          <div class="gov-info-item">
-            <div class="gov-info-label">
-              <i class="bi bi-people"></i> Available Seats
+            <div class="gov-info-item">
+              <div class="gov-info-label">Base Fare</div>
+              <div class="gov-info-value">₹{{ schedule.fare }}</div>
             </div>
-            <div class="gov-info-value {% if available_seats < 5 %}text-danger{% endif %}">
-              {{ available_seats }}
+            <div class="gov-info-item">
+              <div class="gov-info-label">Price per Stop</div>
+              <div class="gov-info-value">₹{{ price_per_stop }}</div>
             </div>
           </div>
         </div>
+      </div>
 
-        {% if available_seats > 0 %}
-          <form method="POST" id="bookingForm">
-            {% csrf_token %}
-
-            <!-- From Stop -->
-            <div class="gov-form-group">
-              <label class="gov-label">
-                <i class="bi bi-geo-alt"></i>
-                Boarding Point
-              </label>
-              <select name="from_stop" id="fromStop" class="gov-select" required>
-                <option value="">Select boarding point</option>
-                {% for stop in stops %}
-                  <option value="{{ stop.id }}" data-order="{{ stop.order }}">
-                    {{ stop.stop_name }}
-                  </option>
-                {% endfor %}
-              </select>
+      <!-- Right Column: Booking Form -->
+      <div class="gov-form-card">
+        <div class="gov-card-header">
+          <h3>
+            <i class="bi bi-pencil-square"></i>
+            Journey Details
+          </h3>
+        </div>
+        <div class="gov-card-body">
+          {% if available_seats > 0 %}
+            
+            <!-- Selected Seat Display -->
+            <div id="selectedSeatInfo" class="selected-seat-info" style="display: none;">
+              <i class="bi bi-check-circle-fill"></i> Selected Seat: <strong id="selectedSeatNumber">-</strong>
             </div>
 
-            <!-- To Stop -->
-            <div class="gov-form-group">
-              <label class="gov-label">
-                <i class="bi bi-flag"></i>
-                Destination
-              </label>
-              <select name="to_stop" id="toStop" class="gov-select" required>
-                <option value="">Select destination</option>
-                {% for stop in stops %}
-                  <option value="{{ stop.id }}" data-order="{{ stop.order }}">
-                    {{ stop.stop_name }}
-                  </option>
-                {% endfor %}
-              </select>
-            </div>
+            <form method="POST" id="bookingForm">
+              {% csrf_token %}
+              <input type="hidden" name="seat_number" id="seatNumberInput">
+              <input type="hidden" name="razorpay_payment_id" id="razorpayPaymentId">
 
-            <!-- Seat Number -->
-            <div class="gov-form-group">
-              <label class="gov-label">
-                <i class="bi bi-person"></i>
-                Seat Number
-              </label>
-              <input type="number"
-                     name="seat_number"
-                     id="seatNumber"
-                     min="1"
-                     max="{{ bus.total_seats }}"
-                     class="gov-input"
-                     placeholder="Enter seat number (1-{{ bus.total_seats }})"
-                     required>
-            </div>
-
-            <!-- Price Display Box -->
-            <div id="ticketPriceBox" class="gov-price-box d-none">
-              <div class="gov-price-header">
-                <i class="bi bi-calculator"></i>
-                Fare Summary
-              </div>
-
-              <div class="gov-price-route">
-                <div class="gov-price-route-item">
+              <!-- From Stop -->
+              <div class="gov-form-group">
+                <label class="gov-label">
                   <i class="bi bi-geo-alt"></i>
-                  <span id="priceFrom">-</span>
-                </div>
-                <i class="bi bi-arrow-right-circle gov-price-arrow"></i>
-                <div class="gov-price-route-item">
+                  Boarding Point
+                </label>
+                <select name="from_stop" id="fromStop" class="gov-select" required onchange="updatePrice()">
+                  <option value="">Select boarding point</option>
+                  {% for stop in stops %}
+                    <option value="{{ stop.id }}" data-order="{{ stop.order }}" data-name="{{ stop.stop_name }}">
+                      {{ stop.stop_name }} (Arrival: {{ stop.arrival_time|time:"h:i A" }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- To Stop -->
+              <div class="gov-form-group">
+                <label class="gov-label">
                   <i class="bi bi-flag"></i>
-                  <span id="priceTo">-</span>
-                </div>
+                  Destination
+                </label>
+                <select name="to_stop" id="toStop" class="gov-select" required onchange="updatePrice()">
+                  <option value="">Select destination</option>
+                  {% for stop in stops %}
+                    <option value="{{ stop.id }}" data-order="{{ stop.order }}" data-name="{{ stop.stop_name }}">
+                      {{ stop.stop_name }} (Arrival: {{ stop.arrival_time|time:"h:i A" }})
+                    </option>
+                  {% endfor %}
+                </select>
               </div>
 
-              <div class="gov-price-calculation">
-                <div class="gov-price-row">
-                  <span class="gov-price-label">Base Fare</span>
-                  <span class="gov-price-value">₹{{ schedule.fare }}</span>
+              <!-- Price Display Box -->
+              <div id="ticketPriceBox" class="gov-price-box" style="display: none;">
+                <div class="gov-price-header">
+                  <i class="bi bi-calculator"></i>
+                  Fare Summary
                 </div>
-                <div class="gov-price-row">
-                  <span class="gov-price-label">Stops Travelled</span>
-                  <span class="gov-price-value" id="stopsCount">0</span>
+
+                <div class="gov-price-route">
+                  <div class="gov-price-route-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <span id="priceFrom">-</span>
+                  </div>
+                  <i class="bi bi-arrow-right-circle" style="color: var(--gov-secondary);"></i>
+                  <div class="gov-price-route-item">
+                    <i class="bi bi-flag"></i>
+                    <span id="priceTo">-</span>
+                  </div>
                 </div>
-                <div class="gov-price-row">
-                  <span class="gov-price-label">Price per Stop</span>
-                  <span class="gov-price-value">₹{{ price_per_stop }}</span>
+
+                <div class="gov-price-calculation">
+                  <div class="gov-price-row">
+                    <span>Base Fare</span>
+                    <span>₹{{ schedule.fare }}</span>
+                  </div>
+                  <div class="gov-price-row">
+                    <span>Stops Travelled</span>
+                    <span id="stopsCount">0</span>
+                  </div>
+                  <div class="gov-price-row">
+                    <span>Stop Charges (₹{{ price_per_stop }} per stop)</span>
+                    <span id="stopCharges">₹0</span>
+                  </div>
                 </div>
-                <div class="gov-price-row">
-                  <span class="gov-price-label">Stop Charges</span>
-                  <span class="gov-price-value" id="stopCharges">₹0</span>
-                </div>
+
+                <div class="gov-total-price" id="totalAmount">₹{{ schedule.fare }}</div>
               </div>
 
-              <div class="gov-total-price" id="totalAmount">₹{{ schedule.fare }}</div>
+              <!-- Payment Button -->
+              <button type="button" class="gov-btn gov-btn-primary" id="payButton" onclick="processPayment()" disabled>
+                <i class="bi bi-credit-card"></i>
+                Select a Seat to Continue
+              </button>
+            </form>
+          {% else %}
+            <div class="gov-alert">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>Sorry, no seats are available on this bus.</span>
             </div>
-
-            <!-- Payment Button -->
-            <button type="button" class="gov-btn gov-btn-primary" id="payButton" onclick="processPayment()">
-              <i class="bi bi-credit-card"></i>
-              Proceed to Payment
-            </button>
-          </form>
-        {% else %}
-          <div class="gov-alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span>Sorry, no seats are available on this bus.</span>
-          </div>
-        {% endif %}
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Razorpay Script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js">
-  
-</script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-// Get DOM elements
-const fromStop = document.getElementById("fromStop");
-const toStop = document.getElementById("toStop");
-const seatNumber = document.getElementById("seatNumber");
-const ticketBox = document.getElementById("ticketPriceBox");
-const priceFrom = document.getElementById("priceFrom");
-const priceTo = document.getElementById("priceTo");
-const finalPrice = document.getElementById("totalAmount");
-const stopsCount = document.getElementById("stopsCount");
-const stopCharges = document.getElementById("stopCharges");
+  var selectedSeat = null;
+  var currentTotal = Number("{{ schedule.fare }}");
+  var selectedFromOrder = null;
+  var selectedToOrder = null;
 
-// Get values from Django
-const baseFare = Number("{{ schedule.fare }}");
-const pricePerStop = Number("{{ price_per_stop }}");
-const totalSeats = parseInt("{{ bus.total_seats }}");
+  var baseFare = Number("{{ schedule.fare }}");
+  var pricePerStop = Number("{{ price_per_stop }}");
+  var totalSeats = parseInt("{{ bus.total_seats }}");
 
-let selectedFromOrder = null;
-let selectedToOrder = null;
-let currentTotal = baseFare;
+  var fromStop = document.getElementById("fromStop");
+  var toStop = document.getElementById("toStop");
+  var ticketBox = document.getElementById("ticketPriceBox");
+  var priceFrom = document.getElementById("priceFrom");
+  var priceTo = document.getElementById("priceTo");
+  var finalPrice = document.getElementById("totalAmount");
+  var stopsCount = document.getElementById("stopsCount");
+  var stopCharges = document.getElementById("stopCharges");
+  var payButton = document.getElementById("payButton");
+  var selectedSeatInfo = document.getElementById("selectedSeatInfo");
+  var selectedSeatNumberSpan = document.getElementById("selectedSeatNumber");
+  var seatNumberInput = document.getElementById("seatNumberInput");
 
-// Update price function
-function updatePrice() {
-  if (!fromStop.value || !toStop.value) {
-    ticketBox.classList.add("d-none");
-    return;
-  }
-
-  const fromOption = fromStop.selectedOptions[0];
-  const toOption = toStop.selectedOptions[0];
-
-  const fromOrder = parseInt(fromOption.dataset.order);
-  const toOrder = parseInt(toOption.dataset.order);
-
-  if (toOrder <= fromOrder) {
-    ticketBox.classList.add("d-none");
-    alert("Destination must be after boarding point");
-    toStop.value = "";
-    return;
-  }
-
-  const stopsTravelled = toOrder - fromOrder;
-  const stopChargesAmount = stopsTravelled * pricePerStop;
-  const total = baseFare + stopChargesAmount;
-
-  // Update display
-  priceFrom.innerText = fromOption.text;
-  priceTo.innerText = toOption.text;
-  stopsCount.innerText = stopsTravelled;
-  stopCharges.innerText = "₹" + stopChargesAmount.toFixed(2);
-  finalPrice.innerText = "₹" + total.toFixed(2);
-  
-  currentTotal = total;
-  selectedFromOrder = fromOrder;
-  selectedToOrder = toOrder;
-
-  ticketBox.classList.remove("d-none");
-}
-
-// Add event listeners
-fromStop.addEventListener("change", updatePrice);
-toStop.addEventListener("change", updatePrice);
-
-// Validate form
-function validateForm() {
-  if (!fromStop.value) {
-    alert("Please select boarding point");
-    return false;
-  }
-  if (!toStop.value) {
-    alert("Please select destination");
-    return false;
-  }
-  if (!seatNumber.value) {
-    alert("Please enter seat number");
-    return false;
-  }
-  if (seatNumber.value < 1 || seatNumber.value > totalSeats) {
-    alert("Seat number must be between 1 and " + totalSeats);
-    return false;
-  }
-  return true;
-}
-
-// Process payment with Razorpay
-function processPayment() {
-  if (!validateForm()) {
-    return;
-  }
-
-  const amountInPaise = Math.round(currentTotal * 100);
-  
-  // Debug: Check amount
-  console.log("Amount in rupees:", currentTotal);
-  console.log("Amount in paise:", amountInPaise);
-  
-  if (amountInPaise <= 0) {
-    alert("Invalid amount. Please try again.");
-    return;
-  }
-
-  // Show loading state
-  const payButton = document.getElementById("payButton");
-  payButton.disabled = true;
-  payButton.innerHTML = '<i class="bi bi-hourglass"></i> Processing...';
-
-  // Create Razorpay order
-  fetch("/traveller/create-razorpay-order/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": "{{ csrf_token }}"
-    },
-    body: JSON.stringify({
-      amount: amountInPaise
-    })
-  })
-  .then(function(response) {
-    if (!response.ok) {
-      return response.json().then(function(err) {
-        throw new Error(err.error || "Failed to create order");
-      });
-    }
-    return response.json();
-  })
-  .then(function(order) {
-    console.log("Order created:", order);
-    
-    // Make sure we have a valid order ID
-    if (!order.id) {
-      throw new Error("No order ID received from server");
-    }
-    
-    const options = {
-      key: "{{ razorpay_key }}",
-      amount: order.amount,
-      currency: order.currency,
-      name: "BusEase - Government Transport",
-      description: "Booking for {{ bus.bus_name }} ({{ bus.bus_number }})",
-      order_id: order.id,
-      handler: function(response) {
-        console.log("Payment successful:", response);
-        
-        // Add payment details to form and submit
-        const form = document.getElementById("bookingForm");
-        
-        const paymentInput = document.createElement("input");
-        paymentInput.type = "hidden";
-        paymentInput.name = "razorpay_payment_id";
-        paymentInput.value = response.razorpay_payment_id;
-        form.appendChild(paymentInput);
-        
-        // Add order ID as well (optional)
-        const orderInput = document.createElement("input");
-        orderInput.type = "hidden";
-        orderInput.name = "razorpay_order_id";
-        orderInput.value = response.razorpay_order_id;
-        form.appendChild(orderInput);
-        
-        form.submit();
-      },
-      prefill: {
-        name: "{{ user.get_full_name|default:user.username }}",
-        email: "{{ user.email }}"
-      },
-      theme: {
-        color: "#003366"
-      },
-      modal: {
-        ondismiss: function() {
-          console.log("Payment cancelled");
-          payButton.disabled = false;
-          payButton.innerHTML = '<i class="bi bi-credit-card"></i> Proceed to Payment';
-        }
+  function selectSeat(seatNumber) {
+    if (selectedSeat) {
+      var prevSeat = document.querySelector('.gov-seat[data-seat="' + selectedSeat + '"]');
+      if (prevSeat) {
+        prevSeat.classList.remove("selected");
       }
-    };
+    }
+
+    var seatElement = document.querySelector('.gov-seat[data-seat="' + seatNumber + '"]');
     
-    const rzp = new Razorpay(options);
+    if (seatElement.classList.contains("booked")) {
+      alert("This seat is already booked!");
+      return;
+    }
+
+    seatElement.classList.add("selected");
+    selectedSeat = seatNumber;
     
-    rzp.on('payment.failed', function(response) {
-      console.error("Payment failed:", response.error);
-      alert("Payment failed: " + response.error.description);
+    selectedSeatNumberSpan.innerText = seatNumber;
+    selectedSeatInfo.style.display = "block";
+    seatNumberInput.value = seatNumber;
+    
+    checkEnablePayButton();
+  }
+
+  function updatePrice() {
+    if (!fromStop.value || !toStop.value) {
+      ticketBox.style.display = "none";
+      checkEnablePayButton();
+      return;
+    }
+
+    var fromOption = fromStop.selectedOptions[0];
+    var toOption = toStop.selectedOptions[0];
+
+    var fromOrder = parseInt(fromOption.dataset.order);
+    var toOrder = parseInt(toOption.dataset.order);
+
+    if (toOrder <= fromOrder) {
+      ticketBox.style.display = "none";
+      alert("Destination must be after boarding point");
+      toStop.value = "";
+      checkEnablePayButton();
+      return;
+    }
+
+    var stopsTravelled = toOrder - fromOrder;
+    var stopChargesAmount = stopsTravelled * pricePerStop;
+    var total = baseFare + stopChargesAmount;
+
+    priceFrom.innerText = fromOption.text.split(" (Arrival")[0];
+    priceTo.innerText = toOption.text.split(" (Arrival")[0];
+    stopsCount.innerText = stopsTravelled;
+    stopCharges.innerText = "₹" + stopChargesAmount.toFixed(2);
+    finalPrice.innerText = "₹" + total.toFixed(2);
+    
+    currentTotal = total;
+    selectedFromOrder = fromOrder;
+    selectedToOrder = toOrder;
+
+    ticketBox.style.display = "block";
+    checkEnablePayButton();
+  }
+
+  function checkEnablePayButton() {
+    if (selectedSeat && fromStop.value && toStop.value) {
       payButton.disabled = false;
-      payButton.innerHTML = '<i class="bi bi-credit-card"></i> Proceed to Payment';
-    });
+      payButton.innerHTML = '<i class="bi bi-credit-card"></i> Pay ₹' + currentTotal.toFixed(2);
+    } else if (!selectedSeat) {
+      payButton.disabled = true;
+      payButton.innerHTML = '<i class="bi bi-credit-card"></i> Select a Seat to Continue';
+    } else if (!fromStop.value || !toStop.value) {
+      payButton.disabled = true;
+      payButton.innerHTML = '<i class="bi bi-credit-card"></i> Select Boarding and Destination';
+    }
+  }
+
+  fromStop.addEventListener("change", updatePrice);
+  toStop.addEventListener("change", updatePrice);
+
+  function validateForm() {
+    if (!selectedSeat) {
+      alert("Please select a seat");
+      return false;
+    }
+    if (!fromStop.value) {
+      alert("Please select boarding point");
+      return false;
+    }
+    if (!toStop.value) {
+      alert("Please select destination");
+      return false;
+    }
+    return true;
+  }
+
+  function processPayment() {
+    if (!validateForm()) {
+      return;
+    }
+
+    var amountInPaise = Math.round(currentTotal * 100);
     
-    rzp.open();
-  })
-  .catch(function(error) {
-    console.error("Error:", error);
-    alert("Payment initialization failed: " + error.message);
-    payButton.disabled = false;
-    payButton.innerHTML = '<i class="bi bi-credit-card"></i> Proceed to Payment';
-  });
-}
+    console.log("Amount in rupees:", currentTotal);
+    console.log("Amount in paise:", amountInPaise);
+    
+    if (amountInPaise <= 0) {
+      alert("Invalid amount. Please try again.");
+      return;
+    }
+
+    payButton.disabled = true;
+    payButton.innerHTML = '<i class="bi bi-hourglass"></i> Processing...';
+
+    fetch("/traveller/create-razorpay-order/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({
+        amount: amountInPaise
+      })
+    })
+    .then(function(response) {
+      if (!response.ok) {
+        return response.json().then(function(err) {
+          throw new Error(err.error || "Failed to create order");
+        });
+      }
+      return response.json();
+    })
+    .then(function(order) {
+      console.log("Order created:", order);
+      
+      if (!order.id) {
+        throw new Error("No order ID received from server");
+      }
+      
+      var options = {
+        key: "{{ razorpay_key }}",
+        amount: order.amount,
+        currency: order.currency,
+        name: "BusEase - Government Transport",
+        description: "Seat Booking - Bus " + "{{ bus.bus_name }}",
+        order_id: order.id,
+        handler: function(response) {
+          console.log("Payment successful:", response);
+          
+          var form = document.getElementById("bookingForm");
+          var paymentInput = document.createElement("input");
+          paymentInput.type = "hidden";
+          paymentInput.name = "razorpay_payment_id";
+          paymentInput.value = response.razorpay_payment_id;
+          form.appendChild(paymentInput);
+          
+          form.submit();
+        },
+        prefill: {
+          name: "{{ user.get_full_name|default:user.username }}",
+          email: "{{ user.email }}"
+        },
+        theme: {
+          color: "#00695c"
+        },
+        modal: {
+          ondismiss: function() {
+            console.log("Payment cancelled");
+            payButton.disabled = false;
+            payButton.innerHTML = '<i class="bi bi-credit-card"></i> Pay ₹' + currentTotal.toFixed(2);
+          }
+        }
+      };
+      
+      var rzp = new Razorpay(options);
+      
+      rzp.on('payment.failed', function(response) {
+        console.error("Payment failed:", response.error);
+        alert("Payment failed: " + (response.error.description || "Please try again"));
+        payButton.disabled = false;
+        payButton.innerHTML = '<i class="bi bi-credit-card"></i> Pay ₹' + currentTotal.toFixed(2);
+      });
+      
+      rzp.open();
+    })
+    .catch(function(error) {
+      console.error("Error:", error);
+      alert("Payment initialization failed: " + error.message);
+      payButton.disabled = false;
+      payButton.innerHTML = '<i class="bi bi-credit-card"></i> Pay ₹' + currentTotal.toFixed(2);
+    });
+  }
 </script>
 {% endblock %}

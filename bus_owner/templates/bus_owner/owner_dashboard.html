@@ -5,11 +5,11 @@
 {% block content %}
 <style>
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -24,20 +24,20 @@
 
   .gov-owner-dashboard {
     padding: 20px 0 40px;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
 
   /* ── Hero ── */
   .gov-hero-section {
     background: var(--gov-gradient);
-    border-radius: 24px;
-    padding: 40px;
+    border-radius: 8px;
+    padding: 30px 35px;
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
-    border: 3px solid var(--gov-secondary);
-    box-shadow: 0 15px 40px rgba(0, 51, 102, 0.2);
+    border-bottom: 3px solid var(--gov-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   .gov-hero-section::before {
@@ -45,9 +45,9 @@
     position: absolute;
     top: -50%;
     right: -10%;
-    width: 400px;
-    height: 400px;
-    background: rgba(255, 215, 0, 0.1);
+    width: 300px;
+    height: 300px;
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -56,9 +56,9 @@
     position: absolute;
     bottom: -30%;
     left: -5%;
-    width: 300px;
-    height: 300px;
-    background: rgba(255, 215, 0, 0.08);
+    width: 250px;
+    height: 250px;
+    background: rgba(255,143,0,0.05);
     border-radius: 50%;
   }
 
@@ -68,19 +68,15 @@
   }
 
   .gov-hero-title {
-    font-size: 2.2rem;
-    font-weight: 800;
+    font-size: 1.8rem;
+    font-weight: 600;
     color: white;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    line-height: 1.3;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
   }
 
   .gov-hero-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 0;
     line-height: 1.6;
     display: flex;
@@ -103,34 +99,32 @@
   .gov-hero-btn {
     background: white;
     color: var(--gov-primary);
-    border: 2px solid var(--gov-secondary);
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-weight: 700;
-    transition: all 0.3s ease;
+    border: 1px solid var(--gov-secondary);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     white-space: nowrap;
-    min-width: 180px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.95rem;
+    min-width: 160px;
+    font-size: 0.85rem;
   }
 
   .gov-hero-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 51, 102, 0.3);
-    color: var(--gov-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,105,92,0.2);
+    background: var(--gov-primary);
+    color: white;
   }
 
   .gov-hero-btn-outline {
     background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: 2px solid var(--gov-secondary);
-    backdrop-filter: blur(10px);
+    border: 1px solid var(--gov-secondary);
   }
 
   .gov-hero-btn-outline:hover {
@@ -140,25 +134,24 @@
 
   .gov-hero-decor {
     position: absolute;
-    right: 30px;
-    bottom: 20px;
-    font-size: 8rem;
+    right: 20px;
+    bottom: 15px;
+    font-size: 5rem;
     color: var(--gov-secondary);
-    opacity: 0.15;
-    transform: rotate(5deg);
+    opacity: 0.1;
   }
 
   /* ── Alert ── */
   .gov-alert {
-    border-radius: 12px;
-    padding: 20px 25px;
+    border-radius: 6px;
+    padding: 15px 20px;
     margin-bottom: 30px;
     display: flex;
     align-items: center;
     gap: 15px;
-    border-left: 6px solid;
+    border-left: 4px solid;
     background: white;
-    box-shadow: 0 5px 15px rgba(0, 51, 102, 0.1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
 
   .gov-alert-warning {
@@ -166,7 +159,7 @@
   }
 
   .gov-alert i {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: var(--gov-warning);
   }
 
@@ -175,15 +168,16 @@
   }
 
   .gov-alert-title {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--gov-primary);
     margin-bottom: 5px;
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .gov-alert-text {
     color: #666;
     margin: 0;
+    font-size: 0.85rem;
   }
 
   /* ── Stats Grid ── */
@@ -196,11 +190,11 @@
 
   .gov-stat-card {
     background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 5px 20px rgba(0, 51, 102, 0.05);
+    border-radius: 6px;
+    padding: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     border: 1px solid #e0e0e0;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -209,41 +203,24 @@
     text-decoration: none;
   }
 
-  .gov-stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary));
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-
   .gov-stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 51, 102, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,105,92,0.15);
     border-color: var(--gov-primary);
   }
 
-  .gov-stat-card:hover::before {
-    transform: scaleX(1);
-  }
-
   .gov-stat-icon {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     background: var(--gov-gradient);
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--gov-secondary);
   }
 
   .gov-stat-icon i {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--gov-secondary);
   }
 
@@ -253,15 +230,15 @@
 
   .gov-stat-label {
     color: #666;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 3px;
   }
 
   .gov-stat-number {
-    font-size: 1.8rem;
-    font-weight: 800;
+    font-size: 1.6rem;
+    font-weight: 600;
     color: var(--gov-primary);
     line-height: 1;
   }
@@ -269,17 +246,17 @@
   /* ── Main Card ── */
   .gov-main-card {
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 51, 102, 0.1);
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     overflow: hidden;
     border: 1px solid #e0e0e0;
     margin-bottom: 25px;
   }
 
   .gov-card-header {
-    background: var(--gov-gradient);
-    padding: 18px 25px;
-    border-bottom: 3px solid var(--gov-secondary);
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -288,15 +265,13 @@
   }
 
   .gov-card-title {
-    color: white;
-    font-size: 1.3rem;
-    font-weight: 700;
+    color: var(--gov-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
   .gov-card-title i {
@@ -304,26 +279,23 @@
   }
 
   .gov-header-register-btn {
-    background: var(--gov-secondary);
-    color: var(--gov-primary);
-    border: 2px solid white;
-    padding: 8px 20px;
-    border-radius: 30px;
-    font-weight: 700;
-    transition: all 0.3s ease;
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.85rem;
+    gap: 6px;
+    font-size: 0.8rem;
   }
 
   .gov-header-register-btn:hover {
-    background: white;
+    background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 
   /* ── Table Styles ── */
@@ -337,60 +309,60 @@
   }
 
   .gov-table thead th {
-    background: #f0f4ff;
-    color: var(--gov-primary);
-    padding: 14px 15px;
-    font-weight: 700;
-    font-size: 0.8rem;
+    background: #f5f5f5;
+    color: #333;
+    padding: 12px 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 3px solid var(--gov-primary);
+    border-bottom: 2px solid var(--gov-primary);
     text-align: left;
   }
 
   .gov-table tbody tr {
-    transition: all 0.3s ease;
-    border-bottom: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   .gov-table tbody tr:hover {
-    background: #f8f9fa;
+    background: #f9f9f9;
   }
 
   .gov-table td {
-    padding: 15px;
+    padding: 12px;
     vertical-align: middle;
+    font-size: 0.85rem;
   }
 
   .gov-bus-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .gov-bus-avatar {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     background: var(--gov-gradient);
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: var(--gov-secondary);
-    border: 2px solid var(--gov-secondary);
   }
 
   .gov-bus-name {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--gov-primary);
-    font-size: 1rem;
-    margin-bottom: 3px;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
   }
 
   .gov-bus-number {
-    color: #666;
-    font-size: 0.8rem;
+    color: #888;
+    font-size: 0.75rem;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -402,27 +374,26 @@
 
   /* Conductor Styles */
   .gov-conductor-avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: var(--gov-gradient);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--gov-secondary);
-    font-weight: 700;
-    font-size: 1rem;
-    border: 2px solid var(--gov-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
   }
 
   .gov-conductor-name {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--gov-primary);
   }
 
   .gov-conductor-username {
-    font-size: 0.75rem;
-    color: #666;
+    font-size: 0.7rem;
+    color: #888;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -437,11 +408,11 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    padding: 4px 12px;
+    padding: 3px 10px;
     border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 2px solid transparent;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border: 1px solid transparent;
   }
 
   .gov-status-active {
@@ -466,8 +437,8 @@
   .gov-action-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 130px;
+    gap: 6px;
+    min-width: 110px;
   }
 
   .gov-action-group form {
@@ -475,31 +446,29 @@
   }
 
   .gov-action-btn {
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border: 2px solid transparent;
     cursor: pointer;
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
     width: 100%;
+    border: none;
   }
 
   .gov-action-primary {
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border-color: var(--gov-secondary);
+    color: white;
   }
 
   .gov-action-primary:hover {
     background: var(--gov-accent);
-    transform: translateY(-2px);
   }
 
   .gov-action-success {
@@ -509,7 +478,6 @@
 
   .gov-action-success:hover {
     background: #218838;
-    transform: translateY(-2px);
   }
 
   .gov-action-danger {
@@ -519,7 +487,6 @@
 
   .gov-action-danger:hover {
     background: #c82333;
-    transform: translateY(-2px);
   }
 
   .gov-action-disabled {
@@ -529,25 +496,27 @@
   }
 
   .gov-action-edit {
-    background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border-color: var(--gov-secondary);
-    padding: 6px 12px;
+    background: #17a2b8;
+    color: white;
+  }
+
+  .gov-action-edit:hover {
+    background: #138496;
   }
 
   /* Assign Duty Card */
   .gov-duty-card {
-    background: linear-gradient(135deg, #f0f4ff, #ffffff);
-    border: 2px solid var(--gov-primary);
-    border-radius: 16px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     padding: 20px;
     margin-bottom: 25px;
   }
 
   .gov-duty-title {
     color: var(--gov-primary);
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -571,41 +540,38 @@
   }
 
   .gov-duty-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #666;
     text-transform: uppercase;
     margin-bottom: 5px;
   }
 
-  .gov-duty-select,
-  .gov-duty-input {
-    padding: 10px;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    font-size: 0.9rem;
+  .gov-duty-select {
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.85rem;
     background: white;
   }
 
-  .gov-duty-select:focus,
-  .gov-duty-input:focus {
+  .gov-duty-select:focus {
     border-color: var(--gov-primary);
     outline: none;
   }
 
   .gov-duty-btn {
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border: 2px solid var(--gov-secondary);
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 700;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .gov-duty-btn:hover {
     background: var(--gov-accent);
-    transform: translateY(-2px);
   }
 
   /* Empty State */
@@ -615,7 +581,7 @@
   }
 
   .gov-empty-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--gov-secondary);
     opacity: 0.5;
     margin-bottom: 10px;
@@ -623,28 +589,28 @@
 
   /* Schedule Cards */
   .gov-schedule-card {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-left: 4px solid var(--gov-primary);
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--gov-primary);
     position: relative;
   }
 
   .gov-route {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .gov-route-point {
     background: var(--gov-primary);
-    color: var(--gov-secondary);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
   }
 
   .gov-schedule-meta {
@@ -655,9 +621,9 @@
 
   .gov-meta-chip {
     background: white;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -665,8 +631,8 @@
 
   .gov-delete-schedule {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     background: transparent;
     border: none;
     color: var(--gov-danger);
@@ -677,7 +643,6 @@
     .gov-stats-grid {
       grid-template-columns: repeat(2, 1fr);
     }
-
     .gov-duty-form {
       grid-template-columns: 1fr;
     }
@@ -687,13 +652,11 @@
     .gov-stats-grid {
       grid-template-columns: 1fr;
     }
-
     .gov-hero-actions {
       justify-content: flex-start;
     }
-
     .gov-hero-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
     }
   }
 </style>
@@ -844,7 +807,7 @@
                     <div class="gov-bus-number"><i class="bi bi-hash"></i>{{ bus.bus_number }}</div>
                   </div>
                 </div>
-              </td>
+               </div>
               <td>
                 {% if bus.driver_name %}
                   {{ bus.driver_name }}
@@ -909,10 +872,10 @@
                   </form>
                 </div>
                </div>
-             </tr>
+              </div>
             {% endfor %}
           </tbody>
-        </table>
+         </div>
       </div>
       {% else %}
       <div class="gov-empty-state">
@@ -927,96 +890,94 @@
     </div>
 
     <!-- Conductor Management Card -->
-    <!-- Conductor Management Card -->
-<div class="gov-main-card">
-  <div class="gov-card-header">
-    <h5 class="gov-card-title"><i class="bi bi-people-fill"></i> Conductors List</h5>
-    <a href="{% url 'owner_add_conductor' %}" class="gov-header-register-btn">
-      <i class="bi bi-plus-circle-fill"></i> Add Conductor
-    </a>
-  </div>
-  {% if conductors %}
-  <div class="gov-table-container">
-    <table class="gov-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Contact</th>
-          <th>Assigned Bus</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for conductor in conductors %}
-        <tr>
-          <td><strong>{{ conductor.employee_id }}</strong> </div>
-          <td>
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div class="gov-conductor-avatar">
-                {{ conductor.user.first_name|first|upper }}{{ conductor.user.last_name|first|upper }}
-              </div>
-              <div>
-                <strong>{{ conductor.user.get_full_name }}</strong><br>
-                <small class="text-muted">@{{ conductor.user.username }}</small>
-              </div>
-            </div>
-           </div>
-          <td>{{ conductor.phone }} </div>
-          <td>
-            {% with assigned_bus=conductor.assigned_bus %}
-              {% if assigned_bus %}
-                <span class="gov-status-badge gov-status-active">
-                  <i class="bi bi-bus-front"></i> {{ assigned_bus.bus_name }} ({{ assigned_bus.bus_number }})
-                </span>
-              {% else %}
-                <span class="gov-status-badge gov-status-inactive">Not Assigned</span>
-              {% endif %}
-            {% endwith %}
-           </div>
-          <td>
-            {% if conductor.is_active %}
-              <span class="gov-status-badge gov-status-active">Active</span>
-            {% else %}
-              <span class="gov-status-badge gov-status-inactive">Inactive</span>
-            {% endif %}
-           </div>
-          <td>
-            <div style="display: flex; gap: 8px; flex-direction: column;">
-              <a href="{% url 'owner_edit_conductor' conductor.id %}" class="gov-action-btn gov-action-edit">
-                <i class="bi bi-pencil"></i> Edit
-              </a>
-              {% with assigned_bus=conductor.assigned_bus %}
-                {% if assigned_bus %}
-                  <!-- Remove the onclick confirm and let the URL handle it -->
-                  <a href="{% url 'owner_unassign_conductor' conductor.id %}" class="gov-action-btn gov-action-danger">
-                    <i class="bi bi-x-circle"></i> Remove from Bus
-                  </a>
+    <div class="gov-main-card">
+      <div class="gov-card-header">
+        <h5 class="gov-card-title"><i class="bi bi-people-fill"></i> Conductors List</h5>
+        <a href="{% url 'owner_add_conductor' %}" class="gov-header-register-btn">
+          <i class="bi bi-plus-circle-fill"></i> Add Conductor
+        </a>
+      </div>
+      {% if conductors %}
+      <div class="gov-table-container">
+        <table class="gov-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Contact</th>
+              <th>Assigned Bus</th>
+              <th>Status</th>
+              <th>Actions</th>
+             </div>
+          </thead>
+          <tbody>
+            {% for conductor in conductors %}
+             </div>
+              <td><strong>{{ conductor.employee_id }}</strong> </div>
+              <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="gov-conductor-avatar">
+                    {{ conductor.user.first_name|first|upper }}{{ conductor.user.last_name|first|upper }}
+                  </div>
+                  <div>
+                    <strong>{{ conductor.user.get_full_name }}</strong><br>
+                    <small class="text-muted">@{{ conductor.user.username }}</small>
+                  </div>
+                </div>
+               </div>
+              <td>{{ conductor.phone }} </div>
+              <td>
+                {% with assigned_bus=conductor.assigned_bus %}
+                  {% if assigned_bus %}
+                    <span class="gov-status-badge gov-status-active">
+                      <i class="bi bi-bus-front"></i> {{ assigned_bus.bus_name }}
+                    </span>
+                  {% else %}
+                    <span class="gov-status-badge gov-status-inactive">Not Assigned</span>
+                  {% endif %}
+                {% endwith %}
+               </div>
+              <td>
+                {% if conductor.is_active %}
+                  <span class="gov-status-badge gov-status-active">Active</span>
                 {% else %}
-                  <a href="{% url 'owner_assign_duty' %}" class="gov-action-btn gov-action-primary">
-                    <i class="bi bi-plus-circle"></i> Assign to Bus
-                  </a>
+                  <span class="gov-status-badge gov-status-inactive">Inactive</span>
                 {% endif %}
-              {% endwith %}
-            </div>
-           </div>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}
-  <div class="gov-empty-state">
-    <i class="bi bi-people gov-empty-icon"></i>
-    <h4>No Conductors</h4>
-    <p>Add your first conductor</p>
-    <a href="{% url 'owner_add_conductor' %}" class="gov-action-btn gov-action-primary" style="width: auto; display: inline-flex;">
-      Add Conductor
-    </a>
-  </div>
-  {% endif %}
-</div>
+               </div>
+              <td>
+                <div style="display: flex; gap: 6px; flex-direction: column;">
+                  <a href="{% url 'owner_edit_conductor' conductor.id %}" class="gov-action-btn gov-action-edit">
+                    <i class="bi bi-pencil"></i> Edit
+                  </a>
+                  {% with assigned_bus=conductor.assigned_bus %}
+                    {% if assigned_bus %}
+                      <a href="{% url 'owner_unassign_conductor' conductor.id %}" class="gov-action-btn gov-action-danger">
+                        <i class="bi bi-x-circle"></i> Remove from Bus
+                      </a>
+                    {% else %}
+                      <a href="{% url 'owner_assign_duty' %}" class="gov-action-btn gov-action-primary">
+                        <i class="bi bi-plus-circle"></i> Assign to Bus
+                      </a>
+                    {% endif %}
+                  {% endwith %}
+                </div>
+               </div>
+             </div>
+            {% endfor %}
+          </tbody>
+         </div>
+      </div>
+      {% else %}
+      <div class="gov-empty-state">
+        <i class="bi bi-people gov-empty-icon"></i>
+        <h4>No Conductors</h4>
+        <p>Add your first conductor</p>
+        <a href="{% url 'owner_add_conductor' %}" class="gov-action-btn gov-action-primary" style="width: auto; display: inline-flex;">
+          Add Conductor
+        </a>
+      </div>
+      {% endif %}
+    </div>
 
   </div>
 </div>
@@ -1025,8 +986,11 @@
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
       document.querySelectorAll('.gov-alert').forEach(function (alert) {
+        alert.style.transition = 'opacity 0.5s ease';
         alert.style.opacity = '0';
-        setTimeout(function () { alert.style.display = 'none'; }, 500);
+        setTimeout(function () { 
+          if (alert) alert.style.display = 'none'; 
+        }, 500);
       });
     }, 5000);
   });

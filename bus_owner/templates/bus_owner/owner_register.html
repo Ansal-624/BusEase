@@ -3,13 +3,13 @@
 
 {% block content %}
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -24,24 +24,11 @@
 
   .gov-register-page {
     min-height: calc(100vh - 80px);
-    background: #f5f7fa;
+    background: #eef2f5;
     padding: 40px 0;
     display: flex;
     align-items: center;
     position: relative;
-  }
-
-  /* Government Background Watermark */
-  .gov-register-page::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-15deg);
-    width: 800px;
-    height: 800px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
-    pointer-events: none;
   }
 
   .gov-register-container {
@@ -60,36 +47,32 @@
   }
 
   .gov-header-icon {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     background: var(--gov-gradient);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 15px;
-    border: 3px solid var(--gov-secondary);
-    box-shadow: 0 10px 25px rgba(0,51,102,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
   .gov-header-icon i {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--gov-secondary);
   }
 
   .gov-header-title {
-    font-size: 2.2rem;
-    font-weight: 800;
+    font-size: 1.8rem;
+    font-weight: 600;
     color: var(--gov-primary);
-    margin: 0 0 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'Times New Roman', serif;
+    margin: 0 0 8px;
   }
 
   .gov-header-subtitle {
     color: #666;
-    font-size: 1rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,52 +86,17 @@
   /* Form Card */
   .gov-form-card {
     background: white;
-    border-radius: 30px;
-    padding: 45px;
-    box-shadow: 0 25px 50px rgba(0,51,102,0.25);
-    border: 2px solid var(--gov-primary);
-    position: relative;
-    overflow: hidden;
-    animation: govSlideUp 0.6s ease-out;
-  }
-
-  @keyframes govSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .gov-form-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: linear-gradient(90deg, var(--gov-primary), var(--gov-secondary), var(--gov-primary));
-  }
-
-  .gov-form-card::after {
-    content: '';
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 150px;
-    height: 150px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
-    pointer-events: none;
+    border-radius: 6px;
+    padding: 30px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
   }
 
   /* Form Sections */
   .gov-form-section {
-    margin-bottom: 30px;
-    padding-bottom: 25px;
-    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
   }
 
   .gov-form-section:last-child {
@@ -160,47 +108,40 @@
   .gov-section-title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 25px;
+    gap: 8px;
+    margin-bottom: 20px;
   }
 
   .gov-section-title i {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--gov-secondary);
-    background: var(--gov-primary);
-    padding: 10px;
-    border-radius: 12px;
   }
 
   .gov-section-title h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     color: var(--gov-primary);
     margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
   /* Form Groups */
   .gov-form-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .gov-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 600;
+    gap: 6px;
+    font-weight: 500;
     color: var(--gov-primary);
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
   }
 
   .gov-label i {
     color: var(--gov-secondary);
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .gov-required {
@@ -210,84 +151,76 @@
 
   .gov-input {
     width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #dee2e6;
-    border-radius: 14px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
   }
 
   .gov-input:focus {
     border-color: var(--gov-primary);
-    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    box-shadow: 0 0 0 2px rgba(0,105,92,0.1);
     outline: none;
-    background: white;
   }
 
   .gov-input::placeholder {
-    color: #999;
-    font-style: italic;
+    color: #bbb;
+    font-size: 0.85rem;
   }
 
   .gov-textarea {
     width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #dee2e6;
-    border-radius: 14px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: white;
     resize: vertical;
-    min-height: 100px;
+    min-height: 80px;
   }
 
   .gov-textarea:focus {
     border-color: var(--gov-primary);
-    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    box-shadow: 0 0 0 2px rgba(0,105,92,0.1);
     outline: none;
-    background: white;
   }
 
   /* File Upload */
   .gov-file-upload {
-    border: 2px dashed var(--gov-primary);
-    border-radius: 14px;
-    padding: 20px;
+    border: 1px dashed var(--gov-primary);
+    border-radius: 4px;
+    padding: 15px;
     text-align: center;
     background: #f8f9fa;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     position: relative;
   }
 
   .gov-file-upload:hover {
-    background: #e9ecef;
+    background: var(--gov-light);
     border-color: var(--gov-secondary);
   }
 
   .gov-file-upload i {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--gov-secondary);
-    background: var(--gov-primary);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 10px;
+    margin-bottom: 8px;
   }
 
   .gov-file-upload p {
     color: var(--gov-primary);
-    font-weight: 600;
+    font-weight: 500;
     margin: 0 0 5px;
+    font-size: 0.85rem;
   }
 
   .gov-file-upload small {
-    color: #666;
-    font-size: 0.8rem;
+    color: #888;
+    font-size: 0.7rem;
   }
 
   .gov-file-input {
@@ -302,15 +235,14 @@
 
   /* File Preview */
   .gov-file-preview {
-    margin-top: 10px;
-    padding: 10px 15px;
-    background: #f0f4ff;
-    border-radius: 10px;
-    border-left: 4px solid var(--gov-secondary);
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: var(--gov-light);
+    border-radius: 4px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
+    gap: 8px;
+    font-size: 0.75rem;
     color: var(--gov-primary);
   }
 
@@ -318,105 +250,110 @@
     color: var(--gov-secondary);
   }
 
+  /* Checkbox */
+  .gov-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .gov-checkbox input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .gov-checkbox label {
+    color: #666;
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  .gov-checkbox a {
+    color: var(--gov-primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .gov-checkbox a:hover {
+    text-decoration: underline;
+  }
+
   /* Submit Button */
   .gov-submit-btn {
-    background: var(--gov-gradient);
+    background: var(--gov-primary);
     color: white;
-    border: 3px solid var(--gov-secondary);
-    border-radius: 50px;
-    padding: 18px 30px;
-    font-size: 1.2rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: all 0.3s ease;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
     cursor: pointer;
     width: 100%;
-    margin-top: 30px;
-    position: relative;
-    overflow: hidden;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-  }
-
-  .gov-submit-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
-    transition: left 0.5s ease;
+    gap: 8px;
   }
 
   .gov-submit-btn:hover {
-    background: linear-gradient(135deg, #002244, #001122);
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0,51,102,0.4);
-  }
-
-  .gov-submit-btn:hover::before {
-    left: 100%;
+    background: var(--gov-accent);
+    transform: translateY(-2px);
   }
 
   .gov-submit-btn i {
-    color: var(--gov-secondary);
-    font-size: 1.3rem;
+    font-size: 1rem;
   }
 
   /* Login Link */
   .gov-login-link {
     text-align: center;
-    margin-top: 25px;
-    padding: 15px;
+    margin-top: 20px;
+    padding: 12px;
     background: #f8f9fa;
-    border-radius: 12px;
-    border: 1px dashed var(--gov-primary);
+    border-radius: 4px;
   }
 
   .gov-login-link p {
     margin: 0;
     color: #666;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
   }
 
   .gov-login-link a {
     color: var(--gov-primary);
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 500;
     margin-left: 5px;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
   }
 
   .gov-login-link a:hover {
-    color: var(--gov-secondary);
     text-decoration: underline;
   }
 
   /* Alert Messages */
   .gov-alert {
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
-    border-radius: 8px;
-    padding: 12px 15px;
+    background: #fff8e1;
+    border-left: 3px solid #ffc107;
+    border-radius: 4px;
+    padding: 10px 15px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
     color: #856404;
+    font-size: 0.85rem;
   }
 
   .gov-alert i {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .gov-alert-success {
-    background: #d4edda;
+    background: #e8f5e9;
     border-left-color: #28a745;
     color: #155724;
   }
@@ -424,57 +361,43 @@
   /* Loading State */
   .gov-submit-btn.loading {
     pointer-events: none;
-    opacity: 0.8;
-    color: transparent;
-    position: relative;
+    opacity: 0.7;
   }
 
-  .gov-submit-btn.loading::after {
-    content: '';
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    top: 50%;
-    left: 50%;
-    margin-left: -12.5px;
-    margin-top: -12.5px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-top-color: var(--gov-secondary);
-    border-radius: 50%;
-    animation: govSpin 0.8s linear infinite;
+  /* Help Text */
+  .gov-help-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.7rem;
+    color: #888;
   }
 
-  @keyframes govSpin {
-    to { transform: rotate(360deg); }
+  .gov-help-text i {
+    color: var(--gov-secondary);
+  }
+
+  /* Footer Note */
+  .gov-footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.7rem;
+    color: #999;
   }
 
   /* Responsive */
   @media (max-width: 768px) {
     .gov-form-card {
-      padding: 30px 25px;
+      padding: 20px;
     }
-
     .gov-header-title {
-      font-size: 1.8rem;
+      font-size: 1.4rem;
     }
-
-    .gov-section-title h3 {
-      font-size: 1.1rem;
+    .gov-header-icon {
+      width: 60px;
+      height: 60px;
     }
-  }
-
-  @media (max-width: 576px) {
-    .gov-form-card {
-      padding: 25px 20px;
-    }
-
-    .gov-header-title {
-      font-size: 1.5rem;
-    }
-
-    .gov-submit-btn {
-      font-size: 1rem;
-      padding: 15px 20px;
+    .gov-header-icon i {
+      font-size: 2rem;
     }
   }
 </style>
@@ -491,7 +414,6 @@
       <p class="gov-header-subtitle">
         <i class="bi bi-shield-check"></i>
         Register as a government-approved transport operator
-        <i class="bi bi-shield-check"></i>
       </p>
     </div>
 
@@ -539,10 +461,10 @@
               Password <span class="gov-required">*</span>
             </label>
             <input type="password" name="password" class="gov-input" placeholder="Create a secure password" required>
-            <small class="text-muted" style="display: block; margin-top: 5px;">
-              <i class="bi bi-info-circle" style="color: var(--gov-secondary);"></i>
+            <div class="gov-help-text">
+              <i class="bi bi-info-circle"></i>
               Minimum 8 characters with mix of letters and numbers
-            </small>
+            </div>
           </div>
         </div>
 
@@ -623,11 +545,11 @@
 
         <!-- Terms and Conditions -->
         <div class="gov-form-section">
-          <div class="gov-checkbox" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-            <input type="checkbox" id="terms" required style="width: 18px; height: 18px; border: 2px solid var(--gov-primary); border-radius: 4px;">
-            <label for="terms" style="color: #666; font-size: 0.95rem;">
-              I agree to the <a href="#" style="color: var(--gov-primary); font-weight: 600;">Terms of Service</a> and 
-              <a href="#" style="color: var(--gov-primary); font-weight: 600;">Privacy Policy</a> of the transport department
+          <div class="gov-checkbox">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">
+              I agree to the <a href="#">Terms of Service</a> and 
+              <a href="#">Privacy Policy</a> of the transport department
             </label>
           </div>
         </div>
@@ -636,7 +558,6 @@
         <button type="submit" class="gov-submit-btn" id="submitBtn">
           <i class="bi bi-check-circle"></i>
           Register as Owner
-          <i class="bi bi-shield-check"></i>
         </button>
 
         <!-- Login Link -->
@@ -650,16 +571,16 @@
     </div>
 
     <!-- Footer Note -->
-    <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; color: #999;">
+    <div class="gov-footer-note">
       <i class="bi bi-shield-check" style="color: var(--gov-secondary);"></i>
       Registration is subject to verification by the transport department
-    </p>
+    </div>
 
   </div>
 </div>
 
 <script>
-  // File preview functionality
+  // Owner Photo Preview
   document.getElementById('ownerPhoto').addEventListener('change', function(e) {
     const preview = document.getElementById('ownerPhotoPreview');
     const fileName = document.getElementById('ownerPhotoName');
@@ -672,6 +593,7 @@
     }
   });
 
+  // Business License Preview
   document.getElementById('businessLicense').addEventListener('change', function(e) {
     const preview = document.getElementById('licensePreview');
     const fileName = document.getElementById('licenseName');
@@ -684,6 +606,7 @@
     }
   });
 
+  // ID Proof Preview
   document.getElementById('idProof').addEventListener('change', function(e) {
     const preview = document.getElementById('idPreview');
     const fileName = document.getElementById('idName');
@@ -712,9 +635,13 @@
   // Auto-hide alerts after 5 seconds
   setTimeout(function() {
     document.querySelectorAll('.gov-alert').forEach(alert => {
-      alert.style.transition = 'opacity 0.5s ease';
-      alert.style.opacity = '0';
-      setTimeout(() => alert.style.display = 'none', 500);
+      if (alert) {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => {
+          if (alert) alert.style.display = 'none';
+        }, 500);
+      }
     });
   }, 5000);
 </script>

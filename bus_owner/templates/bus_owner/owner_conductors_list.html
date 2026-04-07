@@ -3,9 +3,22 @@
 
 {% block content %}
 <style>
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
   .gov-conductors-page {
     padding: 20px 0 40px;
-    background: #f5f7fa;
+    background: #eef2f5;
     min-height: calc(100vh - 80px);
   }
   
@@ -17,24 +30,52 @@
   
   .gov-hero-section {
     background: var(--gov-gradient);
-    border-radius: 24px;
-    padding: 40px;
+    border-radius: 8px;
+    padding: 30px 35px;
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
-    border: 3px solid var(--gov-secondary);
+    border-bottom: 3px solid var(--gov-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .gov-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,143,0,0.08);
+    border-radius: 50%;
+  }
+  
+  .gov-hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,143,0,0.05);
+    border-radius: 50%;
   }
   
   .gov-hero-title {
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: 1.6rem;
+    font-weight: 600;
     color: white;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .gov-hero-title i {
+    color: var(--gov-secondary);
+    margin-right: 8px;
   }
   
   .gov-hero-subtitle {
     color: rgba(255,255,255,0.9);
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
   
   .gov-stats-grid {
@@ -44,50 +85,73 @@
     margin-bottom: 30px;
   }
   
+  @media (max-width: 992px) {
+    .gov-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .gov-stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
   .gov-stat-card {
     background: white;
-    border-radius: 16px;
-    padding: 25px;
+    border-radius: 6px;
+    padding: 18px;
     border: 1px solid #e0e0e0;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
+    transition: all 0.2s ease;
+  }
+  
+  .gov-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,105,92,0.15);
+    border-color: var(--gov-primary);
   }
   
   .gov-stat-icon {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     background: var(--gov-gradient);
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--gov-secondary);
   }
   
   .gov-stat-icon i {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--gov-secondary);
   }
   
   .gov-stat-number {
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: 1.6rem;
+    font-weight: 600;
     color: var(--gov-primary);
+  }
+  
+  .gov-stat-label {
+    color: #666;
+    font-size: 0.7rem;
   }
   
   .gov-main-card {
     background: white;
-    border-radius: 24px;
+    border-radius: 6px;
     overflow: hidden;
     border: 1px solid #e0e0e0;
     margin-bottom: 30px;
   }
   
   .gov-card-header {
-    background: var(--gov-gradient);
-    padding: 20px 25px;
-    border-bottom: 3px solid var(--gov-secondary);
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-primary);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -96,23 +160,36 @@
   }
   
   .gov-card-header h3 {
-    color: white;
+    color: var(--gov-primary);
     margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+  }
+  
+  .gov-card-header h3 i {
+    color: var(--gov-secondary);
   }
   
   .gov-btn-primary {
-    background: var(--gov-secondary);
-    color: var(--gov-primary);
-    padding: 10px 20px;
-    border-radius: 30px;
+    background: var(--gov-primary);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 4px;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+  }
+  
+  .gov-btn-primary:hover {
+    background: var(--gov-accent);
+    transform: translateY(-2px);
   }
   
   .gov-table {
@@ -121,26 +198,37 @@
   }
   
   .gov-table th {
-    background: #f0f4ff;
-    color: var(--gov-primary);
-    padding: 15px;
+    background: #f5f5f5;
+    color: #333;
+    padding: 12px 12px;
     text-align: left;
     font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--gov-primary);
   }
   
   .gov-table td {
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
     vertical-align: middle;
+    font-size: 0.85rem;
   }
   
   .gov-table tr:hover {
-    background: #f8f9fa;
+    background: #f9f9f9;
+  }
+  
+  @media (max-width: 992px) {
+    .gov-table td {
+      min-width: 150px;
+    }
   }
   
   .gov-conductor-avatar {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     background: var(--gov-gradient);
     border-radius: 50%;
     display: flex;
@@ -148,15 +236,15 @@
     justify-content: center;
     color: var(--gov-secondary);
     font-weight: 600;
-    border: 2px solid var(--gov-secondary);
+    font-size: 0.8rem;
   }
   
   .gov-status-active {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 500;
     background: rgba(40, 167, 69, 0.15);
     color: #28a745;
     border: 1px solid #28a745;
@@ -164,10 +252,10 @@
   
   .gov-status-inactive {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 500;
     background: rgba(108, 117, 125, 0.15);
     color: #6c757d;
     border: 1px solid #6c757d;
@@ -175,10 +263,10 @@
   
   .gov-duty-status {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 500;
   }
   
   .gov-duty-active {
@@ -201,9 +289,10 @@
   
   .gov-duty-card {
     background: #f8f9fa;
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 10px;
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--gov-primary);
   }
   
   .gov-duty-card:last-child {
@@ -211,85 +300,100 @@
   }
   
   .gov-duty-bus {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--gov-primary);
-    margin-bottom: 5px;
+    margin-bottom: 4px;
+    font-size: 0.8rem;
   }
   
   .gov-duty-time {
     font-size: 0.7rem;
-    color: #666;
-  }
-  
-  .gov-action-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  
-  .gov-action-btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    text-decoration: none;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .gov-action-edit {
-    background: var(--gov-primary);
-    color: var(--gov-secondary);
-    border: 1px solid var(--gov-secondary);
-  }
-  
-  .gov-action-delete {
-    background: var(--gov-danger);
-    color: white;
-  }
-  
-  .gov-action-duty {
-    background: var(--gov-info);
-    color: white;
-  }
-  
-  .gov-action-cancel {
-    background: var(--gov-warning);
-    color: var(--gov-primary);
-  }
-  
-  .gov-duty-actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 8px;
-  }
-  
-  .gov-empty-state {
-    text-align: center;
-    padding: 60px;
+    color: #888;
   }
   
   .gov-duty-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-top: 6px;
   }
   
-  @media (max-width: 992px) {
-    .gov-stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .gov-table td {
-      min-width: 200px;
-    }
+  .gov-duty-actions {
+    margin-top: 0;
+    display: flex;
+    gap: 5px;
   }
   
-  @media (max-width: 768px) {
-    .gov-stats-grid {
-      grid-template-columns: 1fr;
-    }
+  .gov-action-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  
+  .gov-action-btn {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+  }
+  
+  .gov-action-edit {
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+  }
+  
+  .gov-action-edit:hover {
+    background: var(--gov-accent);
+  }
+  
+  .gov-action-delete {
+    background: var(--gov-danger);
+    color: white;
+    border: none;
+  }
+  
+  .gov-action-delete:hover {
+    background: #c82333;
+  }
+  
+  .gov-action-cancel {
+    background: #ffc107;
+    color: #333;
+    border: none;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+  
+  .gov-action-cancel:hover {
+    background: #e0a800;
+  }
+  
+  .gov-empty-state {
+    text-align: center;
+    padding: 50px 20px;
+  }
+  
+  .gov-empty-icon {
+    font-size: 3rem;
+    color: var(--gov-secondary);
+    margin-bottom: 15px;
+  }
+  
+  .gov-empty-state h3 {
+    color: var(--gov-primary);
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+  
+  .text-muted {
+    color: #888 !important;
+    font-size: 0.75rem;
   }
 </style>
 
@@ -314,7 +418,7 @@
         </div>
         <div>
           <div class="gov-stat-number">{{ total_conductors }}</div>
-          <div style="color: #666;">Total Conductors</div>
+          <div class="gov-stat-label">Total Conductors</div>
         </div>
       </div>
       <div class="gov-stat-card">
@@ -323,7 +427,7 @@
         </div>
         <div>
           <div class="gov-stat-number">{{ active_conductors }}</div>
-          <div style="color: #666;">Active Conductors</div>
+          <div class="gov-stat-label">Active Conductors</div>
         </div>
       </div>
       <div class="gov-stat-card">
@@ -332,7 +436,7 @@
         </div>
         <div>
           <div class="gov-stat-number">{{ on_duty_today|default:"0" }}</div>
-          <div style="color: #666;">On Duty Today</div>
+          <div class="gov-stat-label">On Duty Today</div>
         </div>
       </div>
       <div class="gov-stat-card">
@@ -341,7 +445,7 @@
         </div>
         <div>
           <div class="gov-stat-number">{{ total_duties|default:"0" }}</div>
-          <div style="color: #666;">Total Duties</div>
+          <div class="gov-stat-label">Total Duties</div>
         </div>
       </div>
     </div>
@@ -378,24 +482,24 @@
           <tbody>
             {% for conductor in conductors %}
             <tr>
-              <td><strong>{{ conductor.employee_id }}</strong></td>
+              <td><strong>{{ conductor.employee_id }}</strong></div>
               <td>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
                   <div class="gov-conductor-avatar">
                     {{ conductor.user.first_name|first|upper }}{{ conductor.user.last_name|first|upper }}
                   </div>
                   {{ conductor.user.get_full_name }}
                 </div>
-              </td>
-              <td>{{ conductor.phone }}</td>
-              <td>{{ conductor.user.email }}</td>
+               </div>
+              <td>{{ conductor.phone }}</div>
+              <td>{{ conductor.user.email }}</div>
               <td>
                 {% if conductor.is_active %}
                   <span class="gov-status-active">Active</span>
                 {% else %}
                   <span class="gov-status-inactive">Inactive</span>
                 {% endif %}
-              </td>
+               </div>
               <td>
                 {% with duties=conductor.duties.all|dictsortreversed:"duty_date" %}
                   {% if duties %}
@@ -420,7 +524,7 @@
                           {% endif %}
                           <div class="gov-duty-actions">
                             <a href="{% url 'owner_cancel_duty' duty.id %}" class="gov-action-btn gov-action-cancel" 
-                               onclick="return confirm('Cancel this duty assignment?')" style="padding: 4px 8px;">
+                               onclick="return confirm('Cancel this duty assignment?')">
                               <i class="bi bi-x-circle"></i> Cancel
                             </a>
                           </div>
@@ -434,7 +538,7 @@
                     <span class="text-muted">No duties assigned</span>
                   {% endif %}
                 {% endwith %}
-              </td>
+               </div>
               <td>
                 <div class="gov-action-group">
                   <a href="{% url 'owner_edit_conductor' conductor.id %}" class="gov-action-btn gov-action-edit">
@@ -445,16 +549,18 @@
                     <i class="bi bi-trash"></i> Delete
                   </a>
                 </div>
-              </td>
-            </tr>
+               </div>
+             </div>
             {% endfor %}
           </tbody>
-        </table>
+        </div>
       {% else %}
         <div class="gov-empty-state">
-          <i class="bi bi-people" style="font-size: 4rem; color: var(--gov-secondary);"></i>
-          <h3 style="color: var(--gov-primary); margin-top: 20px;">No Conductors Yet</h3>
-          <p style="color: #666;">Start by adding your first conductor to the fleet.</p>
+          <div class="gov-empty-icon">
+            <i class="bi bi-people"></i>
+          </div>
+          <h3>No Conductors Yet</h3>
+          <p style="color: #888;">Start by adding your first conductor to the fleet.</p>
           <a href="{% url 'owner_add_conductor' %}" class="gov-btn-primary" style="margin-top: 20px; display: inline-block;">
             <i class="bi bi-plus-circle"></i> Add First Conductor
           </a>

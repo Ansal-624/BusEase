@@ -1,12 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Government Login - BusEase{% endblock %}
+
 {% block content %}
 
 <style>
-  /* Government Style Theme */
+  /* Teal & Orange Government Theme */
+  :root {
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    --gov-success: #28a745;
+    --gov-warning: #ffc107;
+    --gov-danger: #dc3545;
+    --gov-info: #17a2b8;
+  }
+
   .gov-wrapper {
     min-height: calc(100vh - 200px);
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    background: #f5f5f5;
     padding: 40px 20px;
     display: flex;
     align-items: center;
@@ -23,7 +37,7 @@
     transform: translate(-50%, -50%);
     width: 600px;
     height: 600px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%2300695c"/></svg>') center/contain no-repeat;
     pointer-events: none;
   }
 
@@ -39,31 +53,31 @@
     text-align: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 2px solid #003366;
+    border-bottom: 2px solid var(--gov-primary);
   }
 
   .gov-emblem {
     width: 80px;
     height: 80px;
     margin: 0 auto 15px;
-    background: #003366;
+    background: var(--gov-primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid #FFD700;
-    box-shadow: 0 4px 12px rgba(0,51,102,0.2);
+    border: 3px solid var(--gov-secondary);
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
   }
 
   .gov-emblem i {
     font-size: 40px;
-    color: #FFD700;
+    color: var(--gov-secondary);
   }
 
   .gov-title {
     font-size: 24px;
     font-weight: 700;
-    color: #003366;
+    color: var(--gov-primary);
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 5px;
@@ -79,8 +93,8 @@
   }
 
   .gov-badge {
-    background: #003366;
-    color: #FFD700;
+    background: var(--gov-primary);
+    color: var(--gov-secondary);
     padding: 5px 15px;
     border-radius: 30px;
     font-size: 12px;
@@ -94,9 +108,9 @@
   /* Official Login Card */
   .gov-card {
     background: white;
-    border-radius: 15px;
+    border-radius: 6px;
     padding: 40px 35px;
-    box-shadow: 0 20px 40px rgba(0,51,102,0.15);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     border: 1px solid #e0e0e0;
     position: relative;
   }
@@ -107,28 +121,17 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 5px;
-    background: linear-gradient(90deg, #003366, #FFD700, #003366);
-  }
-
-  .gov-card::after {
-    content: '';
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    width: 60px;
-    height: 60px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
-    opacity: 0.1;
+    height: 4px;
+    background: var(--gov-gradient);
   }
 
   /* Security Notice */
   .gov-security-notice {
-    background: #f8f9fa;
-    border-left: 4px solid #003366;
+    background: var(--gov-light);
+    border-left: 4px solid var(--gov-primary);
     padding: 15px;
     margin-bottom: 25px;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 13px;
     color: #495057;
     display: flex;
@@ -137,20 +140,20 @@
   }
 
   .gov-security-notice i {
-    color: #003366;
+    color: var(--gov-primary);
     font-size: 20px;
   }
 
   .gov-security-notice strong {
-    color: #003366;
+    color: var(--gov-primary);
   }
 
   /* Form Labels - Official Style */
   .gov-form-label {
     font-weight: 600;
-    color: #003366;
+    color: var(--gov-primary);
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: flex;
@@ -159,27 +162,24 @@
   }
 
   .gov-form-label i {
-    color: #FFD700;
-    font-size: 16px;
-    background: #003366;
-    padding: 4px;
-    border-radius: 50%;
+    color: var(--gov-secondary);
+    font-size: 14px;
   }
 
   /* Form Controls */
   .gov-form-control {
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    padding: 12px 15px 12px 45px;
-    font-size: 15px;
-    transition: all 0.3s ease;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 15px 10px 45px;
+    font-size: 14px;
+    transition: all 0.2s ease;
     background: #fff;
     width: 100%;
   }
 
   .gov-form-control:focus {
-    border-color: #003366;
-    box-shadow: 0 0 0 3px rgba(0,51,102,0.1);
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
     outline: none;
   }
 
@@ -192,8 +192,8 @@
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #003366;
-    font-size: 18px;
+    color: var(--gov-primary);
+    font-size: 16px;
     z-index: 10;
   }
 
@@ -205,57 +205,43 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #003366;
+    color: var(--gov-primary);
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     padding: 0;
     z-index: 10;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
   }
 
   .gov-password-toggle:hover {
-    color: #FFD700;
+    color: var(--gov-secondary);
   }
 
   /* Submit Button - Official Style */
   .gov-btn {
-    background: #003366;
+    background: var(--gov-primary);
     border: none;
-    border-radius: 8px;
-    padding: 15px;
-    font-size: 16px;
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-size: 14px;
     font-weight: 600;
     color: white;
     width: 100%;
     margin: 20px 0 15px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    position: relative;
-    overflow: hidden;
-    border: 2px solid #FFD700;
+    letter-spacing: 1px;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   .gov-btn:hover {
-    background: #002244;
+    background: var(--gov-accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,51,102,0.3);
-  }
-
-  .gov-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .gov-btn:hover::before {
-    left: 100%;
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
   }
 
   /* Checkbox - Official Style */
@@ -264,36 +250,36 @@
   }
 
   .gov-checkbox-input {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #003366;
-    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gov-primary);
+    border-radius: 3px;
     cursor: pointer;
     margin-right: 8px;
   }
 
   .gov-checkbox-input:checked {
-    background-color: #003366;
-    border-color: #003366;
+    background-color: var(--gov-primary);
+    border-color: var(--gov-primary);
   }
 
   .gov-checkbox-label {
     color: #495057;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
   }
 
   /* Links */
   .gov-forgot-link {
-    color: #003366;
+    color: var(--gov-primary);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease;
   }
 
   .gov-forgot-link:hover {
-    color: #FFD700;
+    color: var(--gov-secondary);
     text-decoration: underline;
   }
 
@@ -301,19 +287,19 @@
     text-align: center;
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 2px solid #e9ecef;
+    border-top: 1px solid #e9ecef;
   }
 
   .gov-register-link a {
-    color: #003366;
+    color: var(--gov-primary);
     text-decoration: none;
     font-weight: 600;
-    font-size: 15px;
-    transition: all 0.3s ease;
+    font-size: 14px;
+    transition: all 0.2s ease;
   }
 
   .gov-register-link a:hover {
-    color: #FFD700;
+    color: var(--gov-secondary);
   }
 
   /* Official Footer Information */
@@ -321,11 +307,11 @@
     margin-top: 25px;
     padding: 15px;
     background: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 4px;
     text-align: center;
-    font-size: 12px;
+    font-size: 11px;
     color: #666;
-    border: 1px dashed #003366;
+    border: 1px dashed var(--gov-primary);
   }
 
   .gov-footer-info p {
@@ -333,7 +319,7 @@
   }
 
   .gov-footer-info i {
-    color: #003366;
+    color: var(--gov-primary);
     margin: 0 5px;
   }
 
@@ -346,17 +332,17 @@
     margin-top: 20px;
     padding: 10px;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid #e0e0e0;
   }
 
   .gov-certificate i {
-    font-size: 24px;
-    color: #003366;
+    font-size: 20px;
+    color: var(--gov-primary);
   }
 
   .gov-certificate span {
-    font-size: 11px;
+    font-size: 10px;
     color: #666;
     line-height: 1.4;
   }
@@ -398,8 +384,8 @@
     left: 50%;
     margin-left: -10px;
     margin-top: -10px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-top-color: #FFD700;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gov-secondary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -416,10 +402,38 @@
 
   .gov-seal-text {
     font-size: 10px;
-    color: #003366;
+    color: var(--gov-primary);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
+  }
+
+  /* Alert styling */
+  .gov-alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .gov-alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: var(--gov-danger);
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: var(--gov-success);
+  }
+
+  i.bi {
+    font-size: 0.9rem;
   }
 </style>
 
@@ -441,6 +455,16 @@
     <!-- Login Card -->
     <div class="gov-card">
       
+      <!-- Display Django messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="gov-alert gov-alert-{{ message.tags }}">
+            <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
       <!-- Security Notice -->
       <div class="gov-security-notice">
         <i class="bi bi-shield-lock-fill"></i>

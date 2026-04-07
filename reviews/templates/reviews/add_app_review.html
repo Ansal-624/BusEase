@@ -4,13 +4,13 @@
 {% block content %}
 
 <style>
-  /* Government Transport Portal Theme */
+  /* Teal & Orange Government Theme */
   :root {
-    --gov-primary: #003366;
-    --gov-secondary: #FFD700;
-    --gov-accent: #002244;
-    --gov-light: #f0f4f8;
-    --gov-gradient: linear-gradient(135deg, #003366 0%, #002244 100%);
+    --gov-primary: #00695c;
+    --gov-secondary: #ff8f00;
+    --gov-accent: #004d40;
+    --gov-light: #e0f2f1;
+    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
     --gov-success: #28a745;
     --gov-warning: #ffc107;
     --gov-danger: #dc3545;
@@ -25,7 +25,7 @@
 
   .gov-review-page {
     min-height: calc(100vh - 80px);
-    background: #f5f7fa;
+    background: #eef2f5;
     padding: 40px 0;
     display: flex;
     align-items: center;
@@ -41,7 +41,7 @@
     transform: translate(-50%, -50%) rotate(-15deg);
     width: 800px;
     height: 800px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%2300695c"/></svg>') center/contain no-repeat;
     pointer-events: none;
   }
 
@@ -58,7 +58,7 @@
   .gov-review-card {
     background: white;
     border-radius: 30px;
-    box-shadow: 0 25px 50px rgba(0,51,102,0.25);
+    box-shadow: 0 25px 50px rgba(0,105,92,0.25);
     overflow: hidden;
     position: relative;
     animation: govSlideUp 0.6s ease-out;
@@ -93,7 +93,7 @@
     right: 20px;
     width: 150px;
     height: 150px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%23003366"/></svg>') center/contain no-repeat;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.02"><path d="M50 10 L61 35 L88 35 L66 52 L75 78 L50 63 L25 78 L34 52 L12 35 L39 35 L50 10" fill="%2300695c"/></svg>') center/contain no-repeat;
     pointer-events: none;
   }
 
@@ -114,7 +114,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(255,215,0,0.1);
+    background: rgba(255,143,0,0.1);
     border-radius: 50%;
   }
 
@@ -125,7 +125,7 @@
     left: -5%;
     width: 250px;
     height: 250px;
-    background: rgba(255,215,0,0.08);
+    background: rgba(255,143,0,0.08);
     border-radius: 50%;
   }
 
@@ -235,7 +235,7 @@
   .gov-star-rating input:checked ~ label {
     color: var(--gov-secondary);
     transform: scale(1.1);
-    text-shadow: 0 0 15px rgba(255,215,0,0.5);
+    text-shadow: 0 0 15px rgba(255,143,0,0.5);
   }
 
   .gov-star-hint {
@@ -286,7 +286,7 @@
 
   .gov-textarea:focus {
     border-color: var(--gov-primary);
-    box-shadow: 0 0 0 4px rgba(0,51,102,0.1);
+    box-shadow: 0 0 0 4px rgba(0,105,92,0.1);
     outline: none;
     background: white;
   }
@@ -326,14 +326,14 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,143,0,0.3), transparent);
     transition: left 0.5s ease;
   }
 
   .gov-submit-btn:hover {
-    background: linear-gradient(135deg, #002244, #001122);
+    background: linear-gradient(135deg, var(--gov-accent), #002a20);
     transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0,51,102,0.4);
+    box-shadow: 0 20px 40px rgba(0,105,92,0.4);
   }
 
   .gov-submit-btn:hover::before {
