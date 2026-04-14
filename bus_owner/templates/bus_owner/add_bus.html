@@ -1,573 +1,75 @@
-{% extends "base.html" %}
-{% load static %}
-{% block title %}Verify OTP - Government Transport Portal{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Register New Bus{% endblock %}
 
 {% block content %}
-<style>
-  /* Teal & Orange Government Theme */
-  :root {
-    --gov-primary: #00695c;
-    --gov-secondary: #ff8f00;
-    --gov-accent: #004d40;
-    --gov-light: #e0f2f1;
-    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
-    --gov-success: #28a745;
-    --gov-warning: #ffc107;
-    --gov-danger: #dc3545;
-    --gov-info: #17a2b8;
-  }
+<h2 class="mb-4 d-flex justify-content-between align-items-center">
+    Register a New Bus
+    <!-- 🔙 Back Button -->
+    <a href="javascript:history.back()" class="btn btn-secondary btn-sm">
+        ← Back
+    </a>
+</h2>
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
 
-  .gov-otp-page {
-    padding: 30px 0 50px;
-    background: #eef2f5;
-    min-height: calc(100vh - 80px);
-  }
-
-  .gov-container {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  /* Header Section */
-  .gov-header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-
-  .gov-title-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-
-  .gov-title-icon {
-    width: 50px;
-    height: 50px;
-    background: var(--gov-gradient);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .gov-title-icon i {
-    font-size: 1.5rem;
-    color: var(--gov-secondary);
-  }
-
-  .gov-title-text h1 {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: var(--gov-primary);
-    margin: 0 0 5px;
-  }
-
-  .gov-title-text p {
-    color: #666;
-    font-size: 0.85rem;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .gov-title-text p i {
-    color: var(--gov-secondary);
-  }
-
-  /* Back Button */
-  .gov-back-btn {
-    background: white;
-    border: 1px solid var(--gov-primary);
-    color: var(--gov-primary);
-    border-radius: 4px;
-    padding: 8px 20px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
-  }
-
-  .gov-back-btn:hover {
-    background: var(--gov-primary);
-    color: white;
-    transform: translateX(-3px);
-  }
-
-  /* Form Card */
-  .gov-form-card {
-    background: white;
-    border-radius: 6px;
-    padding: 35px 30px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    border: 1px solid #e0e0e0;
-    position: relative;
-  }
-
-  /* OTP Specific Styles */
-  .gov-otp-icon {
-    text-align: center;
-    margin-bottom: 25px;
-  }
-
-  .gov-otp-icon .icon-circle {
-    width: 80px;
-    height: 80px;
-    background: var(--gov-gradient);
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
-  }
-
-  .gov-otp-icon i {
-    font-size: 2.5rem;
-    color: var(--gov-secondary);
-  }
-
-  .gov-otp-title {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-
-  .gov-otp-title h2 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--gov-primary);
-    margin-bottom: 8px;
-  }
-
-  .gov-otp-title p {
-    color: #666;
-    font-size: 0.85rem;
-  }
-
-  /* Form Groups */
-  .gov-form-group {
-    margin-bottom: 25px;
-  }
-
-  .gov-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-weight: 600;
-    color: var(--gov-primary);
-    margin-bottom: 12px;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .gov-label i {
-    color: var(--gov-secondary);
-    font-size: 0.85rem;
-  }
-
-  .gov-otp-input {
-    width: 100%;
-    padding: 14px 18px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1.5rem;
-    text-align: center;
-    letter-spacing: 12px;
-    font-family: monospace;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    background: white;
-  }
-
-  .gov-otp-input:focus {
-    border-color: var(--gov-primary);
-    box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
-    outline: none;
-  }
-
-  .gov-otp-input::placeholder {
-    letter-spacing: normal;
-    color: #bbb;
-    font-size: 1rem;
-    font-family: system-ui;
-  }
-
-  .gov-hint {
-    text-align: center;
-    margin-top: 8px;
-    font-size: 0.7rem;
-    color: #888;
-  }
-
-  .gov-hint i {
-    font-size: 0.7rem;
-  }
-
-  /* Submit Button */
-  .gov-submit-btn {
-    background: var(--gov-primary);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 12px 24px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .gov-submit-btn:hover {
-    background: var(--gov-accent);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
-  }
-
-  .gov-submit-btn i {
-    font-size: 1rem;
-  }
-
-  /* Resend Section */
-  .gov-resend-section {
-    text-align: center;
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid #e0e0e0;
-  }
-
-  .gov-resend-text {
-    font-size: 0.85rem;
-    color: #666;
-    margin-bottom: 10px;
-  }
-
-  .gov-resend-link {
-    color: var(--gov-primary);
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 0.85rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .gov-resend-link:hover {
-    color: var(--gov-secondary);
-    text-decoration: underline;
-  }
-
-  .gov-resend-link.disabled {
-    color: #999 !important;
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-
-  /* Timer */
-  .gov-timer {
-    text-align: center;
-    margin-top: 12px;
-    font-size: 0.75rem;
-    color: #888;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .gov-timer i {
-    color: var(--gov-primary);
-    font-size: 0.75rem;
-  }
-
-  .gov-timer span {
-    font-weight: 600;
-    color: var(--gov-primary);
-  }
-
-  /* Alert Messages */
-  .gov-alert {
-    background: #fff8e1;
-    border-left: 3px solid #ffc107;
-    border-radius: 4px;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #856404;
-    font-size: 0.85rem;
-  }
-
-  .gov-alert i {
-    font-size: 1rem;
-  }
-
-  .gov-alert-success {
-    background: #d4edda;
-    border-left-color: var(--gov-success);
-    color: #155724;
-  }
-
-  .gov-alert-error {
-    background: #f8d7da;
-    border-left-color: var(--gov-danger);
-    color: #721c24;
-  }
-
-  .gov-alert-warning {
-    background: #fff3cd;
-    border-left-color: var(--gov-warning);
-    color: #856404;
-  }
-
-  .gov-alert-info {
-    background: #d1ecf1;
-    border-left-color: var(--gov-info);
-    color: #0c5460;
-  }
-
-  /* Loading State */
-  .gov-submit-btn.loading {
-    pointer-events: none;
-    opacity: 0.7;
-  }
-
-  /* Responsive */
-  @media (max-width: 576px) {
-    .gov-form-card {
-      padding: 25px 20px;
-    }
-    .gov-header-section {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .gov-title-text h1 {
-      font-size: 1.3rem;
-    }
-    .gov-otp-input {
-      letter-spacing: 8px;
-      font-size: 1.3rem;
-    }
-  }
-</style>
-
-<div class="gov-otp-page">
-  <div class="gov-container">
-
-    <!-- Header Section with Back Button -->
-    <div class="gov-header-section">
-      <div class="gov-title-wrapper">
-        <div class="gov-title-icon">
-          <i class="bi bi-envelope-check-fill"></i>
-        </div>
-        <div class="gov-title-text">
-          <h1>OTP Verification</h1>
-          <p>
-            <i class="bi bi-shield-check"></i>
-            Secure two-factor authentication
-          </p>
-        </div>
-      </div>
-      <a href="javascript:history.back()" class="gov-back-btn">
-        <i class="bi bi-arrow-left"></i> Back
-      </a>
+    <div class="mb-3">
+        <label for="bus_name">Bus Name</label>
+        <input type="text" name="bus_name" id="bus_name" class="form-control" required>
     </div>
 
-    <!-- Display Django messages -->
-    {% if messages %}
-      {% for message in messages %}
-        <div class="gov-alert gov-alert-{{ message.tags }}">
-          <i class="bi bi-{% if message.tags == 'error' %}exclamation-triangle-fill{% elif message.tags == 'success' %}check-circle-fill{% else %}info-circle-fill{% endif %}"></i>
-          <span>{{ message }}</span>
-        </div>
-      {% endfor %}
-    {% endif %}
-
-    <!-- Form Card -->
-    <div class="gov-form-card">
-      
-      <!-- OTP Icon -->
-      <div class="gov-otp-icon">
-        <div class="icon-circle">
-          <i class="bi bi-envelope-check-fill"></i>
-        </div>
-      </div>
-
-      <div class="gov-otp-title">
-        <h2>Verification Code</h2>
-        <p>Enter the 4-digit code sent to your registered email address</p>
-      </div>
-
-      <!-- OTP Form -->
-      <form method="POST" id="otpForm">
-        {% csrf_token %}
-
-        <div class="gov-form-group">
-          <label class="gov-label">
-            <i class="bi bi-shield-lock"></i> OTP Code
-          </label>
-          <input
-            type="text"
-            name="otp"
-            id="otpInput"
-            maxlength="4"
-            class="gov-otp-input"
-            placeholder="••••"
-            required
-            autofocus
-            pattern="[0-9]{4}"
-            title="Please enter a 4-digit OTP"
-          >
-          <div class="gov-hint">
-            <i class="bi bi-info-circle"></i> Enter the 4-digit verification code
-          </div>
-        </div>
-
-        <button type="submit" class="gov-submit-btn" id="verifyBtn">
-          <i class="bi bi-check-circle"></i> Verify OTP
-        </button>
-      </form>
-
-      <!-- Resend Section with Timer -->
-      <div class="gov-resend-section">
-        <div class="gov-resend-text">Didn't receive the code?</div>
-        <a href="{% url 'forgot_password' %}" id="resendLink" class="gov-resend-link">
-          <i class="bi bi-arrow-repeat"></i> Resend OTP
-        </a>
-        <div class="gov-timer" id="timerText">
-          <i class="bi bi-clock"></i>
-          <span>Resend available in <span id="timer">0:00</span></span>
-        </div>
-      </div>
-
+    <div class="mb-3">
+        <label for="bus_number">Bus Number</label>
+        <input type="text" name="bus_number" id="bus_number" class="form-control" required>
     </div>
-  </div>
-</div>
 
-<script>
-  // OTP input - restrict to numbers and auto-submit
-  const otpInput = document.getElementById('otpInput');
-  
-  otpInput.addEventListener('input', function(e) {
-    // Remove any non-digit characters
-    this.value = this.value.replace(/[^0-9]/g, '');
-    
-    // Auto-submit when 4 digits are entered
-    if (this.value.length === 4) {
-      document.getElementById('otpForm').submit();
-    }
-  });
-  
-  // Prevent letters from being typed
-  otpInput.addEventListener('keydown', function(e) {
-    // Allow backspace, delete, tab, escape, enter, arrow keys
-    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 
-                         'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-    
-    if (allowedKeys.includes(e.key)) {
-      return;
-    }
-    
-    // Allow numbers only
-    if (!/^[0-9]$/.test(e.key)) {
-      e.preventDefault();
-    }
-  });
-  
-  // Countdown timer for resend OTP
-  let timeLeft = 60; // 60 seconds countdown
-  const timerElement = document.getElementById('timer');
-  const resendLink = document.getElementById('resendLink');
-  const timerText = document.getElementById('timerText');
-  
-  function startTimer() {
-    const timer = setInterval(function() {
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        timerElement.textContent = '0:00';
-        timerText.style.display = 'none';
-        resendLink.classList.remove('disabled');
-        resendLink.style.pointerEvents = 'auto';
-        resendLink.style.opacity = '1';
-      } else {
-        timeLeft--;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        timerText.style.display = 'flex';
-        resendLink.classList.add('disabled');
-        resendLink.style.pointerEvents = 'none';
-        resendLink.style.opacity = '0.5';
-      }
-    }, 1000);
-  }
-  
-  // Start timer on page load
-  startTimer();
-  
-  // Form submission with loading state
-  document.getElementById('otpForm').addEventListener('submit', function(e) {
-    const verifyBtn = document.getElementById('verifyBtn');
-    const otpValue = otpInput.value;
-    
-    // Validate OTP is exactly 4 digits
-    if (otpValue.length !== 4) {
-      e.preventDefault();
-      alert('Please enter a valid 4-digit OTP');
-      otpInput.focus();
-      return;
-    }
-    
-    // Show loading state
-    verifyBtn.classList.add('loading');
-    verifyBtn.disabled = true;
-    verifyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Verifying...';
-  });
-  
-  // Prevent form resubmission on page refresh
-  if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-  }
-  
-  // Auto-focus on OTP field
-  document.addEventListener('DOMContentLoaded', function() {
-    if (otpInput) {
-      otpInput.focus();
-    }
-  });
-  
-  // Auto-hide alerts after 5 seconds
-  setTimeout(function() {
-    document.querySelectorAll('.gov-alert').forEach(alert => {
-      alert.style.transition = 'opacity 0.5s ease';
-      alert.style.opacity = '0';
-      setTimeout(() => {
-        if (alert) alert.style.display = 'none';
-      }, 500);
-    });
-  }, 5000);
-</script>
+    <div class="mb-3">
+        <label for="total_seats">Total Seats</label>
+        <input type="number" name="total_seats" id="total_seats" class="form-control" required>
+    </div>
 
+    <div class="mb-3">
+        <label for="owner_contact_number">Owner Contact Number</label>
+        <input type="text" name="owner_contact_number" id="owner_contact_number" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="driver_name">Driver’s Name</label>
+        <input type="text" name="driver_name" id="driver_name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="driver_contact_number">Driver’s Contact Number</label>
+        <input type="text" name="driver_contact_number" id="driver_contact_number" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="driver_license">Driver’s License</label>
+        <input type="file" name="driver_license" id="driver_license" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label for="registration_document">Vehicle Registration Document</label>
+        <input type="file" name="registration_document" id="registration_document" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label for="pollution_test_certificate">Pollution Test Certificate</label>
+        <input type="file" name="pollution_test_certificate" id="pollution_test_certificate" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label for="insurance_document">Insurance Document</label>
+        <input type="file" name="insurance_document" id="insurance_document" class="form-control">
+    </div>
+
+    <!-- 📸 Multiple Photos Upload -->
+    <div class="mb-3">
+        <label for="bus_photos">Upload Bus Photos (You can select multiple)</label>
+        <input type="file" name="bus_photos" id="bus_photos" class="form-control" accept="image/*" multiple>
+        <small class="text-muted">Supported formats: JPG, PNG</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit for Approval</button>
+</form>
 {% endblock %}

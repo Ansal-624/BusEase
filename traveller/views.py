@@ -114,10 +114,13 @@ def view_schedules(request, bus_id):
 
 
 from datetime import timedelta
+# Add this import at the top
+from .utils import is_segment_available, calculate_segment_fare, get_available_segments
+from .models import SeatSegment
+from django.db import transaction
 
 @login_required
 def book_bus(request, schedule_id):
-    """Book a bus seat with Razorpay payment"""
     schedule = get_object_or_404(
         BusSchedule.objects.select_related("bus", "route"),
         id=schedule_id
@@ -127,58 +130,76 @@ def book_bus(request, schedule_id):
     route = schedule.route
     photos = bus.photos.all()
 
-    # Stops
     stops = list(route.stops.all().order_by("order"))
+    total_stops = len(stops)
+    
+    PRICE_PER_STOP = Decimal("5.00")
 
-    # Get booked seats list for this schedule
-    booked_seats_list = list(Booking.objects.filter(
-        schedule=schedule
-    ).values_list('seat_number', flat=True))
+    # Get all seat segments for this schedule
+    all_segments = SeatSegment.objects.filter(
+        schedule=schedule,
+        is_active=True
+    ).select_related('from_stop', 'to_stop')
     
-    booked_seats_count = len(booked_seats_list)
-    available_seats = bus.total_seats - booked_seats_count
+    # Create a map of seat availability
+    seat_availability_map = {}
+    for seat_num in range(1, bus.total_seats + 1):
+        available_segments = get_available_segments(schedule.id, seat_num, total_stops)
+        seat_availability_map[seat_num] = {
+            'available': len(available_segments) > 0,
+            'available_segments': available_segments
+        }
     
-    # Create seat range for the template (1 to total_seats)
+    # Calculate available seats count (seats with at least one available segment)
+    available_seats = sum(1 for seat in seat_availability_map.values() if seat['available'])
     seat_range = range(1, bus.total_seats + 1)
 
-    PRICE_PER_STOP = Decimal("5.00")  # FIXED RATE
-
     if request.method == "POST":
-        seat_number = request.POST.get("seat_number")
+        seat_number = int(request.POST.get("seat_number"))
         from_stop_id = request.POST.get("from_stop")
         to_stop_id = request.POST.get("to_stop")
         payment_id = request.POST.get("razorpay_payment_id")
-        
-        if not seat_number or not from_stop_id or not to_stop_id:
-            messages.error(request, "All fields are required.")
+
+        if not all([seat_number, from_stop_id, to_stop_id, payment_id]):
+            messages.error(request, "All fields including payment are required.")
             return redirect("book_bus", schedule_id=schedule.id)
 
         from_stop = get_object_or_404(RouteStop, id=from_stop_id)
         to_stop = get_object_or_404(RouteStop, id=to_stop_id)
 
         if from_stop.order >= to_stop.order:
-            messages.error(request, "Destination must be after boarding stop.")
+            messages.error(request, "Invalid stops selected.")
             return redirect("book_bus", schedule_id=schedule.id)
 
-        if Booking.objects.filter(
-            schedule=schedule,
-            seat_number=seat_number
-        ).exists():
-            messages.error(request, "Seat already booked.")
+        # Check if this specific segment is available
+        if not is_segment_available(schedule.id, seat_number, from_stop.order, to_stop.order):
+            messages.error(request, "This seat segment is no longer available.")
             return redirect("book_bus", schedule_id=schedule.id)
 
-        # Calculate total fare
+        # Calculate fare for this segment
         stops_travelled = to_stop.order - from_stop.order
-        base_fare = Decimal(schedule.fare)
-        total_fare = base_fare + (stops_travelled * PRICE_PER_STOP)
+        segment_fare = calculate_segment_fare(
+            Decimal(schedule.fare), 
+            from_stop.order, 
+            to_stop.order, 
+            PRICE_PER_STOP
+        )
 
-        # Verify payment if payment_id exists
-        if payment_id:
-            try:
-                client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-                client.payment.fetch(payment_id)
-                
-                # Create booking after successful payment
+        try:
+            client = razorpay.Client(auth=(
+                settings.RAZORPAY_KEY_ID,
+                settings.RAZORPAY_KEY_SECRET
+            ))
+
+            # Verify payment
+            payment = client.payment.fetch(payment_id)
+
+            if payment["status"] != "captured":
+                messages.error(request, "Payment not captured.")
+                return redirect("book_bus", schedule_id=schedule.id)
+
+            with transaction.atomic():
+                # Create the booking
                 booking = Booking.objects.create(
                     traveller=request.user,
                     bus=bus,
@@ -186,124 +207,121 @@ def book_bus(request, schedule_id):
                     seat_number=seat_number,
                     from_stop=from_stop,
                     to_stop=to_stop,
-                    total_fare=total_fare,
+                    total_fare=segment_fare,
                     status="Confirmed",
                     payment_id=payment_id,
                     payment_status="Paid",
-                    payment_amount=total_fare,
+                    payment_amount=segment_fare,
                     booking_date=timezone.now()
                 )
                 
-                messages.success(
-                    request,
-                    f"Booking successful! Seat {seat_number} booked. Ticket Price: ₹{total_fare}"
+                # Create the seat segment
+                SeatSegment.objects.create(
+                    booking=booking,
+                    schedule=schedule,
+                    seat_number=seat_number,
+                    from_stop=from_stop,
+                    to_stop=to_stop,
+                    segment_fare=segment_fare,
+                    is_active=True
                 )
-                return redirect("traveller_bookings_page")
-                
-            except Exception as e:
-                messages.error(request, f"Payment verification failed: {str(e)}")
-                return redirect("book_bus", schedule_id=schedule.id)
-        else:
-            messages.error(request, "Payment failed. Please try again.")
+
+            messages.success(
+                request, 
+                f"Seat {seat_number} booked successfully from {from_stop.stop_name} to {to_stop.stop_name}!"
+            )
+            return redirect("traveller_bookings_page")
+
+        except Exception as e:
+            logger.error(f"Payment verification failed: {str(e)}")
+            messages.error(request, f"Payment verification failed: {str(e)}")
             return redirect("book_bus", schedule_id=schedule.id)
+
+    # Get booked segments for display
+    booked_segments_list = []
+    for segment in all_segments:
+        booked_segments_list.append({
+            'seat': segment.seat_number,
+            'from': segment.from_stop.order,
+            'to': segment.to_stop.order,
+            'from_name': segment.from_stop.stop_name,
+            'to_name': segment.to_stop.stop_name,
+        })
+
+    razorpay_key = settings.RAZORPAY_KEY_ID
+    if not razorpay_key:
+        logger.warning("RAZORPAY_KEY_ID is not set in settings!")
+        messages.warning(request, "Payment system is not properly configured.")
 
     return render(request, "traveller/book_bus.html", {
         "bus": bus,
         "schedule": schedule,
         "stops": stops,
         "available_seats": available_seats,
-        "booked_seats": booked_seats_list,  # Add this for the template
-        "seat_range": seat_range,  # Add this for the seat grid
-        "total_seats": bus.total_seats,  # Add this for display
+        "seat_range": seat_range,
         "photos": photos,
         "price_per_stop": PRICE_PER_STOP,
-        "razorpay_key": settings.RAZORPAY_KEY_ID,
-        "currency": "INR",
+        "razorpay_key": razorpay_key,
+        "seat_availability_map": seat_availability_map,
+        "total_stops": total_stops,
+        "booked_segments_list": booked_segments_list,
     })
-# ============================================================
-# RAZORPAY PAYMENT INTEGRATION
-# ============================================================
+
 
 @login_required
-def create_razorpay_order(request):
-    """Create a Razorpay order for payment"""
-    if request.method != "POST":
-        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+def check_seat_availability(request):
+    """Enhanced availability check for segments"""
+    schedule_id = request.GET.get("schedule_id")
+    seat_number = int(request.GET.get("seat_number"))
+    from_order = int(request.GET.get("from_order"))
+    to_order = int(request.GET.get("to_order"))
+
+    is_available = is_segment_available(schedule_id, seat_number, from_order, to_order)
     
+    # Also get available segments for this seat
+    schedule = BusSchedule.objects.get(id=schedule_id)
+    total_stops = schedule.route.stops.count()
+    available_segments = get_available_segments(schedule_id, seat_number, total_stops)
+    
+    return JsonResponse({
+        "available": is_available,
+        "available_segments": available_segments,
+        "message": "Segment available" if is_available else "This segment is already booked"
+    })
+@csrf_exempt
+@login_required
+def create_razorpay_order(request):
+    if request.method != "POST":
+        return JsonResponse({'error': 'Only POST allowed'}, status=405)
+
     try:
         data = json.loads(request.body)
-        amount = int(data.get('amount', 0))
-        
+        amount = int(data.get('amount'))
+
         if amount <= 0:
-            return JsonResponse({'error': 'Invalid amount. Amount must be greater than 0.'}, status=400)
-        
-        if amount > 5000000:  # ₹50,000 max
-            return JsonResponse({'error': 'Amount exceeds maximum limit'}, status=400)
-        
+            return JsonResponse({'error': 'Invalid amount'}, status=400)
+
         client = razorpay.Client(auth=(
-            settings.RAZORPAY_KEY_ID, 
+            settings.RAZORPAY_KEY_ID,
             settings.RAZORPAY_KEY_SECRET
         ))
-        
-        order_data = {
-            'amount': amount,
-            'currency': 'INR',
-            'payment_capture': 1,
-            'notes': {
-                'user_id': request.user.id,
-                'username': request.user.username
-            }
-        }
-        
-        order = client.order.create(order_data)
-        logger.info(f"Order created: {order['id']} for user {request.user.username}")
-        
-        return JsonResponse({
-            'id': order['id'],
-            'amount': order['amount'],
-            'currency': order['currency'],
-            'status': 'success'
+
+        order = client.order.create({
+            "amount": amount,
+            "currency": "INR",
+            "payment_capture": 1
         })
-        
-    except json.JSONDecodeError:
-        logger.error("Invalid JSON in request body")
-        return JsonResponse({'error': 'Invalid JSON format'}, status=400)
-    except razorpay.errors.BadRequestError as e:
-        logger.error(f"Razorpay error: {str(e)}")
-        return JsonResponse({'error': f'Razorpay error: {str(e)}'}, status=400)
-    except razorpay.errors.ServerError as e:
-        logger.error(f"Razorpay server error: {str(e)}")
-        return JsonResponse({'error': 'Payment service temporarily unavailable'}, status=503)
+
+        return JsonResponse({
+            "id": order["id"],
+            "amount": order["amount"],
+            "currency": order["currency"]
+        })
+
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
+        logger.error(str(e))
+        return JsonResponse({'error': 'Server error'}, status=500)
 
-
-@csrf_exempt
-def verify_payment(request):
-    """Verify Razorpay payment signature"""
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            payment_id = data.get('razorpay_payment_id')
-            order_id = data.get('razorpay_order_id')
-            signature = data.get('razorpay_signature')
-            
-            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-            
-            params_dict = {
-                'razorpay_payment_id': payment_id,
-                'razorpay_order_id': order_id,
-                'razorpay_signature': signature
-            }
-            
-            client.utility.verify_payment_signature(params_dict)
-            return JsonResponse({"status": "success"})
-        except Exception as e:
-            logger.error(f"Payment verification failed: {str(e)}")
-            return JsonResponse({"status": "failed", "error": str(e)}, status=400)
-    
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 # ============================================================
@@ -486,13 +504,47 @@ def search_buses(request):
     })
 
 
+from django.db.models import Q
+from datetime import time
+
 @login_required
 def available_buses(request):
-    """List all approved buses"""
     buses = Bus.objects.filter(approved=True)
-    return render(request, 'traveller/available_buses.html', {'buses': buses})
 
+    source = request.GET.get('source')
+    destination = request.GET.get('destination')
+    time_input = request.GET.get('time')
 
+    if source and destination and time_input:
+        time_obj = time.fromisoformat(time_input)
+
+        valid_schedules = []
+
+        schedules = BusSchedule.objects.filter(active=True).select_related('route', 'bus')
+
+        for schedule in schedules:
+            stops = schedule.route.stops.all().order_by('order')
+
+            source_stop = None
+            dest_stop = None
+
+            for stop in stops:
+                if stop.stop_name.lower() == source.lower():
+                    source_stop = stop
+                if stop.stop_name.lower() == destination.lower():
+                    dest_stop = stop
+
+            # ✅ Check conditions
+            if source_stop and dest_stop:
+                if source_stop.order < dest_stop.order:
+                    if source_stop.arrival_time >= time_obj:
+                        valid_schedules.append(schedule)
+
+        buses = Bus.objects.filter(schedules__in=valid_schedules).distinct()
+
+    return render(request, 'traveller/available_buses.html', {
+        'buses': buses
+    })
 # ============================================================
 # BOOKINGS & TICKETS
 # ============================================================
@@ -709,3 +761,421 @@ def add_bus_review(request, bus_id):
         return redirect('view_schedules', bus_id=bus.id)
     
     return render(request, 'traveller/add_bus_review.html', {'bus': bus})
+
+
+from django.http import JsonResponse
+
+@login_required
+def check_seat_availability(request):
+    schedule_id = request.GET.get("schedule_id")
+    seat_number = request.GET.get("seat_number")
+    from_order = int(request.GET.get("from_order"))
+    to_order = int(request.GET.get("to_order"))
+
+    bookings = Booking.objects.filter(
+        schedule_id=schedule_id,
+        seat_number=seat_number
+    )
+
+    for b in bookings:
+        if not (to_order <= b.from_stop.order or from_order >= b.to_stop.order):
+            return JsonResponse({"available": False})
+
+    return JsonResponse({"available": True})
+
+
+@login_required
+def get_available_seats_for_boarding(request):
+    """Get available seats for a specific boarding point"""
+    schedule_id = request.GET.get('schedule_id')
+    boarding_stop_id = request.GET.get('boarding_stop_id')
+    
+    if not schedule_id or not boarding_stop_id:
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+    
+    try:
+        schedule = BusSchedule.objects.get(id=schedule_id)
+        boarding_stop = RouteStop.objects.get(id=boarding_stop_id)
+        total_stops = schedule.route.stops.count()
+        
+        available_seats = []
+        seat_details = {}
+        
+        for seat_num in range(1, schedule.bus.total_seats + 1):
+            # Get available segments from this boarding point
+            available_segments = get_available_segments_from_boarding(
+                schedule_id, seat_num, boarding_stop.order, total_stops
+            )
+            
+            if available_segments:
+                available_seats.append(seat_num)
+                seat_details[seat_num] = {
+                    'available_segments': available_segments,
+                    'max_destination': max([seg[1] for seg in available_segments]),
+                    'min_destination': min([seg[1] for seg in available_segments])
+                }
+        
+        return JsonResponse({
+            'available_seats': available_seats,
+            'seat_details': seat_details,
+            'boarding_stop': {
+                'id': boarding_stop.id,
+                'name': boarding_stop.stop_name,
+                'order': boarding_stop.order
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting available seats: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def get_available_destinations_for_seat(request):
+    """Get available destinations for a specific seat after selecting boarding point"""
+    schedule_id = request.GET.get('schedule_id')
+    seat_number = request.GET.get('seat_number')
+    boarding_order = request.GET.get('boarding_order')
+    
+    if not all([schedule_id, seat_number, boarding_order]):
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+    
+    try:
+        schedule = BusSchedule.objects.get(id=schedule_id)
+        boarding_order = int(boarding_order)
+        seat_number = int(seat_number)
+        total_stops = schedule.route.stops.count()
+        
+        # Get available segments from this boarding point
+        available_segments = get_available_segments_from_boarding(
+            schedule_id, seat_number, boarding_order, total_stops
+        )
+        
+        # Get all stops
+        stops = list(schedule.route.stops.all().order_by('order'))
+        
+        # Get occupied segments for display
+        occupied_segments = SeatSegment.objects.filter(
+            schedule_id=schedule_id,
+            seat_number=seat_number,
+            is_active=True
+        ).select_related('from_stop', 'to_stop')
+        
+        occupied_info = []
+        for segment in occupied_segments:
+            occupied_info.append({
+                'from': segment.from_stop.stop_name,
+                'to': segment.to_stop.stop_name,
+                'from_order': segment.from_stop.order,
+                'to_order': segment.to_stop.order
+            })
+        
+        # Build available destinations
+        available_destinations = []
+        for from_order, to_order in available_segments:
+            # Find the destination stop details
+            dest_stop = next((s for s in stops if s.order == to_order), None)
+            if dest_stop:
+                available_destinations.append({
+                    'id': dest_stop.id,
+                    'name': dest_stop.stop_name,
+                    'order': dest_stop.order,
+                    'arrival_time': dest_stop.arrival_time.strftime("%I:%M %p")
+                })
+        
+        return JsonResponse({
+            'available_destinations': available_destinations,
+            'occupied_segments': occupied_info,
+            'seat_number': seat_number,
+            'has_available_segments': len(available_destinations) > 0,
+            'message': generate_occupancy_message(occupied_info, boarding_order)
+        })
+    except Exception as e:
+        logger.error(f"Error getting destinations: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def get_available_segments_from_boarding(schedule_id, seat_number, boarding_order, total_stops):
+    """Helper function to get available segments from a specific boarding point"""
+    # Get all booked segments for this seat
+    booked_segments = SeatSegment.objects.filter(
+        schedule_id=schedule_id,
+        seat_number=seat_number,
+        is_active=True
+    ).values_list('from_stop__order', 'to_stop__order')
+    
+    if not booked_segments:
+        # No bookings, entire route available from boarding point
+        return [(boarding_order, stop) for stop in range(boarding_order + 1, total_stops + 1)]
+    
+    # Sort booked segments
+    booked_list = sorted([(f, t) for f, t in booked_segments])
+    
+    # Find available segments starting from boarding_order
+    available = []
+    current_pos = boarding_order
+    
+    for from_order, to_order in booked_list:
+        if from_order >= current_pos:
+            # Gap before this booked segment
+            if current_pos < from_order:
+                available.append((current_pos, from_order))
+            current_pos = max(current_pos, to_order)
+    
+    # Remaining after last booking
+    if current_pos < total_stops:
+        available.append((current_pos, total_stops))
+    
+    # Filter to only include segments starting exactly at boarding_order
+    # (Strict sequential behavior)
+    filtered_available = [(f, t) for f, t in available if f == boarding_order]
+    
+    return filtered_available
+
+
+def generate_occupancy_message(occupied_segments, boarding_order):
+    """Generate user-friendly message about occupied segments"""
+    if not occupied_segments:
+        return None
+    
+    message = "⚠️ This seat is already booked for:\n"
+    for seg in occupied_segments:
+        message += f"• {seg['from']} → {seg['to']}\n"
+    
+    # Check if boarding point is within occupied segment
+    for seg in occupied_segments:
+        if seg['from_order'] <= boarding_order < seg['to_order']:
+            message += f"\n❌ You cannot board at this stop as the seat is occupied until {seg['to']}."
+            message += f"\n✓ Available from {seg['to']} onwards."
+            return message
+    
+    message += f"\n✓ You can book from the available stops shown above."
+    return message
+
+@login_required
+def get_seat_status(request):
+    """API endpoint to get status of a specific seat"""
+    schedule_id = request.GET.get('schedule_id')
+    seat_number = request.GET.get('seat_number')
+    
+    if not schedule_id or not seat_number:
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+    
+    try:
+        from bus_owner.models import BusSchedule, RouteStop
+        from .models import SeatSegment
+        
+        schedule = BusSchedule.objects.get(id=schedule_id)
+        total_stops = schedule.route.stops.count()
+        seat_number = int(seat_number)
+        
+        # Get available segments from utils function
+        from .utils import get_available_segments
+        
+        available_segments = get_available_segments(schedule_id, seat_number, total_stops)
+        
+        # Get booked segments for this seat
+        booked_segments = SeatSegment.objects.filter(
+            schedule_id=schedule_id,
+            seat_number=seat_number,
+            is_active=True
+        ).select_related('from_stop', 'to_stop')
+        
+        # Format available segments for display
+        stops = list(schedule.route.stops.all().order_by('order'))
+        available_segments_text = []
+        for from_order, to_order in available_segments:
+            from_stop = next((s for s in stops if s.order == from_order), None)
+            to_stop = next((s for s in stops if s.order == to_order), None)
+            if from_stop and to_stop:
+                available_segments_text.append(f"{from_stop.stop_name} → {to_stop.stop_name}")
+        
+        return JsonResponse({
+            'seat_number': seat_number,
+            'is_fully_booked': len(available_segments) == 0,
+            'has_available_segments': len(available_segments) > 0,
+            'available_segments': available_segments,
+            'available_segments_text': ', '.join(available_segments_text),
+            'booked_segments_count': booked_segments.count()
+        })
+    except Exception as e:
+        logger.error(f"Error getting seat status: {str(e)}")
+        return JsonResponse({'error': str(e), 'is_fully_booked': False, 'has_available_segments': True}, status=200)
+
+
+@login_required
+def get_available_seats_for_boarding(request):
+    """Get available seats for a specific boarding point"""
+    schedule_id = request.GET.get('schedule_id')
+    boarding_stop_id = request.GET.get('boarding_stop_id')
+    
+    if not schedule_id or not boarding_stop_id:
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+    
+    try:
+        from bus_owner.models import BusSchedule, RouteStop
+        from .models import SeatSegment
+        from .utils import get_available_segments
+        
+        schedule = BusSchedule.objects.get(id=schedule_id)
+        boarding_stop = RouteStop.objects.get(id=boarding_stop_id)
+        total_stops = schedule.route.stops.count()
+        
+        available_seats = []
+        seat_details = {}
+        
+        for seat_num in range(1, schedule.bus.total_seats + 1):
+            # Get available segments from this boarding point
+            available_segments = get_available_segments(schedule_id, seat_num, total_stops)
+            
+            # Filter segments that start exactly at boarding point
+            valid_segments = [(f, t) for f, t in available_segments if f == boarding_stop.order]
+            
+            if valid_segments:
+                available_seats.append(seat_num)
+                seat_details[seat_num] = {
+                    'available_segments': valid_segments,
+                    'max_destination': max([seg[1] for seg in valid_segments]),
+                    'min_destination': min([seg[1] for seg in valid_segments])
+                }
+        
+        return JsonResponse({
+            'available_seats': available_seats,
+            'seat_details': seat_details,
+            'boarding_stop': {
+                'id': boarding_stop.id,
+                'name': boarding_stop.stop_name,
+                'order': boarding_stop.order
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting available seats: {str(e)}")
+        return JsonResponse({'error': str(e), 'available_seats': []}, status=200)
+
+
+@login_required
+def get_available_destinations_for_seat(request):
+    """Get available destinations for a specific seat after selecting boarding point"""
+    schedule_id = request.GET.get('schedule_id')
+    seat_number = request.GET.get('seat_number')
+    boarding_order = request.GET.get('boarding_order')
+    
+    if not all([schedule_id, seat_number, boarding_order]):
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+    
+    try:
+        from bus_owner.models import BusSchedule, RouteStop
+        from .models import SeatSegment
+        from .utils import get_available_segments
+        
+        schedule = BusSchedule.objects.get(id=schedule_id)
+        boarding_order = int(boarding_order)
+        seat_number = int(seat_number)
+        total_stops = schedule.route.stops.count()
+        
+        # Get available segments from this boarding point
+        available_segments = get_available_segments(schedule_id, seat_number, total_stops)
+        
+        # Filter segments that start exactly at boarding point
+        valid_segments = [(f, t) for f, t in available_segments if f == boarding_order]
+        
+        # Get all stops
+        stops = list(schedule.route.stops.all().order_by('order'))
+        
+        # Get occupied segments for display
+        occupied_segments = SeatSegment.objects.filter(
+            schedule_id=schedule_id,
+            seat_number=seat_number,
+            is_active=True
+        ).select_related('from_stop', 'to_stop')
+        
+        occupied_info = []
+        for segment in occupied_segments:
+            occupied_info.append({
+                'from': segment.from_stop.stop_name,
+                'to': segment.to_stop.stop_name,
+                'from_order': segment.from_stop.order,
+                'to_order': segment.to_stop.order
+            })
+        
+        # Build available destinations
+        available_destinations = []
+        for from_order, to_order in valid_segments:
+            # Find the destination stop details
+            dest_stop = next((s for s in stops if s.order == to_order), None)
+            if dest_stop:
+                available_destinations.append({
+                    'id': dest_stop.id,
+                    'name': dest_stop.stop_name,
+                    'order': dest_stop.order,
+                    'arrival_time': dest_stop.arrival_time.strftime("%I:%M %p")
+                })
+        
+        # Generate message
+        message = None
+        if occupied_info:
+            message = "⚠️ This seat is already booked for:\n"
+            for seg in occupied_info:
+                message += f"• {seg['from']} → {seg['to']}\n"
+            
+            # Check if boarding point is within occupied segment
+            for seg in occupied_info:
+                if seg['from_order'] <= boarding_order < seg['to_order']:
+                    message += f"\n❌ You cannot board at this stop as the seat is occupied until {seg['to']}."
+                    message += f"\n✓ Available from {seg['to']} onwards."
+                else:
+                    message += f"\n✓ You can book from the available stops shown above."
+        
+        return JsonResponse({
+            'available_destinations': available_destinations,
+            'occupied_segments': occupied_info,
+            'seat_number': seat_number,
+            'has_available_segments': len(available_destinations) > 0,
+            'message': message
+        })
+    except Exception as e:
+        logger.error(f"Error getting destinations: {str(e)}")
+        return JsonResponse({'error': str(e), 'has_available_segments': False}, status=200)
+
+
+@login_required
+def get_seat_segments(request):
+    """Get available segments for a specific seat"""
+    schedule_id = request.GET.get('schedule_id')
+    seat_number = request.GET.get('seat_number')
+    
+    if not schedule_id or not seat_number:
+        return JsonResponse({'error': 'Missing parameters'}, status=400)
+    
+    try:
+        from bus_owner.models import BusSchedule, RouteStop
+        from .utils import get_available_segments
+        
+        schedule = BusSchedule.objects.get(id=schedule_id)
+        total_stops = schedule.route.stops.count()
+        seat_number = int(seat_number)
+        
+        available_segments = get_available_segments(schedule_id, seat_number, total_stops)
+        
+        # Format available segments for display
+        stops = list(schedule.route.stops.all().order_by('order'))
+        formatted_segments = []
+        for from_order, to_order in available_segments:
+            from_stop = next((s for s in stops if s.order == from_order), None)
+            to_stop = next((s for s in stops if s.order == to_order), None)
+            if from_stop and to_stop:
+                formatted_segments.append({
+                    'from': from_stop.stop_name,
+                    'to': to_stop.stop_name,
+                    'from_order': from_order,
+                    'to_order': to_order
+                })
+        
+        return JsonResponse({
+            'seat_number': seat_number,
+            'available_segments': available_segments,
+            'formatted_segments': formatted_segments,
+            'has_available_segments': len(available_segments) > 0
+        })
+    except Exception as e:
+        logger.error(f"Error getting seat segments: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)

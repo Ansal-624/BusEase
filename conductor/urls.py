@@ -27,6 +27,7 @@ urlpatterns = [
     path('schedules/', views.conductor_schedules, name='conductor_schedules'),
     path('bookings/', views.conductor_bookings, name='conductor_bookings'),
     path('cancel-booking/', views.conductor_cancel_booking, name='conductor_cancel_booking'),  # Add 
+    path('update-location/', views.update_bus_location, name='update_bus_location'),
 ]
 
 

@@ -37,7 +37,7 @@
     position: relative;
     overflow: hidden;
     border-bottom: 3px solid var(--gov-secondary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .gov-hero-section::before {
@@ -47,7 +47,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: rgba(255,143,0,0.08);
+    background: rgba(255, 143, 0, 0.08);
     border-radius: 50%;
   }
 
@@ -58,7 +58,7 @@
     left: -5%;
     width: 250px;
     height: 250px;
-    background: rgba(255,143,0,0.05);
+    background: rgba(255, 143, 0, 0.05);
     border-radius: 50%;
   }
 
@@ -116,7 +116,7 @@
 
   .gov-hero-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,105,92,0.2);
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
     background: var(--gov-primary);
     color: white;
   }
@@ -151,7 +151,7 @@
     gap: 15px;
     border-left: 4px solid;
     background: white;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
 
   .gov-alert-warning {
@@ -192,7 +192,7 @@
     background: white;
     border-radius: 6px;
     padding: 18px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     border: 1px solid #e0e0e0;
     transition: all 0.2s ease;
     position: relative;
@@ -205,7 +205,7 @@
 
   .gov-stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,105,92,0.15);
+    box-shadow: 0 4px 12px rgba(0, 105, 92, 0.15);
     border-color: var(--gov-primary);
   }
 
@@ -247,7 +247,7 @@
   .gov-main-card {
     background: white;
     border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     border: 1px solid #e0e0e0;
     margin-bottom: 25px;
@@ -643,6 +643,7 @@
     .gov-stats-grid {
       grid-template-columns: repeat(2, 1fr);
     }
+
     .gov-duty-form {
       grid-template-columns: 1fr;
     }
@@ -652,9 +653,11 @@
     .gov-stats-grid {
       grid-template-columns: 1fr;
     }
+
     .gov-hero-actions {
       justify-content: flex-start;
     }
+
     .gov-hero-title {
       font-size: 1.4rem;
     }
@@ -662,7 +665,7 @@
 </style>
 
 <div class="gov-owner-dashboard">
-  <div class="container">
+  <!-- <div class="container"> -->
 
     <!-- Hero Section -->
     <div class="gov-hero-section">
@@ -751,11 +754,11 @@
           <select name="conductor" class="gov-duty-select" required>
             <option value="">-- Select Conductor --</option>
             {% for conductor in conductors %}
-              {% if conductor.is_active %}
-                <option value="{{ conductor.id }}">
-                  {{ conductor.user.get_full_name }} ({{ conductor.employee_id }})
-                </option>
-              {% endif %}
+            {% if conductor.is_active %}
+            <option value="{{ conductor.id }}">
+              {{ conductor.user.get_full_name }} ({{ conductor.employee_id }})
+            </option>
+            {% endif %}
             {% endfor %}
           </select>
         </div>
@@ -764,9 +767,9 @@
           <select name="bus" class="gov-duty-select" required>
             <option value="">-- Select Bus --</option>
             {% for bus in buses %}
-              {% if bus.approved %}
-                <option value="{{ bus.id }}">{{ bus.bus_name }} ({{ bus.bus_number }})</option>
-              {% endif %}
+            {% if bus.approved %}
+            <option value="{{ bus.id }}">{{ bus.bus_name }} ({{ bus.bus_number }})</option>
+            {% endif %}
             {% endfor %}
           </select>
         </div>
@@ -782,7 +785,8 @@
     <div class="gov-main-card">
       <div class="gov-card-header">
         <h5 class="gov-card-title"><i class="bi bi-grid-3x3-gap-fill"></i> Fleet Management</h5>
-        <a href="{% url 'add_bus' %}" class="gov-header-register-btn"><i class="bi bi-plus-circle-fill"></i> Register Bus</a>
+        <a href="{% url 'add_bus' %}" class="gov-header-register-btn"><i class="bi bi-plus-circle-fill"></i> Register
+          Bus</a>
       </div>
       {% if buses %}
       <div class="gov-table-container">
@@ -796,6 +800,9 @@
               <th>Actions</th>
             </tr>
           </thead>
+          <!-- ONLY SHOWING FIXED PARTS — YOUR CSS REMAINS SAME -->
+
+          <!-- Fleet Management Table -->
           <tbody>
             {% for bus in buses %}
             <tr>
@@ -804,195 +811,205 @@
                   <div class="gov-bus-avatar"><i class="bi bi-bus-front"></i></div>
                   <div>
                     <div class="gov-bus-name">{{ bus.bus_name }}</div>
-                    <div class="gov-bus-number"><i class="bi bi-hash"></i>{{ bus.bus_number }}</div>
+                    <div class="gov-bus-number">
+                      <i class="bi bi-hash"></i>{{ bus.bus_number }}
+                    </div>
                   </div>
                 </div>
-               </div>
+              </td>
+
               <td>
                 {% if bus.driver_name %}
-                  {{ bus.driver_name }}
+                {{ bus.driver_name }}
                 {% else %}
-                  <span class="text-muted">Not assigned</span>
+                <span class="text-muted">Not assigned</span>
                 {% endif %}
-               </div>
+              </td>
+
               <td>
                 {% if bus.approved %}
-                  <span class="gov-status-badge gov-status-active">Active</span>
+                <span class="gov-status-badge gov-status-active">Active</span>
                 {% else %}
-                  <span class="gov-status-badge gov-status-pending">Pending</span>
+                <span class="gov-status-badge gov-status-pending">Pending</span>
                 {% endif %}
-               </div>
+              </td>
+
               <td>
                 {% if bus.schedules.count %}
-                  {% for schedule in bus.schedules.all|slice:":2" %}
-                    <div class="gov-schedule-card">
-                      <div class="gov-route">
-                        <span class="gov-route-point">{{ schedule.route.start_location }}</span>
-                        <i class="bi bi-arrow-right"></i>
-                        <span class="gov-route-point">{{ schedule.route.end_location }}</span>
-                      </div>
-                      <div class="gov-schedule-meta">
-                        <span class="gov-meta-chip"><i class="bi bi-clock"></i> {{ schedule.departure_time|date:"H:i" }}</span>
-                        <span class="gov-meta-chip"><i class="bi bi-currency-rupee"></i> {{ schedule.fare }}</span>
-                      </div>
-                      <form method="POST" action="{% url 'delete_schedule' schedule.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="gov-delete-schedule" onclick="return confirm('Delete this schedule?')">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </form>
-                    </div>
-                  {% endfor %}
-                  {% if bus.schedules.count > 2 %}
-                    <small class="text-muted">+{{ bus.schedules.count|add:"-2" }} more</small>
-                  {% endif %}
+                {% for schedule in bus.schedules.all|slice:":2" %}
+                <div class="gov-schedule-card">
+                  <div class="gov-route">
+                    <span class="gov-route-point">{{ schedule.route.start_location }}</span>
+                    <i class="bi bi-arrow-right"></i>
+                    <span class="gov-route-point">{{ schedule.route.end_location }}</span>
+                  </div>
+                  <div class="gov-schedule-meta">
+                    <span class="gov-meta-chip">
+                      <i class="bi bi-clock"></i>
+                      {{ schedule.departure_time|date:"H:i" }}
+                    </span>
+                    <span class="gov-meta-chip">
+                      <i class="bi bi-currency-rupee"></i>
+                      {{ schedule.fare }}
+                    </span>
+                  </div>
+                </div>
+                {% endfor %}
                 {% else %}
-                  <span class="text-muted">No schedules</span>
+                <span class="text-muted">No schedules</span>
                 {% endif %}
-               </div>
+              </td>
+
               <td>
                 <div class="gov-action-group">
                   {% if bus.approved %}
-                    <a href="{% url 'add_schedule' bus.id %}" class="gov-action-btn gov-action-primary">
-                      <i class="bi bi-plus-circle"></i> Schedule
-                    </a>
-                    <a href="{% url 'view_bookings' bus.id %}" class="gov-action-btn gov-action-success">
-                      <i class="bi bi-people"></i> Bookings
-                    </a>
+                  <a href="{% url 'add_schedule' bus.id %}" class="gov-action-btn gov-action-primary">
+                    Schedule
+                  </a>
+                  <a href="{% url 'view_bookings' bus.id %}" class="gov-action-btn gov-action-success">
+                    Bookings
+                  </a>
                   {% else %}
-                    <button class="gov-action-btn gov-action-disabled" disabled>
-                      <i class="bi bi-lock"></i> Pending
-                    </button>
+                  <button class="gov-action-btn gov-action-disabled" disabled>
+                    Pending
+                  </button>
                   {% endif %}
-                  <form method="POST" action="{% url 'delete_bus' bus.id %}" onsubmit="return confirm('Delete this bus?')">
+                  <form method="POST" action="{% url 'delete_bus' bus.id %}">
                     {% csrf_token %}
                     <button type="submit" class="gov-action-btn gov-action-danger">
-                      <i class="bi bi-trash"></i> Delete
+                      Delete
                     </button>
                   </form>
                 </div>
-               </div>
-              </div>
+              </td>
+            </tr>
             {% endfor %}
           </tbody>
-         </div>
+          </table>
       </div>
-      {% else %}
-      <div class="gov-empty-state">
-        <i class="bi bi-bus-front gov-empty-icon"></i>
-        <h4>No Buses</h4>
-        <p>Register your first bus</p>
-        <a href="{% url 'add_bus' %}" class="gov-action-btn gov-action-primary" style="width: auto; display: inline-flex;">
-          Register Bus
-        </a>
-      </div>
-      {% endif %}
     </div>
-
-    <!-- Conductor Management Card -->
-    <div class="gov-main-card">
-      <div class="gov-card-header">
-        <h5 class="gov-card-title"><i class="bi bi-people-fill"></i> Conductors List</h5>
-        <a href="{% url 'owner_add_conductor' %}" class="gov-header-register-btn">
-          <i class="bi bi-plus-circle-fill"></i> Add Conductor
-        </a>
-      </div>
-      {% if conductors %}
-      <div class="gov-table-container">
-        <table class="gov-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Assigned Bus</th>
-              <th>Status</th>
-              <th>Actions</th>
-             </div>
-          </thead>
-          <tbody>
-            {% for conductor in conductors %}
-             </div>
-              <td><strong>{{ conductor.employee_id }}</strong> </div>
-              <td>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div class="gov-conductor-avatar">
-                    {{ conductor.user.first_name|first|upper }}{{ conductor.user.last_name|first|upper }}
-                  </div>
-                  <div>
-                    <strong>{{ conductor.user.get_full_name }}</strong><br>
-                    <small class="text-muted">@{{ conductor.user.username }}</small>
-                  </div>
-                </div>
-               </div>
-              <td>{{ conductor.phone }} </div>
-              <td>
-                {% with assigned_bus=conductor.assigned_bus %}
-                  {% if assigned_bus %}
-                    <span class="gov-status-badge gov-status-active">
-                      <i class="bi bi-bus-front"></i> {{ assigned_bus.bus_name }}
-                    </span>
-                  {% else %}
-                    <span class="gov-status-badge gov-status-inactive">Not Assigned</span>
-                  {% endif %}
-                {% endwith %}
-               </div>
-              <td>
-                {% if conductor.is_active %}
-                  <span class="gov-status-badge gov-status-active">Active</span>
-                {% else %}
-                  <span class="gov-status-badge gov-status-inactive">Inactive</span>
-                {% endif %}
-               </div>
-              <td>
-                <div style="display: flex; gap: 6px; flex-direction: column;">
-                  <a href="{% url 'owner_edit_conductor' conductor.id %}" class="gov-action-btn gov-action-edit">
-                    <i class="bi bi-pencil"></i> Edit
-                  </a>
-                  {% with assigned_bus=conductor.assigned_bus %}
-                    {% if assigned_bus %}
-                      <a href="{% url 'owner_unassign_conductor' conductor.id %}" class="gov-action-btn gov-action-danger">
-                        <i class="bi bi-x-circle"></i> Remove from Bus
-                      </a>
-                    {% else %}
-                      <a href="{% url 'owner_assign_duty' %}" class="gov-action-btn gov-action-primary">
-                        <i class="bi bi-plus-circle"></i> Assign to Bus
-                      </a>
-                    {% endif %}
-                  {% endwith %}
-                </div>
-               </div>
-             </div>
-            {% endfor %}
-          </tbody>
-         </div>
-      </div>
-      {% else %}
-      <div class="gov-empty-state">
-        <i class="bi bi-people gov-empty-icon"></i>
-        <h4>No Conductors</h4>
-        <p>Add your first conductor</p>
-        <a href="{% url 'owner_add_conductor' %}" class="gov-action-btn gov-action-primary" style="width: auto; display: inline-flex;">
-          Add Conductor
-        </a>
-      </div>
-      {% endif %}
+    {% else %}
+    <div class="gov-empty-state">
+      <i class="bi bi-bus-front gov-empty-icon"></i>
+      <h4>No Buses</h4>
+      <p>Register your first bus</p>
+      <a href="{% url 'add_bus' %}" class="gov-action-btn gov-action-primary"
+        style="width: auto; display: inline-flex;">
+        Register Bus
+      </a>
     </div>
+    {% endif %}
+  </div>
 
+  <!-- Conductor Management Card -->
+  <div class="gov-main-card">
+    <div class="gov-card-header">
+      <h5 class="gov-card-title"><i class="bi bi-people-fill"></i> Conductors List</h5>
+      <a href="{% url 'owner_add_conductor' %}" class="gov-header-register-btn">
+        <i class="bi bi-plus-circle-fill"></i> Add Conductor
+      </a>
+    </div>
+    {% if conductors %}
+    <div class="gov-table-container">
+      <table class="gov-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Assigned Bus</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+    </thead>
+    <tbody>
+      {% for conductor in conductors %}
+      <tr>
+        <td><strong>{{ conductor.employee_id }}</strong></td>
+
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="gov-conductor-avatar">
+              {{ conductor.user.first_name|first|upper }}{{ conductor.user.last_name|first|upper }}
+            </div>
+            <div>
+              <strong>{{ conductor.user.get_full_name }}</strong><br>
+              <small class="text-muted">@{{ conductor.user.username }}</small>
+            </div>
+          </div>
+        </td>
+
+        <td>{{ conductor.phone }}</td>
+
+        <td>
+          {% if conductor.assigned_bus %}
+          <span class="gov-status-badge gov-status-active">
+            {{ conductor.assigned_bus.bus_name }}
+          </span>
+          {% else %}
+          <span class="gov-status-badge gov-status-inactive">
+            Not Assigned
+          </span>
+          {% endif %}
+        </td>
+
+        <td>
+          {% if conductor.is_active %}
+          <span class="gov-status-badge gov-status-active">Active</span>
+          {% else %}
+          <span class="gov-status-badge gov-status-inactive">Inactive</span>
+          {% endif %}
+        </td>
+
+        <td>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <a href="{% url 'owner_edit_conductor' conductor.id %}" class="gov-action-btn gov-action-edit">
+              Edit
+            </a>
+
+            {% if conductor.assigned_bus %}
+            <a href="{% url 'owner_unassign_conductor' conductor.id %}" class="gov-action-btn gov-action-danger">
+              Remove from Bus
+            </a>
+            {% else %}
+            <a href="{% url 'owner_assign_duty' %}" class="gov-action-btn gov-action-primary">
+              Assign to Bus
+            </a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    </table>
   </div>
 </div>
+{% else %}
+<div class="gov-empty-state">
+  <i class="bi bi-people gov-empty-icon"></i>
+  <h4>No Conductors</h4>
+  <p>Add your first conductor</p>
+  <a href="{% url 'owner_add_conductor' %}" class="gov-action-btn gov-action-primary"
+    style="width: auto; display: inline-flex;">
+    Add Conductor
+  </a>
+</div>
+{% endif %}
+</div>
 
+</div>
+</div>
+{% endblock %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
       document.querySelectorAll('.gov-alert').forEach(function (alert) {
         alert.style.transition = 'opacity 0.5s ease';
         alert.style.opacity = '0';
-        setTimeout(function () { 
-          if (alert) alert.style.display = 'none'; 
+        setTimeout(function () {
+          if (alert) alert.style.display = 'none';
         }, 500);
       });
     }, 5000);
   });
 </script>
-{% endblock %}

@@ -11,6 +11,12 @@
 
     <style>
         /* Simple Government Style - Teal & Orange Theme */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background: #eef2f5;
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -62,15 +68,35 @@
             margin-right: 6px;
         }
 
-        /* Content Area */
+        /* Main Container - Takes remaining space */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        /* Content Area - Flexible height */
         .gov-content-wrapper {
             background: white;
             border-radius: 6px;
             padding: 25px;
             margin: 20px auto;
-            min-height: 400px;
+            width: 100%;
             border: 1px solid #e0e0e0;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        /* For pages that need full width content */
+        .gov-content-wrapper-full {
+            background: white;
+            border-radius: 6px;
+            padding: 0;
+            margin: 20px auto;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            overflow-x: auto;
         }
 
         /* Alert Messages */
@@ -105,13 +131,14 @@
             color: #0c5460;
         }
 
-        /* Footer */
+        /* Footer - Sticks to bottom automatically */
         .gov-footer {
             background: #00695c;
             color: white;
             padding: 30px 0 15px;
             margin-top: auto;
             border-top: 2px solid #ff8f00;
+            width: 100%;
         }
 
         .gov-footer h5 {
@@ -125,10 +152,12 @@
             color: #ddd;
             text-decoration: none;
             font-size: 0.85rem;
+            transition: color 0.2s ease;
         }
 
         .gov-footer a:hover {
             color: #ff8f00;
+            text-decoration: underline;
         }
 
         .gov-footer ul {
@@ -156,6 +185,7 @@
             padding: 8px 20px;
             border-radius: 4px;
             text-decoration: none;
+            transition: all 0.2s ease;
         }
 
         .btn-gov:hover {
@@ -170,10 +200,37 @@
             padding: 8px 20px;
             border-radius: 4px;
             text-decoration: none;
+            transition: all 0.2s ease;
         }
 
         .btn-gov-outline:hover {
             background: #e0f2f1;
+        }
+
+        /* Table Styles for better display */
+        .gov-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .gov-table th {
+            background: #00695c;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .gov-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.85rem;
+        }
+
+        .gov-table tr:hover {
+            background: #f5f5f5;
         }
 
         /* Responsive */
@@ -184,9 +241,22 @@
             .gov-content-wrapper {
                 padding: 15px;
                 margin: 10px;
+                width: calc(100% - 20px);
+            }
+            .gov-content-wrapper-full {
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+            .gov-table {
+                font-size: 0.75rem;
+            }
+            .gov-table th, .gov-table td {
+                padding: 8px;
             }
         }
     </style>
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -260,22 +330,24 @@
     </div>
 </nav>
 
-<!-- Main Content -->
-<div class="container">
-    <!-- Display Django messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="gov-alert gov-alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
-                <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
-                {{ message }}
-                <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
+<!-- Main Content Container -->
+<div class="main-container">
+    <div class="container">
+        <!-- Display Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="gov-alert gov-alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
 
-    <!-- Content Block -->
-    <div class="gov-content-wrapper">
-        {% block content %}{% endblock %}
+        <!-- Content Block -->
+        <div class="gov-content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </div>
 
@@ -328,12 +400,15 @@
     document.addEventListener('DOMContentLoaded', function() {
         var currentPath = window.location.pathname;
         document.querySelectorAll('.nav-link').forEach(function(link) {
-            if (link.getAttribute('href') === currentPath) {
+            var href = link.getAttribute('href');
+            if (href && href !== '#' && (currentPath === href || (href !== '/' && currentPath.startsWith(href)))) {
                 link.style.background = 'rgba(255,255,255,0.15)';
             }
         });
     });
 </script>
+
+{% block extra_js %}{% endblock %}
 
 </body>
 </html>

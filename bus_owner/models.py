@@ -189,3 +189,19 @@ class ConductorDuty(models.Model):
     
     def __str__(self):
         return f"{self.conductor} → {self.bus.bus_number}"
+    
+class BusLiveLocation(models.Model):
+    """Stores current live location of a bus (updated by conductor)"""
+    
+    bus = models.ForeignKey(Bus, on_delete=models.CASCADE, related_name='live_locations')
+    schedule = models.ForeignKey(BusSchedule, on_delete=models.CASCADE)
+    current_stop = models.ForeignKey(RouteStop, on_delete=models.SET_NULL, null=True, blank=True)
+
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+
+    updated_by = models.ForeignKey('Conductor', on_delete=models.SET_NULL, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.bus.bus_number} - {self.current_stop}"

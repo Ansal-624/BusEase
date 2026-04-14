@@ -13,33 +13,42 @@ import json
 
 @login_required
 def conductor_dashboard(request):
-    """Conductor dashboard showing assigned bus and today's duties"""
     try:
         conductor = Conductor.objects.get(user=request.user)
     except Conductor.DoesNotExist:
         messages.error(request, "Conductor profile not found.")
         return redirect('home')
     
-    # Get current assigned bus (permanent assignment)
     current_duty = ConductorDuty.objects.filter(
         conductor=conductor,
         is_active=True
     ).first()
     
     assigned_bus = current_duty.bus if current_duty else None
-    has_assignment = assigned_bus is not None  # Add this line
+    has_assignment = assigned_bus is not None
     
-    # Get today's schedules for the assigned bus
     today = timezone.now().date()
+
     today_schedules = []
+    current_schedule = None
+
     if assigned_bus:
-        today_schedules = BusSchedule.objects.filter(
+       today_schedules = BusSchedule.objects.filter(
+        bus=assigned_bus,
+        departure_time__date=today,
+        active=True
+    ).select_related('route').order_by('departure_time')
+
+    # ✅ FIX STARTS HERE
+    if today_schedules.exists():
+        current_schedule = today_schedules.first()
+    else:
+        current_schedule = BusSchedule.objects.filter(
             bus=assigned_bus,
-            departure_time__date=today,
             active=True
-        ).select_related('route').order_by('departure_time')
-    
-    # Get recent bookings for the assigned bus
+        ).select_related('route').first()
+    # ✅ FIX ENDS HERE
+
     recent_bookings = []
     if assigned_bus:
         recent_bookings = Booking.objects.filter(
@@ -49,14 +58,14 @@ def conductor_dashboard(request):
     context = {
         'conductor': conductor,
         'assigned_bus': assigned_bus,
-        'has_assignment': has_assignment,  # Add this
+        'has_assignment': has_assignment,
         'today_schedules': today_schedules,
         'recent_bookings': recent_bookings,
         'today': today,
+        'schedule': current_schedule,  # ✅ correct now
     }
     
     return render(request, 'conductor/dashboard.html', context)
-
 
 @login_required
 def conductor_seat_management(request, bus_id):
@@ -357,3 +366,49 @@ def conductor_cancel_booking(request):
         return redirect('conductor_seat_management', bus_id=bus.id)
     
     return redirect('conductor_dashboard')
+
+
+from bus_owner.models import BusLiveLocation, RouteStop
+
+@login_required
+@require_POST
+def update_bus_location(request):
+    try:
+        conductor = Conductor.objects.get(user=request.user)
+
+        stop_id = request.POST.get('stop_id')
+
+        current_duty = ConductorDuty.objects.filter(
+            conductor=conductor,
+            is_active=True
+        ).first()
+
+        if not current_duty:
+            return JsonResponse({'error': 'No assigned bus'}, status=400)
+
+        bus = current_duty.bus
+
+        schedule = BusSchedule.objects.filter(
+            bus=bus,
+            active=True
+        ).first()
+
+        if not schedule:
+            return JsonResponse({'error': 'No active schedule'}, status=400)
+
+        stop = RouteStop.objects.get(id=stop_id)
+
+        # 🔥 MAIN LOGIC
+        BusLiveLocation.objects.update_or_create(
+            bus=bus,
+            schedule=schedule,
+            defaults={
+                'current_stop': stop,
+                'updated_by': conductor
+            }
+        )
+
+        return redirect('conductor_dashboard')
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

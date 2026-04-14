@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Manage Conductors - Government Transport Portal{% endblock %}
+{% block title %}Add Conductor - Government Transport Portal{% endblock %}
 
 {% block content %}
 <style>
-  /* Teal & Orange Government Theme */
+  /* Teal & Orange Government Theme - Override only form styles */
   :root {
     --gov-primary: #00695c;
     --gov-secondary: #ff8f00;
@@ -16,491 +16,333 @@
     --gov-info: #17a2b8;
   }
 
-  .gov-conductors-page {
-    padding: 20px 0 40px;
-    background: #eef2f5;
-    min-height: calc(100vh - 80px);
+  /* Remove the outer container with margins - let base template handle it */
+  .gov-form-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
   
-  .gov-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  
-  .gov-hero-section {
-    background: var(--gov-gradient);
-    border-radius: 8px;
-    padding: 30px 35px;
-    margin-bottom: 30px;
+  .gov-form-card {
+    background: white;
+    border-radius: 6px;
+    padding: 0;
+    box-shadow: none;
+    border: none;
     position: relative;
-    overflow: hidden;
-    border-bottom: 3px solid var(--gov-secondary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   
-  .gov-hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: rgba(255,143,0,0.08);
-    border-radius: 50%;
-  }
-  
-  .gov-hero-section::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 250px;
-    height: 250px;
-    background: rgba(255,143,0,0.05);
-    border-radius: 50%;
-  }
-  
-  .gov-hero-title {
-    font-size: 1.6rem;
+  .gov-form-title {
+    color: var(--gov-primary);
+    font-size: 1.4rem;
     font-weight: 600;
-    color: white;
-    margin-bottom: 5px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--gov-secondary);
   }
   
-  .gov-hero-title i {
+  .gov-form-title i {
     color: var(--gov-secondary);
-    margin-right: 8px;
   }
   
-  .gov-hero-subtitle {
-    color: rgba(255,255,255,0.9);
-    font-size: 0.85rem;
+  .gov-form-group {
+    margin-bottom: 20px;
   }
   
-  .gov-stats-grid {
+  .gov-form-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
-    margin-bottom: 30px;
   }
   
   @media (max-width: 768px) {
-    .gov-stats-grid {
+    .gov-form-row {
       grid-template-columns: 1fr;
+      gap: 15px;
     }
   }
   
-  .gov-stat-card {
-    background: white;
-    border-radius: 6px;
-    padding: 18px;
-    border: 1px solid #e0e0e0;
+  .gov-label {
     display: flex;
     align-items: center;
-    gap: 15px;
-    transition: all 0.2s ease;
+    gap: 6px;
+    font-weight: 500;
+    color: var(--gov-primary);
+    margin-bottom: 6px;
+    font-size: 0.85rem;
   }
   
-  .gov-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,105,92,0.15);
-    border-color: var(--gov-primary);
-  }
-  
-  .gov-stat-icon {
-    width: 45px;
-    height: 45px;
-    background: var(--gov-gradient);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .gov-stat-icon i {
-    font-size: 1.3rem;
+  .gov-label i {
     color: var(--gov-secondary);
   }
   
-  .gov-stat-number {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: var(--gov-primary);
+  .gov-required {
+    color: var(--gov-danger);
+    margin-left: 3px;
   }
   
-  .gov-stat-label {
-    color: #666;
-    font-size: 0.7rem;
-  }
-  
-  .gov-main-card {
+  .gov-input, .gov-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
     background: white;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid #e0e0e0;
   }
   
-  .gov-card-header {
-    background: #fafafa;
-    padding: 15px 20px;
-    border-bottom: 2px solid var(--gov-primary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
+  .gov-input:focus, .gov-textarea:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 2px rgba(0,105,92,0.1);
+    outline: none;
   }
   
-  .gov-card-header h3 {
+  .gov-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .gov-file-upload {
+    border: 1px dashed var(--gov-primary);
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  .gov-file-upload:hover {
+    background: var(--gov-light);
+    border-color: var(--gov-secondary);
+  }
+  
+  .gov-file-upload i {
+    font-size: 1.5rem;
+    color: var(--gov-secondary);
+    margin-bottom: 8px;
+  }
+  
+  .gov-file-upload p {
     color: var(--gov-primary);
+    font-weight: 500;
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  
+  .gov-file-upload small {
+    font-size: 0.7rem;
+    color: #888;
+  }
+  
+  .gov-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .gov-file-preview {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background: var(--gov-light);
+    border-radius: 4px;
     display: flex;
     align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--gov-primary);
+  }
+  
+  .gov-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  @media (max-width: 768px) {
+    .gov-action-buttons {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  
+  .gov-btn-submit {
+    flex: 1;
+    background: var(--gov-primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
   }
   
-  .gov-card-header h3 i {
-    color: var(--gov-secondary);
-  }
-  
-  .gov-btn-primary {
-    background: var(--gov-primary);
-    color: white;
-    padding: 6px 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    transition: all 0.2s ease;
-  }
-  
-  .gov-btn-primary:hover {
+  .gov-btn-submit:hover {
     background: var(--gov-accent);
     transform: translateY(-2px);
   }
   
-  .gov-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .gov-table th {
-    background: #f5f5f5;
-    color: #333;
-    padding: 12px 12px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid var(--gov-primary);
-  }
-  
-  .gov-table td {
-    padding: 12px;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
-    font-size: 0.85rem;
-  }
-  
-  .gov-table tr:hover {
-    background: #f9f9f9;
-  }
-  
-  @media (max-width: 768px) {
-    .gov-table td {
-      min-width: 140px;
-    }
-  }
-  
-  .gov-conductor-avatar {
-    width: 34px;
-    height: 34px;
-    background: var(--gov-gradient);
-    border-radius: 50%;
-    display: flex;
+  .gov-btn-cancel {
+    flex: 1;
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--gov-secondary);
-    font-weight: 600;
-    font-size: 0.8rem;
+    gap: 8px;
   }
   
-  .gov-status-active {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 15px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    background: rgba(40, 167, 69, 0.15);
-    color: #28a745;
-    border: 1px solid #28a745;
-  }
-  
-  .gov-status-inactive {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 15px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    background: rgba(108, 117, 125, 0.15);
-    color: #6c757d;
-    border: 1px solid #6c757d;
-  }
-  
-  .gov-assigned-bus {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--gov-light);
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-size: 0.75rem;
+  .gov-btn-cancel:hover {
+    background: #f5f5f5;
+    border-color: var(--gov-primary);
     color: var(--gov-primary);
-    border: 1px solid var(--gov-primary);
-  }
-  
-  .gov-unassigned {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #999;
-    font-style: italic;
-    font-size: 0.75rem;
-  }
-  
-  .gov-action-group {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  
-  .gov-action-btn {
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    text-decoration: none;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s ease;
-  }
-  
-  .gov-action-edit {
-    background: var(--gov-primary);
-    color: white;
-    border: none;
-  }
-  
-  .gov-action-edit:hover {
-    background: var(--gov-accent);
-  }
-  
-  .gov-action-delete {
-    background: var(--gov-danger);
-    color: white;
-    border: none;
-  }
-  
-  .gov-action-delete:hover {
-    background: #c82333;
-  }
-  
-  .gov-action-unassign {
-    background: #ff9800;
-    color: white;
-    border: none;
-  }
-  
-  .gov-action-unassign:hover {
-    background: #e68900;
-  }
-  
-  .gov-action-assign {
-    background: #28a745;
-    color: white;
-    border: none;
-  }
-  
-  .gov-action-assign:hover {
-    background: #218838;
-  }
-  
-  .gov-empty-state {
-    text-align: center;
-    padding: 50px 20px;
-  }
-  
-  .gov-empty-icon {
-    font-size: 3rem;
-    color: var(--gov-secondary);
-    margin-bottom: 15px;
-  }
-  
-  .gov-empty-state h3 {
-    color: var(--gov-primary);
-    margin-top: 0;
-    font-size: 1.2rem;
-  }
-  
-  .text-muted {
-    color: #888 !important;
   }
 </style>
 
-<div class="gov-conductors-page">
-  <div class="gov-container">
+<!-- REMOVED the outer gov-form-container div that was causing margins -->
+<div class="gov-form-card">
+  <h2 class="gov-form-title">
+    <i class="bi bi-person-plus-fill"></i>
+    Add New Conductor
+  </h2>
+  
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     
-    <!-- Hero Section -->
-    <div class="gov-hero-section">
-      <h1 class="gov-hero-title">
-        <i class="bi bi-people-fill"></i> Conductor Management
-      </h1>
-      <p class="gov-hero-subtitle">
-        Manage your fleet conductors and bus assignments
-      </p>
-    </div>
-    
-    <!-- Stats Cards -->
-    <div class="gov-stats-grid">
-      <div class="gov-stat-card">
-        <div class="gov-stat-icon">
-          <i class="bi bi-people-fill"></i>
-        </div>
-        <div>
-          <div class="gov-stat-number">{{ total_conductors }}</div>
-          <div class="gov-stat-label">Total Conductors</div>
-        </div>
-      </div>
-      <div class="gov-stat-card">
-        <div class="gov-stat-icon">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div>
-          <div class="gov-stat-number">{{ active_conductors }}</div>
-          <div class="gov-stat-label">Active Conductors</div>
-        </div>
-      </div>
-      <div class="gov-stat-card">
-        <div class="gov-stat-icon">
-          <i class="bi bi-bus-front"></i>
-        </div>
-        <div>
-          <div class="gov-stat-number">{{ assigned_conductors_count|default:"0" }}</div>
-          <div class="gov-stat-label">Assigned to Buses</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Main Card -->
-    <div class="gov-main-card">
-      <div class="gov-card-header">
-        <h3>
-          <i class="bi bi-list-ul"></i>
-          Conductor List
-        </h3>
-        <div style="display: flex; gap: 10px;">
-          <a href="{% url 'owner_add_conductor' %}" class="gov-btn-primary">
-            <i class="bi bi-plus-circle-fill"></i> Add Conductor
-          </a>
-          <a href="{% url 'owner_assign_duty' %}" class="gov-btn-primary">
-            <i class="bi bi-bus-front"></i> Assign/Change Bus
-          </a>
-        </div>
+    <div class="gov-form-row">
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-person"></i>
+          First Name <span class="gov-required">*</span>
+        </label>
+        <input type="text" name="first_name" class="gov-input" required>
       </div>
       
-      {% if conductors %}
-        <table class="gov-table">
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Assigned Bus</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </thead>
-          <tbody>
-            {% for conductor in conductors %}
-            <tr>
-              <td><strong>{{ conductor.employee_id }}</strong></div>
-              <td>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="gov-conductor-avatar">
-                    {{ conductor.user.first_name|first|upper }}{{ conductor.user.last_name|first|upper }}
-                  </div>
-                  {{ conductor.user.get_full_name }}
-                </div>
-               </div>
-              <td>{{ conductor.phone }}</div>
-              <td>
-                {% with assigned_bus=conductor.assigned_bus %}
-                  {% if assigned_bus %}
-                    <span class="gov-assigned-bus">
-                      <i class="bi bi-bus-front"></i>
-                      {{ assigned_bus.bus_name }} ({{ assigned_bus.bus_number }})
-                    </span>
-                  {% else %}
-                    <span class="gov-unassigned">
-                      <i class="bi bi-exclamation-circle"></i> Not assigned
-                    </span>
-                  {% endif %}
-                {% endwith %}
-              </div>
-              <td>
-                {% if conductor.is_active %}
-                  <span class="gov-status-active">Active</span>
-                {% else %}
-                  <span class="gov-status-inactive">Inactive</span>
-                {% endif %}
-              </div>
-              <td>
-                <div class="gov-action-group">
-                  <a href="{% url 'owner_edit_conductor' conductor.id %}" class="gov-action-btn gov-action-edit">
-                    <i class="bi bi-pencil"></i> Edit
-                  </a>
-                  {% with assigned_bus=conductor.assigned_bus %}
-                    {% if assigned_bus %}
-                      <a href="{% url 'owner_unassign_conductor' conductor.id %}" class="gov-action-btn gov-action-unassign">
-                        <i class="bi bi-x-circle"></i> Unassign
-                      </a>
-                    {% else %}
-                      <a href="{% url 'owner_assign_duty' %}" class="gov-action-btn gov-action-assign">
-                        <i class="bi bi-plus-circle"></i> Assign
-                      </a>
-                    {% endif %}
-                  {% endwith %}
-                  <a href="{% url 'owner_delete_conductor' conductor.id %}" class="gov-action-btn gov-action-delete" 
-                     onclick="return confirm('Delete this conductor permanently?')">
-                    <i class="bi bi-trash"></i> Delete
-                  </a>
-                </div>
-              </div>
-             </div>
-            {% endfor %}
-          </tbody>
-        </div>
-      {% else %}
-        <div class="gov-empty-state">
-          <div class="gov-empty-icon">
-            <i class="bi bi-people"></i>
-          </div>
-          <h3>No Conductors Yet</h3>
-          <p style="color: #888;">Start by adding your first conductor to the fleet.</p>
-          <a href="{% url 'owner_add_conductor' %}" class="gov-btn-primary" style="margin-top: 20px; display: inline-block;">
-            <i class="bi bi-plus-circle"></i> Add First Conductor
-          </a>
-        </div>
-      {% endif %}
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-person"></i>
+          Last Name <span class="gov-required">*</span>
+        </label>
+        <input type="text" name="last_name" class="gov-input" required>
+      </div>
     </div>
     
-  </div>
+    <div class="gov-form-group">
+      <label class="gov-label">
+        <i class="bi bi-envelope"></i>
+        Email Address <span class="gov-required">*</span>
+      </label>
+      <input type="email" name="email" class="gov-input" required>
+    </div>
+    
+    <div class="gov-form-row">
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-person-badge"></i>
+          Username <span class="gov-required">*</span>
+        </label>
+        <input type="text" name="username" class="gov-input" required>
+      </div>
+      
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-telephone"></i>
+          Phone Number <span class="gov-required">*</span>
+        </label>
+        <input type="tel" name="phone" class="gov-input" required>
+      </div>
+    </div>
+    
+    <div class="gov-form-row">
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-lock"></i>
+          Password <span class="gov-required">*</span>
+        </label>
+        <input type="password" name="password" class="gov-input" required>
+      </div>
+      
+      <div class="gov-form-group">
+        <label class="gov-label">
+          <i class="bi bi-lock-fill"></i>
+          Confirm Password <span class="gov-required">*</span>
+        </label>
+        <input type="password" name="confirm_password" class="gov-input" required>
+      </div>
+    </div>
+    
+    <div class="gov-form-group">
+      <label class="gov-label">
+        <i class="bi bi-geo-alt"></i>
+        Address
+      </label>
+      <textarea name="address" class="gov-textarea" placeholder="Enter complete address"></textarea>
+    </div>
+    
+    <div class="gov-form-group">
+      <label class="gov-label">
+        <i class="bi bi-camera"></i>
+        Profile Photo
+      </label>
+      <div class="gov-file-upload" id="fileUploadArea">
+        <i class="bi bi-cloud-upload"></i>
+        <p>Click to upload photo</p>
+        <small>Supported: JPG, PNG (Max 5MB)</small>
+        <input type="file" name="profile_photo" id="profilePhoto" class="gov-file-input" accept="image/*">
+      </div>
+      <div id="filePreview" class="gov-file-preview" style="display: none;">
+        <i class="bi bi-image"></i>
+        <span id="fileName"></span>
+      </div>
+    </div>
+    
+    <div class="gov-action-buttons">
+      <button type="submit" class="gov-btn-submit">
+        <i class="bi bi-check-circle"></i> Create Conductor
+      </button>
+      <a href="{% url 'owner_conductors_list' %}" class="gov-btn-cancel">
+        <i class="bi bi-x-circle"></i> Cancel
+      </a>
+    </div>
+  </form>
 </div>
+
+<script>
+  const fileInput = document.getElementById('profilePhoto');
+  const filePreview = document.getElementById('filePreview');
+  const fileName = document.getElementById('fileName');
+  
+  fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      fileName.textContent = this.files[0].name;
+      filePreview.style.display = 'flex';
+    } else {
+      filePreview.style.display = 'none';
+    }
+  });
+</script>
 {% endblock %}

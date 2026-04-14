@@ -57,7 +57,12 @@ urlpatterns = [
     path("track-bus/", views.track_bus_list, name="track_bus_list"),
 
     path('create-razorpay-order/', views.create_razorpay_order, name='create_razorpay_order'),
-    path('verify-payment/', views.verify_payment, name='verify_payment'),
+    # path('verify-payment/', views.verify_payment, name='verify_payment'),
+    
+    path('check-seat-availability/', views.check_seat_availability, name='check_seat_availability'),
+        path('get-available-seats-for-boarding/', views.get_available_seats_for_boarding, name='get_available_seats_for_boarding'),
+    path('get-available-destinations-for-seat/', views.get_available_destinations_for_seat, name='get_available_destinations_for_seat'),
+    
 ]
 
 

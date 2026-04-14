@@ -285,5 +285,17 @@
     {% endif %}
 
   </div>
+  <form method="POST" action="{% url 'update_bus_location' %}">
+  {% csrf_token %}
+
+  <label>Select Current Stop:</label>
+  <select name="stop_id" required>
+    {% for stop in schedule.route.stops.all %}
+      <option value="{{ stop.id }}">{{ stop.stop_name }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit">Update Location</button>
+</form>
 </div>
 {% endblock %}

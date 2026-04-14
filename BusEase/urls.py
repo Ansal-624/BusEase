@@ -28,6 +28,7 @@ urlpatterns = [
      path('reviews/', include('reviews.urls')),
      path('complaints/',include('complaints.urls')),
      path('conductor/',include("conductor.urls")),
+     
 ]
 
 

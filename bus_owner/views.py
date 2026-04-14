@@ -807,3 +807,35 @@ def owner_cancel_duty(request, duty_id):
         return redirect('owner_duty_assignments')
     
     return render(request, 'bus_owner/owner_cancel_duty.html', {'duty': duty})
+
+# Add this import at the top of bus_owner/views.py with your other imports
+from traveller.models import SeatSegment
+
+@login_required
+def view_seat_segments(request, bus_id, schedule_id):
+    """Bus owner views all seat segments for a schedule"""
+    bus = get_object_or_404(Bus, id=bus_id, owner__user=request.user)
+    schedule = get_object_or_404(BusSchedule, id=schedule_id, bus=bus)
+    
+    segments = SeatSegment.objects.filter(
+        schedule=schedule,
+        is_active=True
+    ).select_related('booking__traveller', 'from_stop', 'to_stop')
+    
+    # Group by seat
+    seats_data = {}
+    for segment in segments:
+        if segment.seat_number not in seats_data:
+            seats_data[segment.seat_number] = []
+        seats_data[segment.seat_number].append({
+            'from': segment.from_stop.stop_name,
+            'to': segment.to_stop.stop_name,
+            'passenger': segment.booking.traveller.get_full_name(),
+            'fare': segment.segment_fare,
+        })
+    
+    return render(request, 'bus_owner/seat_segments.html', {
+        'bus': bus,
+        'schedule': schedule,
+        'seats_data': seats_data,
+    })

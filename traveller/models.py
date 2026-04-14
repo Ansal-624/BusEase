@@ -98,10 +98,16 @@ class Booking(models.Model):
         null=True,
         help_text="Full payment response from Razorpay"
     )
+    def get_segments(self):
+        """Get all segments for this booking"""
+        return self.segments.all()
+    
+    def get_total_segments_fare(self):
+        """Calculate total fare from all segments"""
+        return sum(segment.segment_fare for segment in self.segments.all())
 
     class Meta:
-        unique_together = ("schedule", "seat_number")
-        ordering = ["-booking_date"]
+     ordering = ["-booking_date"]
 
     def __str__(self):
         return f"Booking {self.id} - {self.traveller.username} - Seat {self.seat_number} - {self.payment_status}"
@@ -249,3 +255,69 @@ class ConcessionDetail(models.Model):
         verbose_name = "Concession Detail"
         verbose_name_plural = "Concession Details"
         ordering = ['-issued_on']
+
+# Add this to your traveller/models.py
+
+class SeatSegment(models.Model):
+    """Track individual segments of a seat booking"""
+    booking = models.ForeignKey(
+        'Booking',
+        on_delete=models.CASCADE,
+        related_name='segments'
+    )
+    schedule = models.ForeignKey(
+        'bus_owner.BusSchedule',
+        on_delete=models.CASCADE,
+        related_name='seat_segments'
+    )
+    seat_number = models.PositiveIntegerField()
+    from_stop = models.ForeignKey(
+        'bus_owner.RouteStop',
+        on_delete=models.CASCADE,
+        related_name='segments_from'
+    )
+    to_stop = models.ForeignKey(
+        'bus_owner.RouteStop',
+        on_delete=models.CASCADE,
+        related_name='segments_to'
+    )
+    segment_fare = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        default=0
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['schedule', 'seat_number', 'from_stop', 'to_stop']),
+            models.Index(fields=['schedule', 'seat_number', 'is_active']),
+        ]
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"Seat {self.seat_number}: {self.from_stop.stop_name} → {self.to_stop.stop_name}"
+    
+    @property
+    def segment_stops_count(self):
+        """Number of stops in this segment"""
+        return self.to_stop.order - self.from_stop.order
+
+
+class SeatAvailabilityCache(models.Model):
+    """Cache for seat availability to reduce database queries"""
+    schedule = models.ForeignKey(
+        'bus_owner.BusSchedule',
+        on_delete=models.CASCADE,
+        related_name='seat_cache'
+    )
+    seat_number = models.PositiveIntegerField()
+    available_segments = models.JSONField(default=list)  # List of available [from_order, to_order] pairs
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['schedule', 'seat_number']
+        indexes = [
+            models.Index(fields=['schedule', 'last_updated']),
+        ]

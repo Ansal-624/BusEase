@@ -901,48 +901,38 @@
   </div>
 
   <!-- Search Section -->
-  <div class="gov-search-section">
-    <div class="gov-search-title">
-      <i class="bi bi-search"></i>
-      <h3>Find Your Bus</h3>
-    </div>
+  <form method="GET">
+  <div class="gov-search-wrapper">
+    
+    <input 
+      type="text" 
+      name="source"
+      placeholder="Enter Current Location"
+      class="gov-search-input"
+      required
+    >
 
-    <div class="gov-search-wrapper">
-      <input 
-        type="text" 
-        class="gov-search-input" 
-        id="govSearchInput"
-        placeholder="Search by bus name, registration number, or route..."
-      >
-      <button class="gov-search-btn" onclick="searchBuses()">
-        <i class="bi bi-search"></i> Search
-      </button>
-    </div>
+    <input 
+      type="text" 
+      name="destination"
+      placeholder="Enter Destination"
+      class="gov-search-input"
+      required
+    >
 
-    <div class="gov-filter-section">
-      <div class="gov-filter-label">
-        <i class="bi bi-funnel"></i>
-        <span>Filter:</span>
-      </div>
-      <div class="gov-filter-chips">
-        <button class="gov-filter-chip active" onclick="filterBuses('all', this)">
-          <i class="bi bi-grid"></i> All Buses
-        </button>
-        <button class="gov-filter-chip" onclick="filterBuses('ac', this)">
-          <i class="bi bi-snow"></i> AC Buses
-        </button>
-        <button class="gov-filter-chip" onclick="filterBuses('non-ac', this)">
-          <i class="bi bi-wind"></i> Non-AC
-        </button>
-        <button class="gov-filter-chip" onclick="filterBuses('sleeper', this)">
-          <i class="bi bi-moon"></i> Sleeper
-        </button>
-        <button class="gov-filter-chip" onclick="filterBuses('seater', this)">
-          <i class="bi bi-people"></i> Seater
-        </button>
-      </div>
-    </div>
+    <input 
+      type="time" 
+      name="time"
+      class="gov-search-input"
+      required
+    >
+
+    <button type="submit" class="gov-search-btn">
+      <i class="bi bi-search"></i> Search
+    </button>
+
   </div>
+</form>
 
   {% if buses %}
     <!-- Stats Bar -->

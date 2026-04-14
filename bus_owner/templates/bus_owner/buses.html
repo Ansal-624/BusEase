@@ -726,132 +726,105 @@
               </tr>
             </thead>
             <tbody>
-              {% for bus in buses %}
-              <tr>
-                <td>
-                  <div class="gov-bus-name">{{ bus.bus_name }}</div>
-                  <div class="gov-bus-number">
-                    <i class="bi bi-hash"></i> {{ bus.bus_number }}
-                  </div>
-                 </div>
+  {% for bus in buses %}
+  <tr>
 
-                <td>
-                  {% if bus.driver_name %}
-                    <div class="gov-driver-info">
-                      <i class="bi bi-person-badge"></i>
-                      {{ bus.driver_name }}
-                    </div>
-                  {% else %}
-                    <span class="text-muted">—</span>
-                  {% endif %}
-                 </div>
+    <!-- Bus Info -->
+    <td>
+      <div class="gov-bus-name">{{ bus.bus_name }}</div>
+      <div class="gov-bus-number">
+        <i class="bi bi-hash"></i> {{ bus.bus_number }}
+      </div>
+    </td>
 
-                <td>
-                  {% if bus.approved %}
-                    <span class="gov-status-badge gov-status-approved">
-                      <i class="bi bi-check-circle"></i> Approved
-                    </span>
-                  {% else %}
-                    <span class="gov-status-badge gov-status-pending">
-                      <i class="bi bi-clock"></i> Pending
-                    </span>
-                  {% endif %}
-                 </div>
+    <!-- Driver -->
+    <td>
+      {% if bus.driver_name %}
+        <div class="gov-driver-info">
+          <i class="bi bi-person-badge"></i>
+          {{ bus.driver_name }}
+        </div>
+      {% else %}
+        <span class="text-muted">—</span>
+      {% endif %}
+    </td>
 
-                <td>
-                  {% if bus.schedules.count %}
-                    {% for schedule in bus.schedules.all %}
-                      <div class="gov-schedule-card">
-                        <!-- Delete Schedule Button -->
-                        <form method="POST" action="{% url 'delete_schedule' schedule.id %}" 
-                              onsubmit="return confirm('⚠️ Delete this schedule permanently?');" style="display: inline;">
-                          {% csrf_token %}
-                          <button type="submit" class="gov-delete-schedule" title="Delete Schedule">
-                            <i class="bi bi-trash-fill"></i>
-                          </button>
-                        </form>
+    <!-- Status -->
+    <td>
+      {% if bus.approved %}
+        <span class="gov-status-badge gov-status-approved">
+          <i class="bi bi-check-circle"></i> Approved
+        </span>
+      {% else %}
+        <span class="gov-status-badge gov-status-pending">
+          <i class="bi bi-clock"></i> Pending
+        </span>
+      {% endif %}
+    </td>
 
-                        <!-- Route -->
-                        <div class="gov-route-title">
-                          <i class="bi bi-arrow-left-right"></i>
-                          {{ schedule.route.start_location }} → {{ schedule.route.end_location }}
-                        </div>
+    <!-- Schedules -->
+    <td>
+      {% if bus.schedules.count %}
+        {% for schedule in bus.schedules.all %}
+          <div class="gov-schedule-card">
 
-                        <!-- Schedule Meta -->
-                        <div class="gov-schedule-meta">
-                          <span class="gov-meta-chip">
-                            <i class="bi bi-clock"></i> Dep: {{ schedule.departure_time|date:"M d, H:i" }}
-                          </span>
-                          <span class="gov-meta-chip">
-                            <i class="bi bi-clock-history"></i> Arr: {{ schedule.arrival_time|date:"M d, H:i" }}
-                          </span>
-                          <span class="gov-meta-chip gov-fare-chip">
-                            <i class="bi bi-currency-rupee"></i> {{ schedule.fare }}
-                          </span>
-                        </div>
+            <form method="POST" action="{% url 'delete_schedule' schedule.id %}" 
+                  onsubmit="return confirm('Delete this schedule?');">
+              {% csrf_token %}
+              <button type="submit" class="gov-delete-schedule">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </form>
 
-                        <!-- Stops -->
-                        {% if schedule.route.stops.count %}
-                          <button class="gov-stops-btn" type="button" 
-                                  data-bs-toggle="collapse" 
-                                  data-bs-target="#stops{{ schedule.id }}">
-                            <i class="bi bi-pin-map"></i>
-                            View {{ schedule.route.stops.count }} Stops
-                          </button>
-                          
-                          <div class="collapse" id="stops{{ schedule.id }}">
-                            <div class="gov-stops-section">
-                              {% for stop in schedule.route.stops.all %}
-                                <div class="gov-stop-item">
-                                  <span class="gov-stop-name">
-                                    <i class="bi bi-geo-alt"></i>
-                                    {{ stop.stop_name }}
-                                  </span>
-                                  <span class="gov-stop-time">
-                                    {{ stop.arrival_time|time:"H:i" }}
-                                  </span>
-                                </div>
-                              {% endfor %}
-                            </div>
-                          </div>
-                        {% endif %}
-                      </div>
-                    {% endfor %}
-                  {% else %}
-                    <div class="text-muted" style="font-style: italic;">
-                      <i class="bi bi-calendar-x"></i> No schedules
-                    </div>
-                  {% endif %}
-                 </div>
+            <div class="gov-route-title">
+              {{ schedule.route.start_location }} → {{ schedule.route.end_location }}
+            </div>
 
-                <td>
-                  <div class="gov-action-group">
-                    {% if bus.approved %}
-                      <a href="{% url 'add_schedule' bus.id %}" class="gov-action-btn gov-action-primary">
-                        <i class="bi bi-plus-circle"></i> Add Schedule
-                      </a>
-                      <a href="{% url 'view_bookings' bus.id %}" class="gov-action-btn gov-action-success">
-                        <i class="bi bi-people"></i> View Bookings
-                      </a>
-                    {% else %}
-                      <button class="gov-action-btn gov-action-disabled" disabled>
-                        <i class="bi bi-lock"></i> Awaiting Approval
-                      </button>
-                    {% endif %}
+            <div class="gov-schedule-meta">
+              <span class="gov-meta-chip">
+                {{ schedule.departure_time|date:"H:i" }}
+              </span>
+              <span class="gov-meta-chip">
+                {{ schedule.arrival_time|date:"H:i" }}
+              </span>
+              <span class="gov-meta-chip gov-fare-chip">
+                ₹{{ schedule.fare }}
+              </span>
+            </div>
 
-                    <form method="POST" action="{% url 'delete_bus' bus.id %}" 
-                          onsubmit="return confirm('⚠️ Delete this bus and ALL schedules?');">
-                      {% csrf_token %}
-                      <button type="submit" class="gov-action-btn gov-action-danger">
-                        <i class="bi bi-trash"></i> Delete Bus
-                      </button>
-                    </form>
-                  </div>
-                 </div>
-               </div>
-              {% endfor %}
-            </tbody>
           </div>
+        {% endfor %}
+      {% else %}
+        <span class="text-muted">No schedules</span>
+      {% endif %}
+    </td>
+
+    <!-- Actions -->
+    <td>
+      <div class="gov-action-group">
+        {% if bus.approved %}
+          <a href="{% url 'add_schedule' bus.id %}" class="gov-action-btn gov-action-primary">
+            Add Schedule
+          </a>
+        {% else %}
+          <button class="gov-action-btn gov-action-disabled" disabled>
+            Pending
+          </button>
+        {% endif %}
+
+        <form method="POST" action="{% url 'delete_bus' bus.id %}">
+          {% csrf_token %}
+          <button type="submit" class="gov-action-btn gov-action-danger">
+            Delete
+          </button>
+        </form>
+      </div>
+    </td>
+
+  </tr>
+  {% endfor %}
+</tbody>
+          </table>
         </div>
       </div>
     {% else %}

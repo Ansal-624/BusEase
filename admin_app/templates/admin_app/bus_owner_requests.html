@@ -1,605 +1,83 @@
 {% extends "base.html" %}
-{% block title %}Bus Owner Requests - Government Transport Portal{% endblock %}
+{% block title %}Owner Requests{% endblock %}
 
 {% block content %}
-<style>
-  /* Teal & Orange Government Theme */
-  :root {
-    --gov-primary: #00695c;
-    --gov-secondary: #ff8f00;
-    --gov-accent: #004d40;
-    --gov-light: #e0f2f1;
-    --gov-gradient: linear-gradient(135deg, #00695c 0%, #004d40 100%);
-    --gov-success: #28a745;
-    --gov-warning: #ffc107;
-    --gov-danger: #dc3545;
-    --gov-info: #17a2b8;
-  }
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  .gov-requests-page {
-    padding: 20px 0 40px;
-    background: #eef2f5;
-    min-height: calc(100vh - 80px);
-  }
-
-  .gov-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  /* Hero Section */
-  .gov-hero-section {
-    background: var(--gov-gradient);
-    border-radius: 8px;
-    padding: 30px 35px;
-    margin-bottom: 30px;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 3px solid var(--gov-secondary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-
-  .gov-hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: rgba(255,143,0,0.08);
-    border-radius: 50%;
-  }
-
-  .gov-hero-section::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 250px;
-    height: 250px;
-    background: rgba(255,143,0,0.05);
-    border-radius: 50%;
-  }
-
-  .gov-hero-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-
-  .gov-hero-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: white;
-    margin: 0;
-  }
-
-  .gov-hero-title i {
-    color: var(--gov-secondary);
-    margin-right: 8px;
-  }
-
-  .gov-hero-subtitle {
-    color: rgba(255,255,255,0.9);
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 5px;
-  }
-
-  .gov-hero-subtitle i {
-    color: var(--gov-secondary);
-  }
-
-  .gov-stats-badge {
-    background: var(--gov-secondary);
-    color: var(--gov-primary);
-    padding: 8px 18px;
-    border-radius: 30px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-  }
-
-  .gov-hero-decor {
-    position: absolute;
-    right: 20px;
-    bottom: 15px;
-    font-size: 5rem;
-    color: var(--gov-secondary);
-    opacity: 0.1;
-  }
-
-  /* Stats Cards */
-  .gov-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-  }
-
-  .gov-stat-card {
-    background: white;
-    border-radius: 6px;
-    padding: 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    border: 1px solid #e0e0e0;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-
-  .gov-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,105,92,0.15);
-    border-color: var(--gov-primary);
-  }
-
-  .gov-stat-icon {
-    width: 50px;
-    height: 50px;
-    background: var(--gov-gradient);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .gov-stat-icon i {
-    font-size: 1.6rem;
-    color: var(--gov-secondary);
-  }
-
-  .gov-stat-content {
-    flex: 1;
-  }
-
-  .gov-stat-label {
-    color: #666;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-
-  .gov-stat-number {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: var(--gov-primary);
-    line-height: 1;
-  }
-
-  /* Main Card */
-  .gov-main-card {
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    overflow: hidden;
-    border: 1px solid #e0e0e0;
-    margin-bottom: 30px;
-  }
-
-  .gov-card-header {
-    background: #fafafa;
-    padding: 15px 20px;
-    border-bottom: 2px solid var(--gov-primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-
-  .gov-card-title {
-    color: var(--gov-primary);
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .gov-card-title i {
-    color: var(--gov-secondary);
-  }
-
-  .gov-card-subtitle {
-    color: #666;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  /* Table Styles */
-  .gov-table-container {
-    overflow-x: auto;
-  }
-
-  .gov-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .gov-table thead tr {
-    background: #f5f5f5;
-  }
-
-  .gov-table thead th {
-    color: #333;
-    padding: 14px 16px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid var(--gov-primary);
-    text-align: left;
-  }
-
-  .gov-table tbody tr {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .gov-table tbody tr:hover {
-    background: #f9f9f9;
-  }
-
-  .gov-table td {
-    padding: 14px 16px;
-    vertical-align: middle;
-    color: #444;
-    font-size: 0.9rem;
-  }
-
-  /* Owner Info */
-  .gov-owner-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .gov-owner-avatar {
-    width: 40px;
-    height: 40px;
-    background: var(--gov-gradient);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gov-secondary);
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  .gov-owner-name {
-    font-weight: 600;
-    color: var(--gov-primary);
-    margin-bottom: 2px;
-  }
-
-  .gov-owner-username {
-    font-size: 0.75rem;
-    color: #888;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .gov-owner-username i {
-    color: var(--gov-secondary);
-    font-size: 0.7rem;
-  }
-
-  /* Phone Number */
-  .gov-phone {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #555;
-  }
-
-  .gov-phone i {
-    color: var(--gov-secondary);
-    width: 28px;
-  }
-
-  /* Document Links */
-  .gov-doc-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--gov-light);
-    color: var(--gov-primary);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s ease;
-  }
-
-  .gov-doc-link:hover {
-    background: var(--gov-primary);
-    color: white;
-  }
-
-  .gov-doc-link i {
-    font-size: 0.8rem;
-  }
-
-  /* Action Buttons */
-  .gov-action-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .gov-action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 0.75rem;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-  }
-
-  .gov-action-approve {
-    background: var(--gov-success);
-    color: white;
-  }
-
-  .gov-action-approve:hover {
-    background: #218838;
-  }
-
-  /* Empty State */
-  .gov-empty-state {
-    text-align: center;
-    padding: 50px 20px;
-  }
-
-  .gov-empty-icon {
-    font-size: 3rem;
-    color: var(--gov-primary);
-    margin-bottom: 15px;
-  }
-
-  .gov-empty-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-  }
-
-  .gov-empty-text {
-    color: #888;
-    font-size: 0.9rem;
-  }
-
-  /* Responsive */
-  @media (max-width: 992px) {
-    .gov-stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .gov-hero-content {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .gov-stats-grid {
-      grid-template-columns: 1fr;
-    }
-    .gov-table td {
-      min-width: 140px;
-    }
-    .gov-card-header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .gov-owner-info {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .gov-hero-section {
-      padding: 25px 20px;
-    }
-    .gov-hero-title {
-      font-size: 1.4rem;
-    }
-    .gov-action-group {
-      flex-direction: column;
-    }
-  }
-</style>
-
-<div class="gov-requests-page">
-  <div class="gov-container">
-
-    <!-- Hero Section -->
-    <div class="gov-hero-section">
-      <div class="gov-hero-content">
-        <div>
-          <h1 class="gov-hero-title">
-            <i class="bi bi-person-check"></i> Owner Approval Requests
-          </h1>
-          <p class="gov-hero-subtitle">
-            <i class="bi bi-shield-check"></i> Pending Bus Operator Registrations
-          </p>
-        </div>
-        <span class="gov-stats-badge">
-          <i class="bi bi-people"></i> {{ owners|length }} Pending
-        </span>
-      </div>
-      <i class="bi bi-file-earmark-check gov-hero-decor"></i>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4>Pending Approval Requests</h4>
+        <small class="text-muted">Verify documents before approval</small>
     </div>
-
-    <!-- Stats Cards -->
-    <div class="gov-stats-grid">
-      <div class="gov-stat-card">
-        <div class="gov-stat-icon">
-          <i class="bi bi-person-badge"></i>
-        </div>
-        <div class="gov-stat-content">
-          <div class="gov-stat-label">Pending Requests</div>
-          <div class="gov-stat-number">{{ owners|length }}</div>
-        </div>
-      </div>
-
-      <div class="gov-stat-card">
-        <div class="gov-stat-icon">
-          <i class="bi bi-file-earmark-text"></i>
-        </div>
-        <div class="gov-stat-content">
-          <div class="gov-stat-label">Documents to Verify</div>
-          <div class="gov-stat-number">{{ owners|length|add:owners|length }}</div>
-        </div>
-      </div>
-
-      <div class="gov-stat-card">
-        <div class="gov-stat-icon">
-          <i class="bi bi-clock-history"></i>
-        </div>
-        <div class="gov-stat-content">
-          <div class="gov-stat-label">Awaiting Review</div>
-          <div class="gov-stat-number">{{ owners|length }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Requests Table Card -->
-    <div class="gov-main-card">
-      <div class="gov-card-header">
-        <h5 class="gov-card-title">
-          <i class="bi bi-list-check"></i>
-          Pending Approval Requests
-        </h5>
-        <span class="gov-card-subtitle">
-          <i class="bi bi-info-circle"></i> Verify documents before approval
-        </span>
-      </div>
-
-      {% if owners %}
-        <div class="gov-table-container">
-          <table class="gov-table">
-            <thead>
-              <tr>
-                <th>Owner Details</th>
-                <th>Contact Number</th>
-                <th>License Document</th>
-                <th>ID Proof</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for owner in owners %}
-              <tr>
-                <td>
-                  <div class="gov-owner-info">
-                    <div class="gov-owner-avatar">
-                      {{ owner.user.username|slice:":1"|upper }}
-                    </div>
-                    <div>
-                      <div class="gov-owner-name">{{ owner.user.get_full_name|default:owner.user.username }}</div>
-                      <div class="gov-owner-username">
-                        <i class="bi bi-at"></i> {{ owner.user.username }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <td>
-                  <div class="gov-phone">
-                    <i class="bi bi-telephone-fill"></i>
-                    {{ owner.contact_number }}
-                  </div>
-                 </div>
-
-                <td>
-                  <a href="{{ owner.business_license.url }}" target="_blank" class="gov-doc-link">
-                    <i class="bi bi-file-earmark-pdf"></i>
-                    View License
-                  </a>
-                 </div>
-
-                <td>
-                  <a href="{{ owner.id_proof.url }}" target="_blank" class="gov-doc-link">
-                    <i class="bi bi-file-earmark-person"></i>
-                    View ID Proof
-                  </a>
-                 </div>
-
-                <td>
-                  <div class="gov-action-group">
-                    <a href="{% url 'approve_bus_owner' owner.id %}" class="gov-action-btn gov-action-approve">
-                      <i class="bi bi-check-circle"></i>
-                      Approve
-                    </a>
-                  </div>
-                 </div>
-               </div>
-              {% endfor %}
-            </tbody>
-           </div>
-        </div>
-      {% else %}
-        <div class="gov-empty-state">
-          <div class="gov-empty-icon">
-            <i class="bi bi-check-circle"></i>
-          </div>
-          <h3 class="gov-empty-title">No Pending Requests</h3>
-          <p class="gov-empty-text">
-            All bus owner registration requests have been processed.
-          </p>
-        </div>
-      {% endif %}
-    </div>
-
-  </div>
+    <span class="badge bg-warning text-dark">
+        {{ owners|length }} Pending
+    </span>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      document.querySelectorAll('.gov-alert').forEach(alert => {
-        if (alert) {
-          alert.style.transition = 'opacity 0.5s ease';
-          alert.style.opacity = '0';
-          setTimeout(() => {
-            if (alert) alert.style.display = 'none';
-          }, 500);
-        }
-      });
-    }, 5000);
-  });
-</script>
+<!-- Table -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+
+        {% if owners %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Owner</th>
+                        <th>Contact</th>
+                        <th>License</th>
+                        <th>ID Proof</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for owner in owners %}
+                    <tr>
+
+                        <td>
+                            <strong>{{ owner.user.username }}</strong><br>
+                            <small class="text-muted">@{{ owner.user.username }}</small>
+                        </td>
+
+                        <td>{{ owner.contact_number }}</td>
+
+                        <td>
+                            <a href="{{ owner.business_license.url }}" target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+
+                        <td>
+                            <a href="{{ owner.id_proof.url }}" target="_blank"
+                               class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+
+                        <td>
+                            <a href="{% url 'approve_bus_owner' owner.id %}"
+                               class="btn btn-success btn-sm">
+                                Approve
+                            </a>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        {% else %}
+        <div class="text-center p-5">
+            <h5>No Pending Requests</h5>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
 
 {% endblock %}

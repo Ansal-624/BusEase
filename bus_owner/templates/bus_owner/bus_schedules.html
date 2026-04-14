@@ -544,67 +544,75 @@
                 <th>Fare (₹)</th>
               </tr>
             </thead>
-            <tbody>
-              {% for bus in buses %}
-                {% for schedule in bus.schedules.all %}
-                  <tr>
-                    <td>{{ forloop.counter }}</div>
-                    <td>
-                      <div class="gov-bus-name">{{ bus.bus_name }}</div>
-                      <div class="gov-bus-number">{{ bus.bus_number }}</div>
-                    </div>
-                    <td>
-                      <span class="gov-route-badge">
-                        <i class="bi bi-geo-alt"></i>
-                        {{ schedule.route.start_location }}
-                        <i class="bi bi-arrow-right-short"></i>
-                        <i class="bi bi-flag"></i>
-                        {{ schedule.route.end_location }}
-                      </span>
-                    </div>
-                    <td>
-                      <span class="gov-time-chip">
-                        <i class="bi bi-clock"></i>
-                        {{ schedule.departure_time|date:"M d, H:i" }}
-                      </span>
-                    </div>
-                    <td>
-                      <span class="gov-time-chip">
-                        <i class="bi bi-clock-fill"></i>
-                        {{ schedule.arrival_time|date:"M d, H:i" }}
-                      </span>
-                    </div>
-                    <td>
-                      <span class="gov-fare-badge">
-                        <i class="bi bi-currency-rupee"></i> {{ schedule.fare }}
-                      </span>
-                    </div>
-                   </div>
-                {% empty %}
-                  <tr class="gov-no-schedules">
-                    <td colspan="6">
-                      <i class="bi bi-calendar-x gov-empty-icon"></i>
-                      No schedules found for {{ bus.bus_name }}
-                    </div>
-                   </div>
-                {% endfor %}
+           <tbody>
+  {% for bus in buses %}
+    
+    {% for schedule in bus.schedules.all %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
 
-                <tr class="gov-add-row">
-                  <td colspan="5">
-                    <div class="gov-add-label">
-                      <i class="bi bi-plus-circle-fill"></i>
-                      Add new schedule to {{ bus.bus_name }} ({{ bus.bus_number }})
-                    </div>
-                  </div>
-                  <td>
-                    <a href="{% url 'add_schedule' bus.id %}" class="gov-add-btn">
-                      <i class="bi bi-plus-circle"></i> Add
-                    </a>
-                  </div>
-                 </div>
-              {% endfor %}
-            </tbody>
-           </div>
+      <td>
+        <div class="gov-bus-name">{{ bus.bus_name }}</div>
+        <div class="gov-bus-number">{{ bus.bus_number }}</div>
+      </td>
+
+      <td>
+        <span class="gov-route-badge">
+          <i class="bi bi-geo-alt"></i>
+          {{ schedule.route.start_location }}
+          <i class="bi bi-arrow-right-short"></i>
+          {{ schedule.route.end_location }}
+        </span>
+      </td>
+
+      <td>
+        <span class="gov-time-chip">
+          <i class="bi bi-clock"></i>
+          {{ schedule.departure_time|date:"M d, H:i" }}
+        </span>
+      </td>
+
+      <td>
+        <span class="gov-time-chip">
+          <i class="bi bi-clock-fill"></i>
+          {{ schedule.arrival_time|date:"M d, H:i" }}
+        </span>
+      </td>
+
+      <td>
+        <span class="gov-fare-badge">
+          <i class="bi bi-currency-rupee"></i> {{ schedule.fare }}
+        </span>
+      </td>
+    </tr>
+
+    {% empty %}
+    <tr class="gov-no-schedules">
+      <td colspan="6">
+        <i class="bi bi-calendar-x gov-empty-icon"></i>
+        No schedules found for {{ bus.bus_name }}
+      </td>
+    </tr>
+    {% endfor %}
+
+    <!-- Add Row -->
+    <tr class="gov-add-row">
+      <td colspan="5">
+        <div class="gov-add-label">
+          <i class="bi bi-plus-circle-fill"></i>
+          Add new schedule to {{ bus.bus_name }} ({{ bus.bus_number }})
+        </div>
+      </td>
+      <td>
+        <a href="{% url 'add_schedule' bus.id %}" class="gov-add-btn">
+          <i class="bi bi-plus-circle"></i> Add
+        </a>
+      </td>
+    </tr>
+
+  {% endfor %}
+</tbody>
+          </table>
         </div>
       </div>
     {% else %}
