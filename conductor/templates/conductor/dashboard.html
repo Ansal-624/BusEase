@@ -196,6 +196,180 @@
     margin-bottom: 8px;
   }
 
+  /* Location Update Section Styles */
+  .gov-location-update-section {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .gov-location-header {
+    background: #fafafa;
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--gov-secondary);
+  }
+
+  .gov-location-title {
+    color: var(--gov-primary);
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gov-location-title i {
+    color: var(--gov-secondary);
+  }
+
+  .gov-location-content {
+    padding: 20px;
+  }
+
+  .gov-current-location {
+    background: linear-gradient(135deg, #e0f2f1 0%, #ffffff 100%);
+    border-left: 4px solid var(--gov-secondary);
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  .gov-current-location-label {
+    font-size: 0.8rem;
+    color: var(--gov-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .gov-current-location-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .gov-location-badge {
+    background: var(--gov-success);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .gov-last-updated {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  .gov-form-group {
+    margin-bottom: 20px;
+  }
+
+  .gov-form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--gov-primary);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .gov-form-label i {
+    color: var(--gov-secondary);
+    margin-right: 5px;
+  }
+
+  .gov-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .gov-select:focus {
+    outline: none;
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 3px rgba(0,105,92,0.1);
+  }
+
+  .gov-btn-location {
+    width: 100%;
+    background: var(--gov-gradient);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .gov-btn-location:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,105,92,0.3);
+  }
+
+  .gov-btn-location:active {
+    transform: translateY(0);
+  }
+
+  .gov-alert {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .gov-alert-info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+  }
+
+  .gov-alert-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+  }
+
+  .gov-alert-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+  }
+
+  .gov-alert i {
+    font-size: 1.2rem;
+  }
+
+  .gov-route-info {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-size: 0.85rem;
+  }
+
   @media (max-width: 768px) {
     .gov-hero-title {
       font-size: 1.3rem;
@@ -203,6 +377,10 @@
     .gov-bus-info-row {
       flex-direction: column;
       gap: 5px;
+    }
+    .gov-current-location-value {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>
@@ -266,6 +444,92 @@
         </div>
       </div>
     </div>
+
+    <!-- Location Update Section -->
+    <div class="gov-location-update-section">
+      <div class="gov-location-header">
+        <h5 class="gov-location-title">
+          <i class="bi bi-geo-alt-fill"></i> Live Bus Tracking Update
+        </h5>
+      </div>
+      <div class="gov-location-content">
+        
+        <!-- Show current location if available -->
+        {% if current_location %}
+        <div class="gov-current-location">
+          <div class="gov-current-location-label">
+            <i class="bi bi-broadcast"></i> CURRENTLY AT
+          </div>
+          <div class="gov-current-location-value">
+            <span><i class="bi bi-pin-map-fill"></i> {{ current_location.current_stop.stop_name }}</span>
+            <span class="gov-location-badge">
+              <i class="bi bi-check-circle-fill"></i> Live
+            </span>
+          </div>
+          <div class="gov-last-updated">
+            <i class="bi bi-clock-history"></i> Last updated: {{ current_location.updated_at|timesince }} ago
+          </div>
+        </div>
+        {% elif schedule and schedule.route.stops.all %}
+        <div class="gov-alert gov-alert-info">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>No location has been updated yet. Select a stop below to start tracking.</span>
+        </div>
+        {% endif %}
+
+        <!-- Location Update Form -->
+        {% if schedule and schedule.route.stops.all %}
+        <form method="POST" action="{% url 'update_bus_location' %}" id="locationUpdateForm">
+          {% csrf_token %}
+          
+          <div class="gov-form-group">
+            <label class="gov-form-label">
+              <i class="bi bi-signpost-split"></i> Select Current Stop Location
+            </label>
+            <select name="stop_id" class="gov-select" required>
+              <option value="">-- Select the current bus stop --</option>
+              {% for stop in schedule.route.stops.all %}
+              <option value="{{ stop.id }}" 
+                {% if current_location and current_location.current_stop.id == stop.id %}selected{% endif %}>
+                {{ stop.stop_name }} - Arrival: {{ stop.arrival_time|time:"H:i" }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Route Progress Preview -->
+          <div class="gov-route-info">
+            <small>
+              <i class="bi bi-map"></i> <strong>Route:</strong> 
+              {% for stop in schedule.route.stops.all %}
+                {{ stop.stop_name }}{% if not forloop.last %} → {% endif %}
+              {% endfor %}
+            </small>
+          </div>
+
+          <button type="submit" class="gov-btn-location">
+            <i class="bi bi-send-fill"></i> Update Bus Location
+          </button>
+        </form>
+        {% else %}
+        <div class="gov-alert gov-alert-warning">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>No active schedule or route stops found for this bus.</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="gov-alert gov-alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}warning{% else %}info{% endif %}" style="margin-bottom: 20px;">
+          <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}exclamation-triangle-fill{% else %}info-circle-fill{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
     {% else %}
     <!-- No Assignment Message -->
     <div class="gov-assigned-card">
@@ -285,17 +549,40 @@
     {% endif %}
 
   </div>
-  <form method="POST" action="{% url 'update_bus_location' %}">
-  {% csrf_token %}
-
-  <label>Select Current Stop:</label>
-  <select name="stop_id" required>
-    {% for stop in schedule.route.stops.all %}
-      <option value="{{ stop.id }}">{{ stop.stop_name }}</option>
-    {% endfor %}
-  </select>
-
-  <button type="submit">Update Location</button>
-</form>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide messages after 5 seconds
+    const alerts = document.querySelectorAll('.gov-alert');
+    alerts.forEach(alert => {
+      setTimeout(() => {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => {
+          if (alert.parentNode) alert.remove();
+        }, 500);
+      }, 5000);
+    });
+
+    // Form submission - disable button to prevent double submission
+    const form = document.getElementById('locationUpdateForm');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Updating...';
+          
+          // Re-enable after 3 seconds in case of error
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-send-fill"></i> Update Bus Location';
+          }, 3000);
+        }
+      });
+    }
+  });
+</script>
+
 {% endblock %}

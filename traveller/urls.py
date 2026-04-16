@@ -31,7 +31,7 @@ urlpatterns = [
     path('apply-concession/', views.apply_concession, name='apply_concession'),
     path('book/<int:schedule_id>/', views.book_bus, name='book_bus'),
     path('bus/<int:bus_id>/schedules/', views.view_schedules, name='view_schedules'),
-    path('track/<int:bus_id>/', views.track_bus, name='track_bus'),
+    # path('track/<int:bus_id>/', views.track_bus, name='track_bus'),
     path('view_concession_card/<int:concession_id>/', views.view_concession_card, name='view_concession_card'),
 
     # 🔎 Search Buses
@@ -62,7 +62,8 @@ urlpatterns = [
     path('check-seat-availability/', views.check_seat_availability, name='check_seat_availability'),
         path('get-available-seats-for-boarding/', views.get_available_seats_for_boarding, name='get_available_seats_for_boarding'),
     path('get-available-destinations-for-seat/', views.get_available_destinations_for_seat, name='get_available_destinations_for_seat'),
-    
+    path('check-segment-availability/', views.check_segment_availability, name='check_segment_availability'),
+    path('track-bus/<int:bus_id>/', views.track_bus, name='track_bus'),
+    path('api/bus-location/<int:bus_id>/', views.get_bus_location_api, name='bus_location_api'),
 ]
-
 

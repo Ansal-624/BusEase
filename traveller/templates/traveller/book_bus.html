@@ -162,7 +162,7 @@
     position: relative;
   }
 
-  .gov-seat:hover:not(.booked) {
+  .gov-seat:hover:not(.booked):not(.not-available) {
     transform: translateY(-3px);
     border-color: var(--gov-primary);
     background: var(--gov-light);
@@ -173,6 +173,13 @@
     border-color: var(--gov-danger);
     cursor: not-allowed;
     opacity: 0.6;
+  }
+
+  .gov-seat.not-available {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 
   .gov-seat.selected {
@@ -446,6 +453,12 @@
     color: var(--gov-danger);
   }
 
+  /* Loading overlay for seat */
+  .gov-seat.loading {
+    opacity: 0.5;
+    cursor: wait;
+  }
+
   @media (max-width: 992px) {
     .gov-two-columns {
       grid-template-columns: 1fr;
@@ -508,19 +521,12 @@
         </div>
         <div class="gov-card-body">
           <!-- Seat Grid -->
-          <div class="gov-seat-grid">
+          <div class="gov-seat-grid" id="seatGrid">
             {% for seat_number in seat_range %}
-              {% if seat_number in booked_seats %}
-                <div class="gov-seat booked" data-seat="{{ seat_number }}" data-status="booked">
-                  <div class="gov-seat-number">{{ seat_number }}</div>
-                  <div class="gov-seat-status">Booked</div>
-                </div>
-              {% else %}
-                <div class="gov-seat available" data-seat="{{ seat_number }}" data-status="available" onclick="selectSeat('{{ seat_number }}')">
-                  <div class="gov-seat-number">{{ seat_number }}</div>
-                  <div class="gov-seat-status">Available</div>
-                </div>
-              {% endif %}
+              <div class="gov-seat available" data-seat="{{ seat_number }}" data-status="available" onclick="selectSeat('{{ seat_number }}')">
+                <div class="gov-seat-number">{{ seat_number }}</div>
+                <div class="gov-seat-status">Available</div>
+              </div>
             {% endfor %}
           </div>
 
@@ -528,15 +534,15 @@
           <div class="gov-legend">
             <div class="gov-legend-item">
               <div class="gov-legend-color" style="background: white; border: 2px solid #dee2e6;"></div>
-              <span>Available</span>
+              <span>Available for this route</span>
             </div>
             <div class="gov-legend-item">
               <div class="gov-legend-color" style="background: var(--gov-success); border: 2px solid var(--gov-success);"></div>
               <span>Selected</span>
             </div>
             <div class="gov-legend-item">
-              <div class="gov-legend-color" style="background: #f8d7da; border: 2px solid var(--gov-danger);"></div>
-              <span>Booked</span>
+              <div class="gov-legend-color" style="background: #e9ecef; border: 2px solid #adb5bd;"></div>
+              <span>Not Available for this route</span>
             </div>
           </div>
 
@@ -547,9 +553,9 @@
               <div class="gov-info-value">{{ bus.total_seats }}</div>
             </div>
             <div class="gov-info-item">
-              <div class="gov-info-label">Available Seats</div>
-              <div class="gov-info-value">{{ available_seats }}</div>
-            </div>
+  <div class="gov-info-label">Bookable Seats</div>
+  <div class="gov-info-value" id="bookableSeatsCount">-</div>
+</div>
             <div class="gov-info-item">
               <div class="gov-info-label">Base Fare</div>
               <div class="gov-info-value">₹{{ schedule.fare }}</div>
@@ -586,7 +592,7 @@
                   <i class="bi bi-geo-alt"></i>
                   Boarding Point
                 </label>
-                <select name="from_stop" id="fromStop" class="gov-select" required onchange="updatePrice()">
+                <select name="from_stop" id="fromStop" class="gov-select" required onchange="updateSeatAvailability()">
                   <option value="">Select boarding point</option>
                   {% for stop in stops %}
                     <option value="{{ stop.id }}" data-order="{{ stop.order }}" data-name="{{ stop.stop_name }}">
@@ -601,7 +607,7 @@
                   <i class="bi bi-flag"></i>
                   Destination
                 </label>
-                <select name="to_stop" id="toStop" class="gov-select" required onchange="updatePrice()">
+                <select name="to_stop" id="toStop" class="gov-select" required onchange="updateSeatAvailability()">
                   <option value="">Select destination</option>
                   {% for stop in stops %}
                     <option value="{{ stop.id }}" data-order="{{ stop.order }}" data-name="{{ stop.stop_name }}">
@@ -648,6 +654,8 @@
                 <i class="bi bi-credit-card"></i>
                 Select a Seat to Continue
               </button>
+            
+
             </form>
           {% else %}
             <div class="gov-alert">
@@ -664,7 +672,6 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-  // Debug: Check if Razorpay key is loaded
   console.log("Razorpay Key from backend:", "{{ razorpay_key }}");
   
   var selectedSeat = null;
@@ -672,7 +679,6 @@
   var baseFare = Number("{{ schedule.fare }}");
   var pricePerStop = Number("{{ price_per_stop }}");
 
-  // Get CSRF token from cookie
   function getCSRFToken() {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {
@@ -688,59 +694,54 @@
       return cookieValue;
   }
 
-  // Global function for seat selection
-  window.selectSeat = function(seatNumber) {
-      console.log("Selecting seat:", seatNumber);
-      var seatElement = document.querySelector(`.gov-seat[data-seat="${seatNumber}"]`);
-      
-      if (!seatElement) {
-          console.error("Seat element not found");
-          return;
-      }
-      
-      if (seatElement.classList.contains("booked")) {
-          alert("This seat is already booked!");
-          return;
-      }
-      
-      if (selectedSeat) {
-          var prevSeat = document.querySelector(`.gov-seat[data-seat="${selectedSeat}"]`);
-          if (prevSeat) prevSeat.classList.remove("selected");
-      }
-      
-      seatElement.classList.add("selected");
-      selectedSeat = seatNumber;
-      document.getElementById("selectedSeatNumber").innerText = seatNumber;
-      document.getElementById("selectedSeatInfo").style.display = "block";
-      document.getElementById("seatNumberInput").value = seatNumber;
-      
-      checkEnablePayButton();
-  }
-
-  // Price calculation
-  window.updatePrice = function() {
+  // Update seat availability based on selected boarding and destination
+  window.updateSeatAvailability = async function() {
       var fromStop = document.getElementById("fromStop");
       var toStop = document.getElementById("toStop");
       
       if (!fromStop.value || !toStop.value) {
           document.getElementById("ticketPriceBox").style.display = "none";
+          resetAllSeatsToAvailable();
           checkEnablePayButton();
           return;
       }
       
-      var fromOption = fromStop.selectedOptions[0];
-      var toOption = toStop.selectedOptions[0];
-      
-      var fromOrder = parseInt(fromOption.dataset.order);
-      var toOrder = parseInt(toOption.dataset.order);
+      var fromOrder = parseInt(fromStop.selectedOptions[0].dataset.order);
+      var toOrder = parseInt(toStop.selectedOptions[0].dataset.order);
       
       if (toOrder <= fromOrder) {
           alert("Destination must be after boarding point");
           toStop.value = "";
-          document.getElementById("ticketPriceBox").style.display = "none";
+          resetAllSeatsToAvailable();
           checkEnablePayButton();
           return;
       }
+      
+      updatePriceDisplay(fromOrder, toOrder);
+      showAllSeatsChecking();
+      
+      try {
+          var url = `/traveller/check-segment-availability/?schedule_id={{ schedule.id }}&from_order=${fromOrder}&to_order=${toOrder}`;
+          var response = await fetch(url);
+          var data = await response.json();
+          
+          if (data.seat_availability) {
+              updateSeatDisplayBasedOnAvailability(data.seat_availability);
+          } else if (data.error) {
+              console.error("Server error:", data.error);
+              resetAllSeatsToAvailable();
+          }
+      } catch (error) {
+          console.error("Error fetching seat availability:", error);
+          resetAllSeatsToAvailable();
+      }
+  }
+
+  function updatePriceDisplay(fromOrder, toOrder) {
+      var fromStop = document.getElementById("fromStop");
+      var toStop = document.getElementById("toStop");
+      var fromOption = fromStop.selectedOptions[0];
+      var toOption = toStop.selectedOptions[0];
       
       var stopsTravelled = toOrder - fromOrder;
       var stopChargesAmount = stopsTravelled * pricePerStop;
@@ -754,6 +755,137 @@
       
       currentTotal = total;
       document.getElementById("ticketPriceBox").style.display = "block";
+  }
+
+  function showAllSeatsChecking() {
+      var allSeats = document.querySelectorAll('.gov-seat');
+      allSeats.forEach(seat => {
+          if (!seat.classList.contains('selected')) {
+              seat.querySelector('.gov-seat-status').innerText = 'Checking...';
+              seat.style.cursor = 'wait';
+          }
+      });
+  }
+
+  function resetAllSeatsToAvailable() {
+      var allSeats = document.querySelectorAll('.gov-seat');
+      allSeats.forEach(seat => {
+          if (!seat.classList.contains('selected') && !seat.classList.contains('booked')) {
+              seat.classList.remove('not-available');
+              seat.classList.add('available');
+              seat.querySelector('.gov-seat-status').innerText = 'Available';
+              seat.style.cursor = 'pointer';
+              seat.removeAttribute('title');
+          }
+      });
+      var bookableCountElem = document.getElementById('bookableSeatsCount');
+      if (bookableCountElem) bookableCountElem.innerText = '-';
+  }
+
+  function updateSeatDisplayBasedOnAvailability(seatAvailability) {
+      var allSeats = document.querySelectorAll('.gov-seat');
+      var bookableCount = 0;
+      
+      allSeats.forEach(seat => {
+          var seatNum = parseInt(seat.dataset.seat);
+          
+          if (seat.classList.contains('selected')) return;
+          if (seat.classList.contains('booked')) return;
+          
+          var availability = seatAvailability[seatNum];
+          
+          if (availability && availability.available === true) {
+              seat.classList.remove('not-available');
+              seat.classList.add('available');
+              seat.querySelector('.gov-seat-status').innerText = 'Available';
+              seat.style.cursor = 'pointer';
+              seat.removeAttribute('title');
+              bookableCount++;
+          } else {
+              seat.classList.add('not-available');
+              seat.classList.remove('available');
+              seat.querySelector('.gov-seat-status').innerText = 'Not Available';
+              seat.style.cursor = 'not-allowed';
+              
+              if (availability && availability.conflict_message) {
+                  seat.setAttribute('title', availability.conflict_message);
+              } else {
+                  seat.setAttribute('title', 'Not available for this route segment');
+              }
+          }
+      });
+      
+      document.getElementById('bookableSeatsCount').innerText = bookableCount;
+  }
+
+  // Global function for seat selection
+  window.selectSeat = async function(seatNumber) {
+      var seatElement = document.querySelector(`.gov-seat[data-seat="${seatNumber}"]`);
+      
+      if (!seatElement) {
+          console.error("Seat element not found");
+          return;
+      }
+      
+      if (seatElement.classList.contains('not-available')) {
+          var conflictMsg = seatElement.getAttribute('title') || "This seat is not available for the selected route segment";
+          alert(conflictMsg);
+          return;
+      }
+      
+      if (seatElement.classList.contains('booked')) {
+          alert("This seat is already fully booked!");
+          return;
+      }
+      
+      var fromStop = document.getElementById("fromStop");
+      var toStop = document.getElementById("toStop");
+      
+      if (fromStop.value && toStop.value) {
+          var fromOrder = fromStop.selectedOptions[0].dataset.order;
+          var toOrder = toStop.selectedOptions[0].dataset.order;
+          
+          var originalStatus = seatElement.querySelector('.gov-seat-status').innerText;
+          seatElement.querySelector('.gov-seat-status').innerText = 'Checking...';
+          
+          try {
+              var url = `/traveller/check-seat-availability/?schedule_id={{ schedule.id }}&seat_number=${seatNumber}&from_order=${fromOrder}&to_order=${toOrder}`;
+              var response = await fetch(url);
+              var data = await response.json();
+              
+              if (!data.available) {
+                  alert(data.message || "❌ Seat already booked for this route segment!");
+                  seatElement.querySelector('.gov-seat-status').innerText = 'Not Available';
+                  seatElement.classList.add('not-available');
+                  return;
+              }
+          } catch (error) {
+              console.error("Availability check failed:", error);
+              seatElement.querySelector('.gov-seat-status').innerText = originalStatus;
+              alert("Error checking seat availability. Please try again.");
+              return;
+          }
+      }
+      
+      if (selectedSeat) {
+          var prevSeat = document.querySelector(`.gov-seat[data-seat="${selectedSeat}"]`);
+          if (prevSeat) {
+              prevSeat.classList.remove("selected");
+              if (prevSeat.classList.contains('not-available')) {
+                  prevSeat.querySelector('.gov-seat-status').innerText = 'Not Available';
+              } else {
+                  prevSeat.querySelector('.gov-seat-status').innerText = 'Available';
+              }
+          }
+      }
+      
+      seatElement.classList.add("selected");
+      seatElement.querySelector('.gov-seat-status').innerText = 'Selected';
+      selectedSeat = seatNumber;
+      document.getElementById("selectedSeatNumber").innerText = seatNumber;
+      document.getElementById("selectedSeatInfo").style.display = "block";
+      document.getElementById("seatNumberInput").value = seatNumber;
+      
       checkEnablePayButton();
   }
 
@@ -774,7 +906,6 @@
       }
   }
 
-  // Check seat availability
   function checkSeatAvailability() {
       return new Promise((resolve, reject) => {
           var fromStop = document.getElementById("fromStop");
@@ -783,21 +914,17 @@
           var toOrder = parseInt(toStop.selectedOptions[0].dataset.order);
           
           var url = `/traveller/check-seat-availability/?schedule_id={{ schedule.id }}&seat_number=${selectedSeat}&from_order=${fromOrder}&to_order=${toOrder}`;
-          console.log("Checking availability at:", url);
           
           fetch(url, {
               method: "GET",
-              headers: {
-                  "X-CSRFToken": getCSRFToken(),
-              }
+              headers: { "X-CSRFToken": getCSRFToken() }
           })
           .then(res => res.json())
           .then(data => {
-              console.log("Availability response:", data);
               if (data.available) {
                   resolve(true);
               } else {
-                  alert("❌ Seat already booked for this route segment!");
+                  alert(data.message || "❌ Seat already booked for this route segment!");
                   reject(false);
               }
           })
@@ -809,11 +936,7 @@
       });
   }
 
-  // Main payment function
   window.processPayment = function() {
-      console.log("processPayment called");
-      console.log("Selected seat:", selectedSeat);
-      
       if (!selectedSeat) {
           alert("Please select a seat");
           return;
@@ -827,35 +950,24 @@
           return;
       }
       
-      // First check availability
       checkSeatAvailability().then(() => {
           var amountInPaise = Math.round(currentTotal * 100);
-          console.log("Creating order for amount (paise):", amountInPaise);
           
-          // Create Razorpay order
           fetch("/traveller/create-razorpay-order/", {
               method: "POST",
               headers: {
                   "Content-Type": "application/json",
                   "X-CSRFToken": getCSRFToken(),
               },
-              body: JSON.stringify({
-                  amount: amountInPaise
-              })
+              body: JSON.stringify({ amount: amountInPaise })
           })
           .then(res => {
-              console.log("Order response status:", res.status);
               if (!res.ok) {
-                  return res.json().then(err => {
-                      console.error("Order creation error:", err);
-                      throw new Error(err.error || "Failed to create order");
-                  });
+                  return res.json().then(err => { throw new Error(err.error || "Failed to create order"); });
               }
               return res.json();
           })
           .then(order => {
-              console.log("Order created successfully:", order);
-              
               var options = {
                   key: "{{ razorpay_key }}",
                   amount: order.amount,
@@ -864,47 +976,35 @@
                   description: `Bus Booking - Seat ${selectedSeat}`,
                   order_id: order.id,
                   handler: function(response) {
-                      console.log("Payment successful:", response);
-                      // Set payment ID and submit form
                       document.getElementById("razorpayPaymentId").value = response.razorpay_payment_id;
                       document.getElementById("bookingForm").submit();
                   },
-                  modal: {
-                      ondismiss: function() {
-                          console.log("Payment modal closed");
-                          alert("Payment cancelled");
-                      }
-                  },
+                  modal: { ondismiss: function() { alert("Payment cancelled"); } },
                   prefill: {
                       name: "{{ request.user.get_full_name|default:request.user.username }}",
                       email: "{{ request.user.email }}",
                   },
-                  theme: {
-                      color: "#00695c"
-                  }
+                  theme: { color: "#00695c" }
               };
               
               var rzp = new Razorpay(options);
               rzp.on('payment.failed', function(response) {
-                  console.error("Payment failed:", response.error);
                   alert("Payment failed: " + response.error.description);
               });
               rzp.open();
           })
           .catch(error => {
-              console.error("Order creation error:", error);
-              alert("Failed to initialize payment. Please try again.\nError: " + error.message);
+              alert("Failed to initialize payment: " + error.message);
           });
-      }).catch(() => {
-          console.log("Availability check failed, payment cancelled");
-      });
+      }).catch(() => {});
   }
   
-  // Add event listeners after DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
-      console.log("DOM loaded, adding event listeners");
-      document.getElementById("fromStop").addEventListener("change", window.updatePrice);
-      document.getElementById("toStop").addEventListener("change", window.updatePrice);
+      var fromStop = document.getElementById("fromStop");
+      var toStop = document.getElementById("toStop");
+      
+      if (fromStop) fromStop.addEventListener("change", updateSeatAvailability);
+      if (toStop) toStop.addEventListener("change", updateSeatAvailability);
   });
 </script>
 {% endblock %}
