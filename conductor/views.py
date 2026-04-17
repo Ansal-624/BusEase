@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from bus_owner.models import Conductor, ConductorDuty, Bus, BusSchedule
 from traveller.models import Booking
 import json
+from decimal import Decimal
 
 
 @login_required
@@ -89,33 +90,35 @@ def conductor_seat_management(request, bus_id):
     
     bus = get_object_or_404(Bus, id=bus_id)
     
-    # Get all bookings for this bus (get ALL bookings, not filtered by date)
-    # This will show all booked seats regardless of date
+    # Get schedule
+    schedule = BusSchedule.objects.filter(bus=bus, active=True).first()
+    
+    # Get all stops for the route
+    stops = []
+    price_per_stop = Decimal("5.00")
+    base_fare = Decimal("0")
+    
+    if schedule and schedule.route:
+        stops = schedule.route.stops.all().order_by('order')
+        
+        # Calculate base fare and price per stop
+        if stops.count() >= 2:
+            first_stop = stops.first()
+            last_stop = stops.last()
+            stops_travelled_total = last_stop.order - first_stop.order
+            if stops_travelled_total > 0:
+                base_fare = Decimal(str(schedule.fare))
+    
+    # Get all bookings for this bus
     bookings = Booking.objects.filter(
         bus=bus,
-        status__in=['Confirmed', 'booked']  # Get both Confirmed and booked status
+        status='Confirmed'
     ).values_list('seat_number', flat=True)
     
     booked_seats = list(bookings)
     
-    # Also check for ConductorBooking if you're using that model
-    # If you created ConductorBooking model, include those too
-    try:
-        from conductor.models import ConductorBooking
-        conductor_bookings = ConductorBooking.objects.filter(
-            bus=bus,
-            status='booked'
-        ).values_list('seat_number', flat=True)
-        booked_seats.extend(list(conductor_bookings))
-        booked_seats = list(set(booked_seats))  # Remove duplicates
-    except ImportError:
-        pass  # ConductorBooking model doesn't exist yet
-    
     # Create seat range
     seat_range = range(1, bus.total_seats + 1)
-    
-    # Get schedule for fare display
-    schedule = BusSchedule.objects.filter(bus=bus, active=True).first()
     
     context = {
         'bus': bus,
@@ -124,13 +127,16 @@ def conductor_seat_management(request, bus_id):
         'seat_status_map': {},
         'total_seats': bus.total_seats,
         'schedule': schedule,
+        'stops': stops,
+        'price_per_stop': price_per_stop,
+        'base_fare': base_fare,
     }
     
     return render(request, 'conductor/seat_management.html', context)
 
 @login_required
 def conductor_update_seat_status(request):
-    """Update seat status (booked/occupied/cancelled)"""
+    """Update seat status with boarding and dropping points"""
     if request.method == 'POST':
         try:
             conductor = Conductor.objects.get(user=request.user)
@@ -139,7 +145,8 @@ def conductor_update_seat_status(request):
             passenger_phone = request.POST.get('passenger_phone')
             fare_collected = request.POST.get('fare_collected')
             payment_status = request.POST.get('payment_status')  # 'paid' or 'unpaid'
-            status = request.POST.get('status')
+            boarding_stop_id = request.POST.get('boarding_stop')
+            dropping_stop_id = request.POST.get('dropping_stop')
             notes = request.POST.get('notes', '')
             
             # Get the bus from conductor's assignment
@@ -154,20 +161,40 @@ def conductor_update_seat_status(request):
             
             bus = current_duty.bus
             
-            # Get or create a schedule for this bus
+            # Get schedule for this bus
             schedule = BusSchedule.objects.filter(bus=bus, active=True).first()
             
             if not schedule:
                 messages.error(request, 'No active schedule found for this bus.')
                 return redirect('conductor_dashboard')
             
+            # Get boarding and dropping stops
+            boarding_stop = get_object_or_404(RouteStop, id=boarding_stop_id)
+            dropping_stop = get_object_or_404(RouteStop, id=dropping_stop_id)
+            
+            # Validate stops order
+            if boarding_stop.order >= dropping_stop.order:
+                messages.error(request, 'Invalid stops selected. Dropping point must be after boarding point.')
+                return redirect('conductor_seat_management', bus_id=bus.id)
+            
+            # Calculate fare if not provided or if we need to calculate
+            if not fare_collected:
+                PRICE_PER_STOP = Decimal("5.00")
+                stops_travelled = dropping_stop.order - boarding_stop.order
+                fare_collected = Decimal(schedule.fare) + (stops_travelled * PRICE_PER_STOP)
+            else:
+                fare_collected = Decimal(str(fare_collected))
+            
             # Set payment status for booking
             payment_status_value = 'Paid' if payment_status == 'paid' else 'Pending'
+            booking_status = 'Confirmed'
             
-            # IMPORTANT: Explicitly set the status field
-            booking_status = 'Confirmed'  # Use 'Confirmed' as per your model default
+            # Store passenger details in notes
+            passenger_info = f"Conductor Booking - Passenger: {passenger_name}, Phone: {passenger_phone}"
+            if notes:
+                passenger_info += f" | Notes: {notes}"
             
-            # Check if booking already exists
+            # Check if booking already exists for this seat
             existing_booking = Booking.objects.filter(
                 bus=bus,
                 seat_number=seat_number,
@@ -177,49 +204,43 @@ def conductor_update_seat_status(request):
             if existing_booking:
                 # Update existing booking
                 existing_booking.traveller = conductor.user
-                existing_booking.total_fare = fare_collected or 0
-                existing_booking.status = booking_status  # Explicitly set status
+                existing_booking.total_fare = fare_collected
+                existing_booking.status = booking_status
                 existing_booking.payment_status = payment_status_value
                 existing_booking.payment_amount = fare_collected if payment_status == 'paid' else 0
+                existing_booking.from_stop = boarding_stop
+                existing_booking.to_stop = dropping_stop
                 existing_booking.save()
-                booking = existing_booking
                 created = False
             else:
-                # Create new booking with ALL required fields
+                # Create new booking with all fields
                 booking = Booking.objects.create(
                     bus=bus,
                     seat_number=seat_number,
                     schedule=schedule,
                     traveller=conductor.user,
-                    total_fare=fare_collected or 0,
-                    status=booking_status,  # Explicitly set status
+                    total_fare=fare_collected,
+                    status=booking_status,
                     payment_status=payment_status_value,
                     payment_amount=fare_collected if payment_status == 'paid' else 0,
-                    booking_date=timezone.now()
+                    booking_date=timezone.now(),
+                    from_stop=boarding_stop,
+                    to_stop=dropping_stop
                 )
                 created = True
             
-            # Store passenger details in a way that persists
-            passenger_info = f"Passenger: {passenger_name}, Phone: {passenger_phone}"
-            if notes:
-                passenger_info += f" | Notes: {notes}"
-            
-            # If your Booking model has a notes field, save it
-            if hasattr(booking, 'notes'):
-                booking.notes = passenger_info
-                booking.save()
-            
             payment_text = "with payment" if payment_status == 'paid' else "without payment"
-            messages.success(request, f'✅ Seat {seat_number} booked for {passenger_name} {payment_text}')
+            messages.success(
+                request, 
+                f'✅ Seat {seat_number} booked for {passenger_name} from {boarding_stop.stop_name} to {dropping_stop.stop_name} {payment_text}'
+            )
             
-            # Force redirect to refresh the page with updated data
             return redirect('conductor_seat_management', bus_id=bus.id)
             
         except Conductor.DoesNotExist:
             messages.error(request, 'Conductor profile not found')
         except Exception as e:
             messages.error(request, f'Error: {str(e)}')
-            # Print the full error for debugging
             import traceback
             traceback.print_exc()
     
@@ -321,7 +342,7 @@ def conductor_bookings(request):
 
 @login_required
 def conductor_cancel_booking(request):
-    """Cancel a booked seat - DELETE the booking"""
+    """Cancel a booked seat - UPDATE the booking status or DELETE"""
     if request.method == 'POST':
         try:
             conductor = Conductor.objects.get(user=request.user)
@@ -340,23 +361,27 @@ def conductor_cancel_booking(request):
             
             bus = current_duty.bus
             
-            # Find and DELETE the booking
+            # Find the booking
             booking = Booking.objects.filter(
                 bus=bus,
-                seat_number=seat_number
+                seat_number=seat_number,
+                status='Confirmed'
             ).first()
             
             if booking:
-                # Optional: Log cancellation reason if you want to track it
-                if cancel_reason:
-                    # You can print or log this for audit purposes
-                    print(f"Seat {seat_number} on bus {bus.bus_number} cancelled by {conductor.user.username}. Reason: {cancel_reason}")
+                # Update status to Cancelled instead of deleting
+                booking.status = 'Cancelled'
+                booking.save()
                 
-                # Delete the booking
-                booking.delete()
-                messages.success(request, f'✅ Seat {seat_number} booking has been cancelled and is now available!')
+                # Optional: Log cancellation reason
+                if cancel_reason:
+                    if hasattr(booking, 'notes'):
+                        booking.notes = f"{booking.notes}\nCancelled by conductor: {cancel_reason}"
+                        booking.save()
+                
+                messages.success(request, f'✅ Seat {seat_number} booking has been cancelled!')
             else:
-                messages.warning(request, f'No booking found for seat {seat_number}')
+                messages.warning(request, f'No active booking found for seat {seat_number}')
             
         except Conductor.DoesNotExist:
             messages.error(request, 'Conductor profile not found')

@@ -121,11 +121,13 @@
     background: white;
     border-radius: 20px;
     padding: 30px;
-    max-width: 450px;
+    max-width: 500px;
     width: 90%;
     position: relative;
     animation: modalSlideIn 0.3s ease;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   @keyframes modalSlideIn {
@@ -250,6 +252,23 @@
     font-size: 0.7rem;
   }
 
+  .fare-breakdown {
+    background: #e8f5e9;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 15px 0;
+  }
+
+  .fare-breakdown p {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .fare-breakdown hr {
+    margin: 8px 0;
+  }
+
   .gov-btn {
     background: var(--gov-primary);
     color: var(--gov-secondary);
@@ -328,6 +347,14 @@
     border-top: 5px solid #dc3545;
   }
 
+  .route-info-preview {
+    background: #e3f2fd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+  }
+
   @media (max-width: 768px) {
     .gov-seat-grid {
       grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -382,27 +409,24 @@
         <!-- Seat Map -->
         <div class="gov-seat-grid">
           {% for seat in seat_range %}
-            {% with seat_status=seat_status_map|get_item:seat %}
-              <div class="gov-seat 
-                {% if seat in booked_seats %}booked
-                {% elif seat_status and seat_status.status == 'occupied' %}occupied
-                {% endif %}" 
-                data-seat="{{ seat }}" 
-                data-status="{% if seat in booked_seats %}booked{% elif seat_status and seat_status.status == 'occupied' %}occupied{% else %}available{% endif %}"
-                onclick="handleSeatClick(this, '{{ seat }}')">
-                <div class="gov-seat-number">{{ seat }}</div>
-                <div class="gov-seat-status">
-                  {% if seat in booked_seats %}Booked
-                  {% elif seat_status and seat_status.status == 'occupied' %}Occupied
-                  {% else %}Available{% endif %}
-                </div>
-                {% if seat in booked_seats %}
-                  <div class="cancel-icon">
-                    <i class="bi bi-x-circle-fill"></i>
-                  </div>
-                {% endif %}
+            <div class="gov-seat 
+              {% if seat in booked_seats %}booked
+              {% else %}available
+              {% endif %}" 
+              data-seat="{{ seat }}" 
+              data-status="{% if seat in booked_seats %}booked{% else %}available{% endif %}"
+              onclick="handleSeatClick(this, '{{ seat }}')">
+              <div class="gov-seat-number">{{ seat }}</div>
+              <div class="gov-seat-status">
+                {% if seat in booked_seats %}Booked
+                {% else %}Available{% endif %}
               </div>
-            {% endwith %}
+              {% if seat in booked_seats %}
+                <div class="cancel-icon">
+                  <i class="bi bi-x-circle-fill"></i>
+                </div>
+              {% endif %}
+            </div>
           {% endfor %}
         </div>
 
@@ -410,7 +434,6 @@
         <div style="display: flex; gap: 20px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; flex-wrap: wrap; justify-content: center;">
           <div><span style="display: inline-block; width: 20px; height: 20px; background: white; border: 2px solid #dee2e6; border-radius: 4px;"></span> Available (Click to Book)</div>
           <div><span style="display: inline-block; width: 20px; height: 20px; background: #f8d7da; border: 2px solid #dc3545; border-radius: 4px;"></span> Booked (Click to Cancel)</div>
-          <div><span style="display: inline-block; width: 20px; height: 20px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 4px;"></span> Occupied</div>
         </div>
 
         <!-- Back Button -->
@@ -440,17 +463,51 @@
           {% csrf_token %}
           <input type="hidden" name="seat_number" id="seatNumber">
           <input type="hidden" name="action" value="book">
+          
+          <!-- Passenger Details -->
           <div class="gov-form-group">
             <label class="gov-label"><i class="bi bi-person"></i> Passenger Name <span style="color: red;">*</span></label>
             <input type="text" name="passenger_name" class="gov-input" placeholder="Enter passenger name" required>
           </div>
+          
           <div class="gov-form-group">
             <label class="gov-label"><i class="bi bi-telephone"></i> Phone Number <span style="color: red;">*</span></label>
             <input type="tel" name="passenger_phone" class="gov-input" placeholder="Enter phone number" required>
           </div>
+          
+          <!-- Boarding and Dropping Points -->
+          <div class="gov-form-group">
+            <label class="gov-label"><i class="bi bi-box-arrow-in-right"></i> Boarding Point <span style="color: red;">*</span></label>
+            <select name="boarding_stop" id="boardingStop" class="gov-select" required onchange="calculateFare()">
+              <option value="">Select boarding point</option>
+              {% for stop in stops %}
+                <option value="{{ stop.id }}" data-order="{{ stop.order }}">{{ stop.stop_name }} ({{ stop.arrival_time|time:"H:i" }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="gov-form-group">
+            <label class="gov-label"><i class="bi bi-box-arrow-in-down"></i> Dropping Point <span style="color: red;">*</span></label>
+            <select name="dropping_stop" id="droppingStop" class="gov-select" required onchange="calculateFare()">
+              <option value="">Select dropping point</option>
+              {% for stop in stops %}
+                <option value="{{ stop.id }}" data-order="{{ stop.order }}">{{ stop.stop_name }} ({{ stop.arrival_time|time:"H:i" }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <!-- Fare Display -->
+          <div class="fare-breakdown" id="fareBreakdown" style="display: none;">
+            <p><strong>Fare Details:</strong></p>
+            <p><span>Base Fare:</span> <span>₹<span id="baseFare">0</span></span></p>
+            <p><span>Distance ({{ price_per_stop }}/stop):</span> <span><span id="stopsCount">0</span> stops</span></p>
+            <hr>
+            <p><strong>Total Fare:</strong> <strong>₹<span id="totalFareAmount">0</span></strong></p>
+          </div>
+          
           <div class="gov-form-group">
             <label class="gov-label"><i class="bi bi-currency-rupee"></i> Fare Collected (₹)</label>
-            <input type="number" name="fare_collected" class="gov-input" value="{{ schedule.fare|default:'0' }}" step="0.01">
+            <input type="number" name="fare_collected" id="fareCollected" class="gov-input" step="0.01" readonly>
           </div>
           
           <!-- Payment Status Field -->
@@ -458,12 +515,12 @@
             <label class="gov-label"><i class="bi bi-credit-card"></i> Payment Status</label>
             <div class="payment-status">
               <label>
-                <input type="radio" name="payment_status" value="paid" checked>
+                <input type="radio" name="payment_status" value="paid" checked onchange="updatePaymentStatus()">
                 <i class="bi bi-check-circle-fill" style="color: #28a745;"></i> Paid
                 <span class="paid-badge">Paid</span>
               </label>
               <label>
-                <input type="radio" name="payment_status" value="unpaid">
+                <input type="radio" name="payment_status" value="unpaid" onchange="updatePaymentStatus()">
                 <i class="bi bi-x-circle-fill" style="color: #dc3545;"></i> Not Paid
                 <span class="unpaid-badge">Unpaid</span>
               </label>
@@ -474,6 +531,7 @@
             <label class="gov-label"><i class="bi bi-chat"></i> Notes</label>
             <textarea name="notes" class="gov-input" rows="2" placeholder="Optional notes"></textarea>
           </div>
+          
           <div class="gov-modal-footer">
             <button type="button" class="gov-btn gov-btn-danger" onclick="closeSeatForm()">
               <i class="bi bi-x-circle"></i> Cancel
@@ -527,39 +585,60 @@
   </div>
 </div>
 
+<!-- Hidden div to store Django data -->
+<div id="django-data" 
+     data-stops='[
+       {% for stop in stops %}
+         {"id": {{ stop.id }}, "name": "{{ stop.stop_name }}", "order": {{ stop.order }}, "arrival_time": "{{ stop.arrival_time|time:'H:i' }}"}{% if not forloop.last %},{% endif %}
+       {% endfor %}
+     ]'
+     data-price-per-stop="{{ price_per_stop|default:5 }}"
+     data-base-fare="{{ base_fare|default:0 }}">
+</div>
+
 <script>
+  // Get data from data attributes
+  const djangoData = document.getElementById('django-data');
+  let stopsData = [];
+  let pricePerStop = 5;
+  let baseFareAmount = 0;
+  
+  if (djangoData) {
+    try {
+      stopsData = JSON.parse(djangoData.dataset.stops);
+      pricePerStop = parseInt(djangoData.dataset.pricePerStop);
+      baseFareAmount = parseFloat(djangoData.dataset.baseFare);
+    } catch(e) {
+      console.error('Error parsing stops data:', e);
+    }
+  }
+  
   let currentSeatElement = null;
 
   function handleSeatClick(element, seatNumber) {
     const status = element.dataset.status;
     
     if (status === 'booked') {
-      // Show cancel modal for booked seats
       openCancelModal(seatNumber);
     } else if (status === 'available') {
-      // Show booking form for available seats
       openSeatForm(element, seatNumber);
-    } else if (status === 'occupied') {
-      alert('❌ This seat is already occupied!');
     }
   }
 
   function openSeatForm(element, seatNumber) {
-    // Store reference to the current seat element
     currentSeatElement = element;
     
-    // Set seat number in form
     document.getElementById('seatNumber').value = seatNumber;
     document.getElementById('selectedSeatNumber').innerText = seatNumber;
     
-    // Clear form fields for new entry
+    // Reset form
     document.getElementById('seatForm').reset();
+    document.getElementById('fareBreakdown').style.display = 'none';
+    document.getElementById('fareCollected').value = '';
     
-    // Set default fare if available
-    const fareInput = document.querySelector('input[name="fare_collected"]');
-    if (fareInput && '{{ schedule.fare|default:"0" }}') {
-      fareInput.value = '{{ schedule.fare|default:"0" }}';
-    }
+    // Reset selects
+    document.getElementById('boardingStop').value = '';
+    document.getElementById('droppingStop').value = '';
     
     // Set default payment status to paid
     const paidRadio = document.querySelector('input[name="payment_status"][value="paid"]');
@@ -567,13 +646,54 @@
       paidRadio.checked = true;
     }
     
-    // Show modal
     document.getElementById('seatFormModal').classList.add('active');
   }
 
   function closeSeatForm() {
     document.getElementById('seatFormModal').classList.remove('active');
     currentSeatElement = null;
+  }
+
+  function calculateFare() {
+    const boardingStopId = document.getElementById('boardingStop').value;
+    const droppingStopId = document.getElementById('droppingStop').value;
+    
+    if (!boardingStopId || !droppingStopId) {
+      document.getElementById('fareBreakdown').style.display = 'none';
+      return;
+    }
+    
+    const boardingStop = stopsData.find(function(s) { return s.id == boardingStopId; });
+    const droppingStop = stopsData.find(function(s) { return s.id == droppingStopId; });
+    
+    if (!boardingStop || !droppingStop) return;
+    
+    const stopsTravelled = Math.abs(droppingStop.order - boardingStop.order);
+    
+    if (stopsTravelled === 0) {
+      alert('Boarding and dropping points cannot be the same');
+      document.getElementById('fareBreakdown').style.display = 'none';
+      return;
+    }
+    
+    const totalFare = baseFareAmount + (stopsTravelled * pricePerStop);
+    
+    document.getElementById('baseFare').innerText = baseFareAmount;
+    document.getElementById('stopsCount').innerText = stopsTravelled;
+    document.getElementById('totalFareAmount').innerText = totalFare;
+    document.getElementById('fareCollected').value = totalFare;
+    document.getElementById('fareBreakdown').style.display = 'block';
+  }
+  
+  function updatePaymentStatus() {
+    const paidRadio = document.querySelector('input[name="payment_status"][value="paid"]');
+    const fareField = document.getElementById('fareCollected');
+    
+    if (paidRadio && paidRadio.checked) {
+      fareField.readOnly = true;
+    } else {
+      fareField.readOnly = false;
+    }
   }
 
   function openCancelModal(seatNumber) {
@@ -599,26 +719,44 @@
   }
 
   // Handle booking form submission
-  document.getElementById('seatForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Validate required fields
-    const passengerName = document.querySelector('input[name="passenger_name"]').value.trim();
-    const passengerPhone = document.querySelector('input[name="passenger_phone"]').value.trim();
-    
-    if (!passengerName) {
-      alert('Please enter passenger name');
-      return;
-    }
-    
-    if (!passengerPhone) {
-      alert('Please enter phone number');
-      return;
-    }
-    
-    // Submit the form
-    this.submit();
-  });
+  const seatForm = document.getElementById('seatForm');
+  if (seatForm) {
+    seatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const passengerName = document.querySelector('input[name="passenger_name"]').value.trim();
+      const passengerPhone = document.querySelector('input[name="passenger_phone"]').value.trim();
+      const boardingStop = document.getElementById('boardingStop').value;
+      const droppingStop = document.getElementById('droppingStop').value;
+      
+      if (!passengerName) {
+        alert('Please enter passenger name');
+        return;
+      }
+      
+      if (!passengerPhone) {
+        alert('Please enter phone number');
+        return;
+      }
+      
+      if (!boardingStop) {
+        alert('Please select boarding point');
+        return;
+      }
+      
+      if (!droppingStop) {
+        alert('Please select dropping point');
+        return;
+      }
+      
+      if (boardingStop === droppingStop) {
+        alert('Boarding and dropping points cannot be the same');
+        return;
+      }
+      
+      this.submit();
+    });
+  }
 
   // Close modals with Escape key
   document.addEventListener('keydown', function(e) {
