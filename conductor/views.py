@@ -10,6 +10,7 @@ from bus_owner.models import Conductor, ConductorDuty, Bus, BusSchedule
 from traveller.models import Booking
 import json
 from decimal import Decimal
+from django.db import transaction  # Add this import
 
 
 @login_required
@@ -72,6 +73,8 @@ def conductor_dashboard(request):
 def conductor_seat_management(request, bus_id):
     """Conductor seat management page for a specific bus"""
     try:
+        from traveller.models import SeatSegment
+        
         conductor = Conductor.objects.get(user=request.user)
     except Conductor.DoesNotExist:
         messages.error(request, "Conductor profile not found.")
@@ -117,6 +120,24 @@ def conductor_seat_management(request, bus_id):
     
     booked_seats = list(bookings)
     
+    # Get seat segment information for tooltips
+    seat_segments = SeatSegment.objects.filter(
+        schedule=schedule,
+        is_active=True
+    ).select_related('from_stop', 'to_stop')
+    
+    seat_booking_map = {}
+    for segment in seat_segments:
+        seat = segment.seat_number
+        if seat not in seat_booking_map:
+            seat_booking_map[seat] = []
+        seat_booking_map[seat].append({
+            'from_name': segment.from_stop.stop_name,
+            'to_name': segment.to_stop.stop_name,
+            'from_order': segment.from_stop.order,
+            'to_order': segment.to_stop.order
+        })
+    
     # Create seat range
     seat_range = range(1, bus.total_seats + 1)
     
@@ -124,7 +145,7 @@ def conductor_seat_management(request, bus_id):
         'bus': bus,
         'seat_range': seat_range,
         'booked_seats': booked_seats,
-        'seat_status_map': {},
+        'seat_booking_map': seat_booking_map,  # Pass for tooltips
         'total_seats': bus.total_seats,
         'schedule': schedule,
         'stops': stops,
@@ -139,6 +160,9 @@ def conductor_update_seat_status(request):
     """Update seat status with boarding and dropping points"""
     if request.method == 'POST':
         try:
+            from decimal import Decimal
+            from traveller.models import SeatSegment  # Add this import
+            
             conductor = Conductor.objects.get(user=request.user)
             seat_number = request.POST.get('seat_number')
             passenger_name = request.POST.get('passenger_name')
@@ -177,7 +201,7 @@ def conductor_update_seat_status(request):
                 messages.error(request, 'Invalid stops selected. Dropping point must be after boarding point.')
                 return redirect('conductor_seat_management', bus_id=bus.id)
             
-            # Calculate fare if not provided or if we need to calculate
+            # Calculate fare if not provided
             if not fare_collected:
                 PRICE_PER_STOP = Decimal("5.00")
                 stops_travelled = dropping_stop.order - boarding_stop.order
@@ -201,33 +225,68 @@ def conductor_update_seat_status(request):
                 schedule=schedule
             ).first()
             
-            if existing_booking:
-                # Update existing booking
-                existing_booking.traveller = conductor.user
-                existing_booking.total_fare = fare_collected
-                existing_booking.status = booking_status
-                existing_booking.payment_status = payment_status_value
-                existing_booking.payment_amount = fare_collected if payment_status == 'paid' else 0
-                existing_booking.from_stop = boarding_stop
-                existing_booking.to_stop = dropping_stop
-                existing_booking.save()
-                created = False
-            else:
-                # Create new booking with all fields
-                booking = Booking.objects.create(
-                    bus=bus,
-                    seat_number=seat_number,
-                    schedule=schedule,
-                    traveller=conductor.user,
-                    total_fare=fare_collected,
-                    status=booking_status,
-                    payment_status=payment_status_value,
-                    payment_amount=fare_collected if payment_status == 'paid' else 0,
-                    booking_date=timezone.now(),
-                    from_stop=boarding_stop,
-                    to_stop=dropping_stop
-                )
-                created = True
+            with transaction.atomic():
+                if existing_booking:
+                    # Update existing booking
+                    existing_booking.traveller = conductor.user
+                    existing_booking.total_fare = fare_collected
+                    existing_booking.status = booking_status
+                    existing_booking.payment_status = payment_status_value
+                    existing_booking.payment_amount = fare_collected if payment_status == 'paid' else 0
+                    existing_booking.from_stop = boarding_stop
+                    existing_booking.to_stop = dropping_stop
+                    existing_booking.save()
+                    booking = existing_booking
+                    
+                    # Update existing seat segment or create new one
+                    existing_segment = SeatSegment.objects.filter(
+                        booking=booking,
+                        schedule=schedule,
+                        seat_number=seat_number,
+                        is_active=True
+                    ).first()
+                    
+                    if existing_segment:
+                        existing_segment.from_stop = boarding_stop
+                        existing_segment.to_stop = dropping_stop
+                        existing_segment.segment_fare = fare_collected
+                        existing_segment.save()
+                    else:
+                        SeatSegment.objects.create(
+                            booking=booking,
+                            schedule=schedule,
+                            seat_number=seat_number,
+                            from_stop=boarding_stop,
+                            to_stop=dropping_stop,
+                            segment_fare=fare_collected,
+                            is_active=True
+                        )
+                else:
+                    # Create new booking
+                    booking = Booking.objects.create(
+                        bus=bus,
+                        seat_number=seat_number,
+                        schedule=schedule,
+                        traveller=conductor.user,
+                        total_fare=fare_collected,
+                        status=booking_status,
+                        payment_status=payment_status_value,
+                        payment_amount=fare_collected if payment_status == 'paid' else 0,
+                        booking_date=timezone.now(),
+                        from_stop=boarding_stop,
+                        to_stop=dropping_stop
+                    )
+                    
+                    # ✅ CRITICAL: Create the seat segment
+                    SeatSegment.objects.create(
+                        booking=booking,
+                        schedule=schedule,
+                        seat_number=seat_number,
+                        from_stop=boarding_stop,
+                        to_stop=dropping_stop,
+                        segment_fare=fare_collected,
+                        is_active=True
+                    )
             
             payment_text = "with payment" if payment_status == 'paid' else "without payment"
             messages.success(
@@ -342,9 +401,11 @@ def conductor_bookings(request):
 
 @login_required
 def conductor_cancel_booking(request):
-    """Cancel a booked seat - UPDATE the booking status or DELETE"""
+    """Cancel a booked seat - UPDATE the booking status and deactivate seat segment"""
     if request.method == 'POST':
         try:
+            from traveller.models import SeatSegment
+            
             conductor = Conductor.objects.get(user=request.user)
             seat_number = request.POST.get('seat_number')
             cancel_reason = request.POST.get('cancel_reason', '')
@@ -369,9 +430,15 @@ def conductor_cancel_booking(request):
             ).first()
             
             if booking:
-                # Update status to Cancelled instead of deleting
+                # Update status to Cancelled
                 booking.status = 'Cancelled'
                 booking.save()
+                
+                # Deactivate the seat segment
+                SeatSegment.objects.filter(
+                    booking=booking,
+                    is_active=True
+                ).update(is_active=False)
                 
                 # Optional: Log cancellation reason
                 if cancel_reason:
@@ -391,7 +458,6 @@ def conductor_cancel_booking(request):
         return redirect('conductor_seat_management', bus_id=bus.id)
     
     return redirect('conductor_dashboard')
-
 
 from bus_owner.models import BusLiveLocation, RouteStop
 
